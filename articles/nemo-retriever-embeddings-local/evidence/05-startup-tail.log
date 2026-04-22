@@ -1,0 +1,30 @@
+I0422 21:29:43.843297 239 metrics.cc:782] "Collecting CPU metrics"
+I0422 21:29:43.843423 239 tritonserver.cc:2598] 
++----------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Option                           | Value                                                                                                                                                                                                           |
++----------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| server_id                        | triton                                                                                                                                                                                                          |
+| server_version                   | 2.61.0                                                                                                                                                                                                          |
+| server_extensions                | classification sequence model_repository model_repository(unload_dependents) schedule_policy model_configuration system_shared_memory cuda_shared_memory binary_tensor_data parameters statistics trace logging |
+| model_repository_path[0]         | /opt/nim/tmp/run/triton-model-repository                                                                                                                                                                        |
+| model_control_mode               | MODE_NONE                                                                                                                                                                                                       |
+| strict_model_config              | 1                                                                                                                                                                                                               |
+| model_config_name                |                                                                                                                                                                                                                 |
+| rate_limit                       | OFF                                                                                                                                                                                                             |
+| pinned_memory_pool_byte_size     | 268435456                                                                                                                                                                                                       |
+| cuda_memory_pool_byte_size{0}    | 67108864                                                                                                                                                                                                        |
+| min_supported_compute_capability | 6.0                                                                                                                                                                                                             |
+| strict_readiness                 | 1                                                                                                                                                                                                               |
+| exit_timeout                     | 30                                                                                                                                                                                                              |
+| cache_enabled                    | 0                                                                                                                                                                                                               |
++----------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+I0422 21:29:43.847671 239 grpc_server.cc:2562] "Started GRPCInferenceService at 0.0.0.0:8001"
+I0422 21:29:43.847864 239 http_server.cc:4789] "Started HTTPService at 0.0.0.0:8080"
+I0422 21:29:43.888705 239 http_server.cc:358] "Started Metrics Service at 0.0.0.0:8002"
+W0422 21:29:44.844880 239 metrics.cc:643] "Unable to get power limit for GPU 0. Status:Success, value:0.000000"
+W0422 21:29:44.844922 239 metrics.cc:724] "Unable to get memory usage for GPU 0. Memory usage status:Success, value:0. Memory total status:Success, value:0"
+W0422 21:29:45.849970 239 metrics.cc:643] "Unable to get power limit for GPU 0. Status:Success, value:0.000000"
+W0422 21:29:45.850004 239 metrics.cc:724] "Unable to get memory usage for GPU 0. Memory usage status:Success, value:0. Memory total status:Success, value:0"
+W0422 21:29:46.850601 239 metrics.cc:643] "Unable to get power limit for GPU 0. Status:Success, value:0.000000"
+W0422 21:29:46.850633 239 metrics.cc:724] "Unable to get memory usage for GPU 0. Memory usage status:Success, value:0. Memory total status:Success, value:0"

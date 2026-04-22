@@ -1,0 +1,4 @@
+NAME                         CPU %     MEM USAGE / LIMIT     MEM %
+nim-embed-nemotron           0.97%     3.591GiB / 121.7GiB   2.95%
+nim-llama31-8b               1.75%     2.186GiB / 121.7GiB   1.80%
+openshell-cluster-nemoclaw   1.61%     462.2MiB / 121.7GiB   0.37%

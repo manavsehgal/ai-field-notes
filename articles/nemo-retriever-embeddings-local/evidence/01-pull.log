@@ -1,0 +1,124 @@
+latest: Pulling from nim/nvidia/llama-nemotron-embed-1b-v2
+5426025bdcba: Pulling fs layer
+7f38a19b6a8a: Pulling fs layer
+310e9d9d197a: Pulling fs layer
+6bb446f1bbc9: Pulling fs layer
+940cf390fa0a: Pulling fs layer
+2efba31bbc85: Pulling fs layer
+f07afc8f7b59: Pulling fs layer
+7a8e98948de0: Pulling fs layer
+930f77706e76: Pulling fs layer
+acad22e4d79f: Pulling fs layer
+4f4fb700ef54: Pulling fs layer
+8c473302e828: Pulling fs layer
+a320f591a012: Pulling fs layer
+1c7d662fec54: Pulling fs layer
+651fbb64490d: Pulling fs layer
+048da95e6756: Pulling fs layer
+b00259c7f21e: Pulling fs layer
+cf4c554c1659: Pulling fs layer
+07ea1298a76b: Pulling fs layer
+99a82982ef3d: Pulling fs layer
+b602ed7600ca: Pulling fs layer
+ab7823c3b36a: Pulling fs layer
+36c1869ed4e3: Pulling fs layer
+4f4fb700ef54: Pulling fs layer
+fad033b707a7: Pulling fs layer
+4f4fb700ef54: Pulling fs layer
+4f4fb700ef54: Pulling fs layer
+4f4fb700ef54: Pulling fs layer
+08d632d2cc8e: Pulling fs layer
+e4f262559a51: Pulling fs layer
+4f4fb700ef54: Pulling fs layer
+9f9190b976f5: Pulling fs layer
+08b29fd3af07: Pulling fs layer
+6f58d8391b4c: Pulling fs layer
+d49883fdf598: Pulling fs layer
+886362475fd3: Pulling fs layer
+de487633607c: Pulling fs layer
+4f4fb700ef54: Pulling fs layer
+447ef8172fe6: Pulling fs layer
+4f4fb700ef54: Pulling fs layer
+a3b0c6cc22e7: Pulling fs layer
+a8d766ef21b9: Pulling fs layer
+6c4b4556893e: Pulling fs layer
+f23c34c7b700: Pulling fs layer
+4f4fb700ef54: Already exists
+3a357ac0b16e: Download complete
+930f77706e76: Download complete
+1c7d662fec54: Download complete
+f07afc8f7b59: Download complete
+2efba31bbc85: Download complete
+a320f591a012: Download complete
+940cf390fa0a: Download complete
+8c473302e828: Download complete
+b602ed7600ca: Download complete
+5426025bdcba: Download complete
+b00259c7f21e: Download complete
+cf4c554c1659: Download complete
+36c1869ed4e3: Download complete
+a8d766ef21b9: Download complete
+07ea1298a76b: Download complete
+447ef8172fe6: Download complete
+048da95e6756: Download complete
+ab7823c3b36a: Download complete
+fad033b707a7: Download complete
+08d632d2cc8e: Download complete
+6c4b4556893e: Download complete
+886362475fd3: Download complete
+d49883fdf598: Download complete
+e4f262559a51: Download complete
+7f38a19b6a8a: Download complete
+99a82982ef3d: Download complete
+de487633607c: Download complete
+310e9d9d197a: Download complete
+6f58d8391b4c: Download complete
+f23c34c7b700: Download complete
+a3b0c6cc22e7: Download complete
+651fbb64490d: Download complete
+08b29fd3af07: Download complete
+7a8e98948de0: Download complete
+6bb446f1bbc9: Download complete
+9f9190b976f5: Download complete
+acad22e4d79f: Download complete
+acad22e4d79f: Pull complete
+9f9190b976f5: Pull complete
+6bb446f1bbc9: Pull complete
+5426025bdcba: Pull complete
+7f38a19b6a8a: Pull complete
+310e9d9d197a: Pull complete
+99a82982ef3d: Pull complete
+7a8e98948de0: Pull complete
+6f58d8391b4c: Pull complete
+a3b0c6cc22e7: Pull complete
+a320f591a012: Pull complete
+b00259c7f21e: Pull complete
+447ef8172fe6: Pull complete
+08d632d2cc8e: Pull complete
+886362475fd3: Pull complete
+8c473302e828: Pull complete
+048da95e6756: Pull complete
+ab7823c3b36a: Pull complete
+f23c34c7b700: Pull complete
+6c4b4556893e: Pull complete
+08b29fd3af07: Pull complete
+940cf390fa0a: Pull complete
+d49883fdf598: Pull complete
+de487633607c: Pull complete
+4f4fb700ef54: Pull complete
+930f77706e76: Pull complete
+2efba31bbc85: Pull complete
+fad033b707a7: Pull complete
+07ea1298a76b: Pull complete
+e4f262559a51: Pull complete
+651fbb64490d: Pull complete
+1c7d662fec54: Pull complete
+b602ed7600ca: Pull complete
+a8d766ef21b9: Pull complete
+f07afc8f7b59: Pull complete
+cf4c554c1659: Pull complete
+36c1869ed4e3: Pull complete
+Digest: sha256:3c22c0bd8d36dcdee4c46ff371951bb83ec537361db5d6b5737b5c4ecbec92ae
+Status: Downloaded newer image for nvcr.io/nim/nvidia/llama-nemotron-embed-1b-v2:latest
+nvcr.io/nim/nvidia/llama-nemotron-embed-1b-v2:latest
+63.10 seconds

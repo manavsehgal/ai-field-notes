@@ -1,0 +1,25 @@
+{
+  "model": "nvidia/llama-nemotron-embed-1b-v2",
+  "embedding_dim": 2048,
+  "input_tokens_per_chunk": 539,
+  "batch_1": {
+    "p50_ms": 40.4,
+    "p95_ms": 42.7,
+    "docs_per_sec": 24.75,
+    "tok_per_sec": 13342
+  },
+  "batch_8": {
+    "p50_ms": 278.9,
+    "docs_per_sec": 28.69,
+    "tok_per_sec": 15463
+  },
+  "batch_32": {
+    "p50_ms": 1118.0,
+    "docs_per_sec": 28.62,
+    "tok_per_sec": 15427
+  },
+  "cosine": {
+    "query_vs_near": 0.3466,
+    "query_vs_far": -0.0518
+  }
+}
