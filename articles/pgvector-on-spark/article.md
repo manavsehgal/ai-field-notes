@@ -35,16 +35,16 @@ pgvector is not a database. It's a *Postgres extension* — a shared library loa
         <stop offset="100%" stop-color="var(--svg-accent-teal)" stop-opacity="0.02"/>
       </linearGradient>
       <radialGradient id="d03-pgv-halo-grad" cx="0.5" cy="0.5" r="0.6">
-        <stop offset="0%"   stop-color="var(--color-primary)" stop-opacity="0.22"/>
+        <stop offset="0%"   stop-color="var(--color-primary)" stop-opacity="0.12"/>
         <stop offset="100%" stop-color="var(--color-primary)" stop-opacity="0"/>
       </radialGradient>
       <linearGradient id="d03-pgv-accent-grad" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%"   stop-color="var(--color-primary)" stop-opacity="0.55"/>
-        <stop offset="100%" stop-color="var(--color-primary)" stop-opacity="0.18"/>
+        <stop offset="0%"   stop-color="var(--color-primary)" stop-opacity="0.30"/>
+        <stop offset="100%" stop-color="var(--color-primary)" stop-opacity="0.08"/>
       </linearGradient>
     </defs>
     <rect x="80" y="20" width="740" height="400" rx="10" fill="url(#d03-stack-band-grad)" stroke="none"/>
-    <rect x="100" y="200" width="700" height="80" fill="url(#d03-pgv-halo-grad)" stroke="none"/>
+    <rect x="120" y="208" width="660" height="76" rx="10" fill="url(#d03-pgv-halo-grad)" stroke="none"/>
     <g class="fn-diagram__edges"></g>
     <g class="fn-diagram__nodes">
       <rect class="fn-diagram__node fn-diagram__node--ghost" x="120" y="40" width="660" height="56" rx="8" />

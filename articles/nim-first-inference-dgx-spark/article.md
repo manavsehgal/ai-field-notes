@@ -35,16 +35,16 @@ NIM is not a new inference engine. It's NVIDIA's packaging layer around existing
         <stop offset="100%" stop-color="var(--svg-accent-blue)" stop-opacity="0.02"/>
       </linearGradient>
       <radialGradient id="d01-endpoint-halo-grad" cx="0.5" cy="0.5" r="0.6">
-        <stop offset="0%" stop-color="var(--svg-accent-blue)" stop-opacity="0.22"/>
+        <stop offset="0%" stop-color="var(--svg-accent-blue)" stop-opacity="0.12"/>
         <stop offset="100%" stop-color="var(--svg-accent-blue)" stop-opacity="0"/>
       </radialGradient>
       <linearGradient id="d01-endpoint-accent-grad" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%"   stop-color="var(--color-primary)" stop-opacity="0.55"/>
-        <stop offset="100%" stop-color="var(--color-primary)" stop-opacity="0.18"/>
+        <stop offset="0%"   stop-color="var(--color-primary)" stop-opacity="0.30"/>
+        <stop offset="100%" stop-color="var(--color-primary)" stop-opacity="0.08"/>
       </linearGradient>
     </defs>
     <rect x="20" y="110" width="860" height="60" rx="4" fill="url(#d01-pipeline-band-grad)" stroke="none"/>
-    <rect x="640" y="60" width="200" height="160" fill="url(#d01-endpoint-halo-grad)" stroke="none"/>
+    <rect x="670" y="80" width="140" height="120" rx="8" fill="url(#d01-endpoint-halo-grad)" stroke="none"/>
     <g class="fn-diagram__edges">
       <path id="d01-nim-flow-path" class="fn-diagram__edge fn-diagram__edge--accent" pathLength="100" d="M 170 140 L 740 140" />
       <path class="fn-diagram__edge" pathLength="100" d="M 170 140 L 190 140" />

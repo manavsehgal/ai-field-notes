@@ -90,9 +90,8 @@
 
 .fn-diagram__node--accent {
   fill: color-mix(in oklch, var(--color-primary) 22%, transparent);
-  stroke: var(--color-primary);
-  stroke-width: 1.5;
-  filter: drop-shadow(0 0 10px color-mix(in oklch, var(--color-primary) 30%, transparent));
+  stroke: var(--color-text-muted);
+  stroke-width: 1.25;
 }
 
 .fn-diagram__node--ink {
@@ -166,8 +165,7 @@
   transform-box: fill-box;
 }
 .fn-diagram--visible .fn-diagram__pulse {
-  animation: fn-soft-pulse 2800ms var(--fn-ease) infinite;
-  animation-delay: calc(var(--fn-dur-long) + 200ms);
+  animation: fn-fade-rise var(--fn-dur-med) var(--fn-ease) forwards;
 }
 
 /* Data-point dots */
@@ -334,14 +332,8 @@
 }
 
 @keyframes fn-soft-pulse {
-  0%, 100% {
-    transform: scale(1);
-    filter: drop-shadow(0 0 0 transparent);
-  }
-  50% {
-    transform: scale(1.04);
-    filter: drop-shadow(0 0 6px color-mix(in oklch, var(--color-primary) 50%, transparent));
-  }
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.04); }
 }
 
 @keyframes fn-bar-grow {

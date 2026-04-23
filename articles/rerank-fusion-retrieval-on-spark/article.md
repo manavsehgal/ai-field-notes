@@ -27,16 +27,16 @@ This article answers that with a 30-query benchmark across four modes and an hon
         <stop offset="100%" stop-color="var(--svg-accent-teal)" stop-opacity="0.02"/>
       </linearGradient>
       <linearGradient id="d05-rerank-grad" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%"   stop-color="var(--svg-accent-orange)" stop-opacity="0.55"/>
-        <stop offset="100%" stop-color="var(--svg-accent-orange)" stop-opacity="0.18"/>
+        <stop offset="0%"   stop-color="var(--svg-accent-orange)" stop-opacity="0.30"/>
+        <stop offset="100%" stop-color="var(--svg-accent-orange)" stop-opacity="0.08"/>
       </linearGradient>
       <radialGradient id="d05-rerank-halo" cx="0.5" cy="0.5" r="0.6">
-        <stop offset="0%"   stop-color="var(--svg-accent-orange)" stop-opacity="0.22"/>
+        <stop offset="0%"   stop-color="var(--svg-accent-orange)" stop-opacity="0.12"/>
         <stop offset="100%" stop-color="var(--svg-accent-orange)" stop-opacity="0"/>
       </radialGradient>
     </defs>
     <rect x="40" y="60" width="820" height="150" rx="8" fill="url(#d05-lane-grad)" stroke="none"/>
-    <rect x="620" y="30" width="220" height="210" fill="url(#d05-rerank-halo)" stroke="none"/>
+    <rect x="620" y="80" width="200" height="110" rx="10" fill="url(#d05-rerank-halo)" stroke="none"/>
     <g class="fn-diagram__scale">
       <line x1="60" y1="195" x2="840" y2="195" class="fn-diagram__axis"/>
       <text class="fn-diagram__label fn-diagram__label--mono fn-diagram__label--muted" x="60"  y="214" text-anchor="start">79.1%</text>

@@ -34,17 +34,17 @@ The short version: the chain works. Embedding a query costs 40 milliseconds. pgv
         <stop offset="100%" stop-color="var(--svg-text-faint)" stop-opacity="0.02"/>
       </linearGradient>
       <radialGradient id="d04-grounded-halo" cx="0.5" cy="0.5" r="0.6">
-        <stop offset="0%"   stop-color="var(--color-primary)" stop-opacity="0.22"/>
+        <stop offset="0%"   stop-color="var(--color-primary)" stop-opacity="0.12"/>
         <stop offset="100%" stop-color="var(--color-primary)" stop-opacity="0"/>
       </radialGradient>
       <linearGradient id="d04-answer-grad" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%"   stop-color="var(--color-primary)" stop-opacity="0.55"/>
-        <stop offset="100%" stop-color="var(--color-primary)" stop-opacity="0.18"/>
+        <stop offset="0%"   stop-color="var(--color-primary)" stop-opacity="0.30"/>
+        <stop offset="100%" stop-color="var(--color-primary)" stop-opacity="0.08"/>
       </linearGradient>
     </defs>
     <rect x="190" y="60"  width="680" height="120" rx="8" fill="url(#d04-rag-lane-grad)" stroke="none"/>
     <rect x="340" y="300" width="530" height="100" rx="8" fill="url(#d04-bare-lane-grad)" stroke="none"/>
-    <rect x="680" y="40"  width="200" height="160" fill="url(#d04-grounded-halo)" stroke="none"/>
+    <rect x="670" y="80"  width="200" height="80" rx="10" fill="url(#d04-grounded-halo)" stroke="none"/>
     <g class="fn-diagram__edges">
       <path class="fn-diagram__edge fn-diagram__edge--accent" pathLength="100" d="M 170 200 L 190 120" />
       <path class="fn-diagram__edge" pathLength="100" d="M 170 260 L 340 350" />

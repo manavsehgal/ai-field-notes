@@ -24,18 +24,18 @@ const cy = 100;
       <stop offset="100%" stop-color="var(--svg-accent-orange)" stop-opacity="0.02"/>
     </linearGradient>
     <linearGradient id="gu-49b-grad" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%"   stop-color="var(--svg-accent-orange)" stop-opacity="0.85"/>
-      <stop offset="100%" stop-color="var(--svg-accent-orange)" stop-opacity="0.35"/>
+      <stop offset="0%"   stop-color="var(--svg-accent-orange)" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="var(--svg-accent-orange)" stop-opacity="0.15"/>
     </linearGradient>
     <radialGradient id="gu-49b-halo" cx="0.5" cy="0.5" r="0.6">
-      <stop offset="0%"   stop-color="var(--svg-accent-orange)" stop-opacity="0.22"/>
+      <stop offset="0%"   stop-color="var(--svg-accent-orange)" stop-opacity="0.12"/>
       <stop offset="100%" stop-color="var(--svg-accent-orange)" stop-opacity="0"/>
     </radialGradient>
   </defs>
 
   <!-- Atmospheric bands: teal retrieval left, amber on the 49B center (the surprise), teal right lane -->
   <rect x="10"  y={cy - 18} width="54" height="36" rx="3" fill="url(#gu-band-teal)" stroke="none"/>
-  <rect x="126" y="50"  width="48" height="100" fill="url(#gu-49b-halo)" stroke="none"/>
+  <rect x="110" y={cy - 16} width="60" height="32" rx="6" fill="url(#gu-49b-halo)" stroke="none"/>
   <rect x="126" y={cy - 22} width="48" height="44" rx="3" fill="url(#gu-band-amber)" stroke="none"/>
 
   <!-- Retrieval node → fan-out to 3 generators -->

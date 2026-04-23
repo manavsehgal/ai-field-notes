@@ -36,15 +36,15 @@ I'll use "access layer" throughout this piece. What I mean by it, in five roles:
   <svg viewBox="0 0 900 600" role="img" aria-label="The access layer stack — a hexagonal You hub at centre connects via five spokes to a pentagon of tool chips: Sunshine+Moonlight for reach, Claude Code for collaboration, Playwright-MCP for browser exploration, NemoClaw for safe sandboxed automation, and git+blog for publishing." preserveAspectRatio="xMidYMid meet">
     <defs>
       <radialGradient id="d01-access-hub-halo-grad" cx="0.5" cy="0.5" r="0.55">
-        <stop offset="0%"   stop-color="var(--svg-accent-blue)" stop-opacity="0.22"/>
+        <stop offset="0%"   stop-color="var(--svg-accent-blue)" stop-opacity="0.12"/>
         <stop offset="100%" stop-color="var(--svg-accent-blue)" stop-opacity="0"/>
       </radialGradient>
       <linearGradient id="d01-access-hub-accent-grad" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%"   stop-color="var(--color-primary)" stop-opacity="0.55"/>
-        <stop offset="100%" stop-color="var(--color-primary)" stop-opacity="0.18"/>
+        <stop offset="0%"   stop-color="var(--color-primary)" stop-opacity="0.30"/>
+        <stop offset="100%" stop-color="var(--color-primary)" stop-opacity="0.08"/>
       </linearGradient>
     </defs>
-    <rect x="290" y="140" width="320" height="320" fill="url(#d01-access-hub-halo-grad)" stroke="none"/>
+    <rect x="390" y="248" width="120" height="104" fill="url(#d01-access-hub-halo-grad)" stroke="none"/>
     <g class="fn-diagram__edges">
       <path class="fn-diagram__edge fn-diagram__edge--accent" pathLength="100" d="M 450 300 L 450 90" />
       <path class="fn-diagram__edge" pathLength="100" d="M 450 300 L 650 235" />
@@ -185,16 +185,16 @@ The `tech-writer` skill lives at `~/.claude/skills/tech-writer/`. It has an enfo
         <stop offset="100%" stop-color="var(--svg-accent-blue)" stop-opacity="0.02"/>
       </linearGradient>
       <radialGradient id="d02-endpoint-halo-grad" cx="0.5" cy="0.5" r="0.6">
-        <stop offset="0%"   stop-color="var(--svg-accent-blue)" stop-opacity="0.22"/>
+        <stop offset="0%"   stop-color="var(--svg-accent-blue)" stop-opacity="0.12"/>
         <stop offset="100%" stop-color="var(--svg-accent-blue)" stop-opacity="0"/>
       </radialGradient>
       <linearGradient id="d02-public-accent-grad" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%"   stop-color="var(--color-primary)" stop-opacity="0.55"/>
-        <stop offset="100%" stop-color="var(--color-primary)" stop-opacity="0.18"/>
+        <stop offset="0%"   stop-color="var(--color-primary)" stop-opacity="0.30"/>
+        <stop offset="100%" stop-color="var(--color-primary)" stop-opacity="0.08"/>
       </linearGradient>
     </defs>
     <rect x="20" y="100" width="860" height="60" rx="4" fill="url(#d02-flow-band-grad)" stroke="none"/>
-    <rect x="640" y="50" width="200" height="160" fill="url(#d02-endpoint-halo-grad)" stroke="none"/>
+    <rect x="670" y="70" width="140" height="120" rx="8" fill="url(#d02-endpoint-halo-grad)" stroke="none"/>
     <g class="fn-diagram__edges">
       <path id="d02-flow-path" class="fn-diagram__edge fn-diagram__edge--accent" pathLength="100" d="M 170 130 L 740 130" />
       <path class="fn-diagram__edge" pathLength="100" d="M 170 130 L 190 130" />

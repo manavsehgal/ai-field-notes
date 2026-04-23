@@ -38,12 +38,12 @@ NIM is still the packaging layer, but the engine inside the embed container is d
         <stop offset="100%" stop-color="var(--svg-accent-teal)" stop-opacity="0.03"/>
       </linearGradient>
       <radialGradient id="d02-space-grad" cx="0.5" cy="0.5" r="0.7">
-        <stop offset="0%" stop-color="var(--svg-accent-blue)" stop-opacity="0.18"/>
+        <stop offset="0%" stop-color="var(--svg-accent-blue)" stop-opacity="0.08"/>
         <stop offset="100%" stop-color="var(--svg-accent-blue)" stop-opacity="0"/>
       </radialGradient>
       <linearGradient id="d02-nim-accent-grad" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%"   stop-color="var(--color-primary)" stop-opacity="0.55"/>
-        <stop offset="100%" stop-color="var(--color-primary)" stop-opacity="0.18"/>
+        <stop offset="0%"   stop-color="var(--color-primary)" stop-opacity="0.30"/>
+        <stop offset="100%" stop-color="var(--color-primary)" stop-opacity="0.08"/>
       </linearGradient>
     </defs>
     <rect x="20" y="40" width="200" height="140" rx="10" fill="url(#d02-query-lane-grad)" stroke="none"/>

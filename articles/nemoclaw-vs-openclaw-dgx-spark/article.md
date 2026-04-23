@@ -52,13 +52,13 @@ Both stacks ultimately call the same Ollama process on the host:
         <stop offset="100%" stop-color="var(--svg-accent-blue)" stop-opacity="0"/>
       </radialGradient>
       <linearGradient id="d01-ollama-accent-grad" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%"   stop-color="var(--color-primary)" stop-opacity="0.55"/>
-        <stop offset="100%" stop-color="var(--color-primary)" stop-opacity="0.18"/>
+        <stop offset="0%"   stop-color="var(--color-primary)" stop-opacity="0.30"/>
+        <stop offset="100%" stop-color="var(--color-primary)" stop-opacity="0.08"/>
       </linearGradient>
     </defs>
     <rect x="50" y="20" width="260" height="155" rx="10" fill="url(#d01-host-lane-grad)" stroke="none"/>
     <rect x="30" y="255" width="410" height="170" rx="10" fill="url(#d01-sandbox-lane-grad)" stroke="none"/>
-    <rect x="650" y="130" width="220" height="200" fill="url(#d01-ollama-halo-grad)" stroke="none"/>
+    <rect x="690" y="152" width="140" height="156" fill="url(#d01-ollama-halo-grad)" stroke="none"/>
     <g class="fn-diagram__edges">
       <path class="fn-diagram__edge" pathLength="100" d="M 270 100 L 690 180" />
       <path class="fn-diagram__edge" pathLength="100" d="M 240 340 L 285 340" />
