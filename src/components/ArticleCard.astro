@@ -30,7 +30,7 @@ const cardClass = isUpcoming ? 'card card--upcoming' : 'card';
 const metaSlot = isUpcoming ? 'Upcoming' : `Article №${ordinalDigits}`;
 ---
 <a class={cardClass} href={href} aria-label={`${isUpcoming ? 'Upcoming: ' : ordinalLabel + ': '}${title}`}>
-  <span class="card__watermark" aria-hidden="true">{isUpcoming ? '…' : ordinalDigits}</span>
+  <span class="card__watermark" aria-hidden="true">{isUpcoming ? '#' : ordinalDigits}</span>
   <div class="card__body">
     <div class="card__meta">
       <span class="card__article">{metaSlot}</span>

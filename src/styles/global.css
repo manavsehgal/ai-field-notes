@@ -666,69 +666,71 @@ main { flex: 1; padding-top: 4rem; /* offset for fixed nav */ }
   gap: 0.5rem;
 }
 
-/* Home-only wrapper: stacks the upcoming toggle above the stage chips with
-   symmetric padding between the stats divider and the first article card. */
-.filter-strip {
+/* Home-only wrapper: stage chips + upcoming toggle on one row. Gives
+   the filter strip symmetric padding between the stats divider and the
+   first article card. */
+.filter-row {
   max-width: 72rem;
   margin-inline: auto;
-  padding: 2rem 1.5rem;
+  padding: 1.75rem 1.5rem;
   display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
 }
-.filter-strip .stage-filter { padding: 0; margin: 0; max-width: none; }
-.filter-strip__toggle-row {
-  display: flex;
-  justify-content: flex-end;
-}
-.upcoming-toggle {
+/* Let the stage-filter's chips flow as direct siblings of the toggle
+   inside .filter-row, so `margin-left: auto` can push the toggle to
+   the right edge of the same visual row. */
+.filter-row .stage-filter { display: contents; }
+
+/* Upcoming toggle — same pill geometry and mono case as the stage chips,
+   with a leading state dot. Pushed to the end of the row. */
+.stage-filter__chip--toggle {
   appearance: none;
   background: transparent;
-  border: 1px solid var(--color-border);
-  border-radius: 999px;
-  padding: 0.35rem 0.75rem 0.35rem 0.45rem;
+  cursor: pointer;
+  margin-left: auto;
   display: inline-flex;
   align-items: center;
-  gap: 0.55rem;
-  cursor: pointer;
-  font-family: var(--font-mono);
-  font-size: 0.68rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  gap: 0.45rem;
   color: var(--color-text-muted);
-  transition: color 0.15s, border-color 0.15s;
 }
-.upcoming-toggle:hover { color: var(--color-text); border-color: var(--color-text-dim); }
-.upcoming-toggle:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
-.upcoming-toggle__track {
-  width: 1.8rem;
-  height: 1rem;
-  border-radius: 999px;
-  background: var(--color-border);
-  position: relative;
-  transition: background 0.15s;
+.stage-filter__chip-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  border: 1.5px solid var(--color-text-dim);
+  background: transparent;
+  transition: background 0.15s, border-color 0.15s;
   flex: 0 0 auto;
 }
-.upcoming-toggle__thumb {
-  position: absolute;
-  top: 50%;
-  left: 0.15rem;
-  width: 0.7rem;
-  height: 0.7rem;
-  border-radius: 50%;
-  background: var(--color-text-muted);
-  transform: translateY(-50%);
-  transition: left 0.15s, background 0.15s;
+.stage-filter__chip--toggle[aria-pressed="true"] {
+  color: var(--color-text);
+  border-color: var(--color-primary-dim);
+  background: color-mix(in oklch, var(--color-primary) 8%, transparent);
 }
-.upcoming-toggle[aria-pressed="true"] .upcoming-toggle__track { background: color-mix(in oklch, var(--color-primary) 35%, transparent); }
-.upcoming-toggle[aria-pressed="true"] .upcoming-toggle__thumb { left: 0.95rem; background: var(--color-primary); }
-.upcoming-toggle[aria-pressed="true"] { color: var(--color-text); border-color: var(--color-primary-dim); }
+.stage-filter__chip--toggle[aria-pressed="true"] .stage-filter__chip-dot {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
 
 /* Home listing hides upcoming cards until the toggle flips. */
 .research-list[data-show-upcoming="false"] .card--upcoming { display: none; }
-/* First card on home sits close to the filter strip — the outer padding
-   lives on .filter-strip so the spacing above/below is symmetric. */
+/* First card sits close to the filter strip — outer padding lives on
+   .filter-row for symmetric spacing. */
 .research-list > .card:first-of-type { padding-top: 0; }
+
+/* KPI "+5" superscript for the Articles tile — reflects upcoming count
+   without overflowing the small uppercase label below. */
+.kpi__super {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 0.55em;
+  color: var(--color-primary);
+  margin-left: 0.2em;
+  vertical-align: super;
+  letter-spacing: 0.02em;
+}
 .stage-filter__chip {
   font-family: var(--font-mono);
   font-size: 0.7rem;
@@ -1084,6 +1086,18 @@ main { flex: 1; padding-top: 4rem; /* offset for fixed nav */ }
 @media (max-width: 640px) {
   .nav__links { display: none; }
 }
+.nav__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  color: var(--color-text-muted);
+  transition: color 0.15s, background 0.15s;
+}
+.nav__icon:hover { color: var(--color-primary); background: color-mix(in oklch, var(--color-primary) 10%, transparent); }
+.nav__icon:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
 
 /* ---------- Theme toggle ---------- */
 .theme-toggle {
@@ -1151,6 +1165,14 @@ main { flex: 1; padding-top: 4rem; /* offset for fixed nav */ }
   text-decoration: none;
 }
 .footer__links a:hover { color: var(--color-primary); }
+.footer__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+}
+.footer__icon:hover { color: var(--color-primary); }
+.footer__icon:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 3px; border-radius: 4px; }
 .footer__copy { color: var(--color-text-dim); }
 
 /* ---------- Scroll-reveal motion system ----------

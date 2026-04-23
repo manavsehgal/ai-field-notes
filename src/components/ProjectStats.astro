@@ -45,8 +45,11 @@ const fmt = (n: number) => new Intl.NumberFormat('en-US').format(n);
           <path d="M9 12h7M9 16h7M9 8h3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
         </svg>
         <div class="kpi__text">
-          <div class="kpi__value">{ARTICLES}</div>
-          <div class="kpi__label">Articles{UPCOMING > 0 ? ` · +${UPCOMING} upcoming` : ''}</div>
+          <div class="kpi__value">
+            {ARTICLES}
+            {UPCOMING > 0 && <sup class="kpi__super">+{UPCOMING}</sup>}
+          </div>
+          <div class="kpi__label">Articles</div>
         </div>
       </article>
       <article class="kpi" role="listitem">

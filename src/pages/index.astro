@@ -43,34 +43,32 @@ const volLabel = new Intl.DateTimeFormat('en-GB', { month: 'short', year: 'numer
     <ProjectStats />
   </header>
 
-  <div class="filter-strip">
-    <div class="filter-strip__toggle-row">
+  <nav class="filter-row" aria-label="Filter articles">
+    <StageFilter current={null} />
+    {upcomingAsc.length > 0 && (
       <button
         type="button"
-        class="upcoming-toggle"
+        class="stage-filter__chip stage-filter__chip--toggle"
         id="upcoming-toggle"
         role="switch"
         aria-pressed="false"
         aria-controls="home-research-list"
       >
-        <span class="upcoming-toggle__track" aria-hidden="true">
-          <span class="upcoming-toggle__thumb"></span>
-        </span>
-        <span class="upcoming-toggle__label">Show upcoming</span>
+        <span class="stage-filter__chip-dot" aria-hidden="true"></span>
+        <span>+{upcomingAsc.length} Upcoming</span>
       </button>
-    </div>
-    <StageFilter current={null} />
-  </div>
+    )}
+  </nav>
 
   <section class="research-list" id="home-research-list" data-show-upcoming="false">
-    {publishedDesc.length === 0 ? (
+    {publishedDesc.length === 0 && upcomingAsc.length === 0 ? (
       <p class="research-list__empty">No entries yet.</p>
     ) : (
       <>
-        {publishedDesc.map((article) => (
+        {upcomingAsc.map((article) => (
           <ArticleCard article={article} ordinal={ordinalById.get(article.id)!} />
         ))}
-        {upcomingAsc.map((article) => (
+        {publishedDesc.map((article) => (
           <ArticleCard article={article} ordinal={ordinalById.get(article.id)!} />
         ))}
         <div class="research-list__closer">
