@@ -1,0 +1,3157 @@
+{
+  "summary": {
+    "naive": {
+      "n": 30,
+      "mean_recall@5": 0.9206,
+      "mean_recall@10": 0.9583,
+      "median_wall_ms": 98.3,
+      "p95_wall_ms": 111.62,
+      "max_wall_ms": 122.97
+    },
+    "bm25": {
+      "n": 30,
+      "mean_recall@5": 0.7911,
+      "mean_recall@10": 0.8922,
+      "median_wall_ms": 75.43,
+      "p95_wall_ms": 84.51,
+      "max_wall_ms": 97.46
+    },
+    "rrf": {
+      "n": 30,
+      "mean_recall@5": 0.8839,
+      "mean_recall@10": 0.9411,
+      "median_wall_ms": 168.94,
+      "p95_wall_ms": 188.61,
+      "max_wall_ms": 202.06
+    },
+    "rerank": {
+      "n": 30,
+      "mean_recall@5": 0.9183,
+      "mean_recall@10": 0.9683,
+      "median_wall_ms": 522.6,
+      "p95_wall_ms": 582.55,
+      "max_wall_ms": 735.93
+    }
+  },
+  "per_query": [
+    {
+      "retrieved_ids": [
+        71,
+        36,
+        20,
+        13,
+        1136,
+        72,
+        1151,
+        1091,
+        26,
+        1112
+      ],
+      "timings_ms": {
+        "embed": 36.27,
+        "retrieve": 74.38
+      },
+      "wall_ms": 110.66,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q01",
+      "query": "Did Google have an IPO in 2004?",
+      "mode": "naive",
+      "relevant_count": 13
+    },
+    {
+      "retrieved_ids": [
+        71,
+        13,
+        1136,
+        20,
+        36,
+        1112,
+        725,
+        72,
+        26,
+        1091
+      ],
+      "timings_ms": {
+        "retrieve": 75.97
+      },
+      "wall_ms": 75.98,
+      "recall@5": 1.0,
+      "recall@10": 0.9,
+      "id": "q01",
+      "query": "Did Google have an IPO in 2004?",
+      "mode": "bm25",
+      "relevant_count": 13
+    },
+    {
+      "retrieved_ids": [
+        71,
+        20,
+        36,
+        13,
+        1136,
+        26,
+        1245,
+        1091,
+        1151,
+        72
+      ],
+      "timings_ms": {
+        "embed": 17.6,
+        "retrieve_dense": 65.37,
+        "retrieve_bm25": 87.08,
+        "fuse": 0.06
+      },
+      "wall_ms": 170.13,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q01",
+      "query": "Did Google have an IPO in 2004?",
+      "mode": "rrf",
+      "relevant_count": 13
+    },
+    {
+      "retrieved_ids": [
+        13,
+        36,
+        1151,
+        1091,
+        71,
+        1136,
+        1112,
+        20,
+        1245,
+        72
+      ],
+      "timings_ms": {
+        "embed": 17.38,
+        "retrieve_dense": 74.22,
+        "retrieve_bm25": 63.37,
+        "fuse": 0.05,
+        "rerank": 398.71
+      },
+      "wall_ms": 553.77,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q01",
+      "query": "Did Google have an IPO in 2004?",
+      "mode": "rerank",
+      "relevant_count": 13
+    },
+    {
+      "retrieved_ids": [
+        20,
+        71,
+        72,
+        220,
+        215,
+        36,
+        13,
+        209,
+        1136,
+        26
+      ],
+      "timings_ms": {
+        "embed": 28.08,
+        "retrieve": 66.27
+      },
+      "wall_ms": 94.37,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q02",
+      "query": "What was the Playboy controversy around the Google IPO?",
+      "mode": "naive",
+      "relevant_count": 5
+    },
+    {
+      "retrieved_ids": [
+        71,
+        20,
+        220,
+        72,
+        36,
+        13,
+        1136,
+        1091,
+        725,
+        1112
+      ],
+      "timings_ms": {
+        "retrieve": 74.62
+      },
+      "wall_ms": 74.62,
+      "recall@5": 0.8,
+      "recall@10": 0.8,
+      "id": "q02",
+      "query": "What was the Playboy controversy around the Google IPO?",
+      "mode": "bm25",
+      "relevant_count": 5
+    },
+    {
+      "retrieved_ids": [
+        20,
+        71,
+        220,
+        72,
+        13,
+        36,
+        215,
+        1136,
+        1151,
+        1245
+      ],
+      "timings_ms": {
+        "embed": 27.41,
+        "retrieve_dense": 65.18,
+        "retrieve_bm25": 56.52,
+        "fuse": 0.04
+      },
+      "wall_ms": 149.17,
+      "recall@5": 0.8,
+      "recall@10": 1.0,
+      "id": "q02",
+      "query": "What was the Playboy controversy around the Google IPO?",
+      "mode": "rrf",
+      "relevant_count": 5
+    },
+    {
+      "retrieved_ids": [
+        20,
+        71,
+        215,
+        220,
+        72,
+        13,
+        36,
+        1136,
+        1112,
+        1245
+      ],
+      "timings_ms": {
+        "embed": 26.75,
+        "retrieve_dense": 72.84,
+        "retrieve_bm25": 66.1,
+        "fuse": 0.05,
+        "rerank": 416.78
+      },
+      "wall_ms": 582.55,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q02",
+      "query": "What was the Playboy controversy around the Google IPO?",
+      "mode": "rerank",
+      "relevant_count": 5
+    },
+    {
+      "retrieved_ids": [
+        1002,
+        1023,
+        582,
+        533,
+        1014,
+        537,
+        912,
+        1110,
+        455,
+        1118
+      ],
+      "timings_ms": {
+        "embed": 17.72,
+        "retrieve": 64.6
+      },
+      "wall_ms": 82.33,
+      "recall@5": 0.75,
+      "recall@10": 0.75,
+      "id": "q03",
+      "query": "Who beat Michael Phelps in the 200m freestyle in Athens?",
+      "mode": "naive",
+      "relevant_count": 4
+    },
+    {
+      "retrieved_ids": [
+        582,
+        537,
+        533,
+        1023,
+        448,
+        1002,
+        912,
+        594,
+        455,
+        626
+      ],
+      "timings_ms": {
+        "retrieve": 69.22
+      },
+      "wall_ms": 69.23,
+      "recall@5": 0.25,
+      "recall@10": 0.5,
+      "id": "q03",
+      "query": "Who beat Michael Phelps in the 200m freestyle in Athens?",
+      "mode": "bm25",
+      "relevant_count": 4
+    },
+    {
+      "retrieved_ids": [
+        533,
+        582,
+        1002,
+        1023,
+        537,
+        912,
+        448,
+        1014,
+        1110,
+        594
+      ],
+      "timings_ms": {
+        "embed": 28.13,
+        "retrieve_dense": 54.31,
+        "retrieve_bm25": 75.14,
+        "fuse": 0.04
+      },
+      "wall_ms": 157.64,
+      "recall@5": 0.5,
+      "recall@10": 0.75,
+      "id": "q03",
+      "query": "Who beat Michael Phelps in the 200m freestyle in Athens?",
+      "mode": "rrf",
+      "relevant_count": 4
+    },
+    {
+      "retrieved_ids": [
+        1002,
+        1023,
+        1014,
+        1185,
+        537,
+        582,
+        533,
+        774,
+        1118,
+        455
+      ],
+      "timings_ms": {
+        "embed": 26.68,
+        "retrieve_dense": 58.66,
+        "retrieve_bm25": 64.06,
+        "fuse": 0.06,
+        "rerank": 392.06
+      },
+      "wall_ms": 541.55,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q03",
+      "query": "Who beat Michael Phelps in the 200m freestyle in Athens?",
+      "mode": "rerank",
+      "relevant_count": 4
+    },
+    {
+      "retrieved_ids": [
+        581,
+        588,
+        876,
+        1072,
+        531,
+        777,
+        1005,
+        881,
+        610,
+        914
+      ],
+      "timings_ms": {
+        "embed": 27.69,
+        "retrieve": 82.71
+      },
+      "wall_ms": 110.42,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q04",
+      "query": "How much damage did Hurricane Charley cause in Florida?",
+      "mode": "naive",
+      "relevant_count": 13
+    },
+    {
+      "retrieved_ids": [
+        581,
+        588,
+        532,
+        531,
+        777,
+        914,
+        1072,
+        881,
+        610,
+        530
+      ],
+      "timings_ms": {
+        "retrieve": 61.63
+      },
+      "wall_ms": 61.64,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q04",
+      "query": "How much damage did Hurricane Charley cause in Florida?",
+      "mode": "bm25",
+      "relevant_count": 13
+    },
+    {
+      "retrieved_ids": [
+        581,
+        588,
+        1072,
+        531,
+        777,
+        532,
+        914,
+        881,
+        876,
+        610
+      ],
+      "timings_ms": {
+        "embed": 27.29,
+        "retrieve_dense": 77.49,
+        "retrieve_bm25": 67.15,
+        "fuse": 0.04
+      },
+      "wall_ms": 171.99,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q04",
+      "query": "How much damage did Hurricane Charley cause in Florida?",
+      "mode": "rrf",
+      "relevant_count": 13
+    },
+    {
+      "retrieved_ids": [
+        581,
+        588,
+        1005,
+        531,
+        530,
+        532,
+        610,
+        881,
+        876,
+        777
+      ],
+      "timings_ms": {
+        "embed": 17.04,
+        "retrieve_dense": 71.96,
+        "retrieve_bm25": 79.09,
+        "fuse": 0.04,
+        "rerank": 335.8
+      },
+      "wall_ms": 503.96,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q04",
+      "query": "How much damage did Hurricane Charley cause in Florida?",
+      "mode": "rerank",
+      "relevant_count": 13
+    },
+    {
+      "retrieved_ids": [
+        1007,
+        1016,
+        758,
+        831,
+        761,
+        879,
+        776,
+        755,
+        534,
+        867
+      ],
+      "timings_ms": {
+        "embed": 17.13,
+        "retrieve": 70.08
+      },
+      "wall_ms": 87.23,
+      "recall@5": 1.0,
+      "recall@10": 0.9,
+      "id": "q05",
+      "query": "Did Chavez win the Venezuela recall referendum?",
+      "mode": "naive",
+      "relevant_count": 13
+    },
+    {
+      "retrieved_ids": [
+        1007,
+        1016,
+        761,
+        879,
+        758,
+        1080,
+        755,
+        653,
+        534,
+        529
+      ],
+      "timings_ms": {
+        "retrieve": 61.29
+      },
+      "wall_ms": 61.29,
+      "recall@5": 1.0,
+      "recall@10": 0.9,
+      "id": "q05",
+      "query": "Did Chavez win the Venezuela recall referendum?",
+      "mode": "bm25",
+      "relevant_count": 13
+    },
+    {
+      "retrieved_ids": [
+        1007,
+        1016,
+        758,
+        761,
+        879,
+        755,
+        534,
+        831,
+        653,
+        529
+      ],
+      "timings_ms": {
+        "embed": 26.42,
+        "retrieve_dense": 79.06,
+        "retrieve_bm25": 67.33,
+        "fuse": 0.05
+      },
+      "wall_ms": 172.89,
+      "recall@5": 1.0,
+      "recall@10": 0.9,
+      "id": "q05",
+      "query": "Did Chavez win the Venezuela recall referendum?",
+      "mode": "rrf",
+      "relevant_count": 13
+    },
+    {
+      "retrieved_ids": [
+        1007,
+        761,
+        1016,
+        758,
+        831,
+        879,
+        755,
+        776,
+        1080,
+        1114
+      ],
+      "timings_ms": {
+        "embed": 27.77,
+        "retrieve_dense": 65.73,
+        "retrieve_bm25": 78.34,
+        "fuse": 0.04,
+        "rerank": 367.64
+      },
+      "wall_ms": 539.56,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q05",
+      "query": "Did Chavez win the Venezuela recall referendum?",
+      "mode": "rerank",
+      "relevant_count": 13
+    },
+    {
+      "retrieved_ids": [
+        1179,
+        572,
+        598,
+        964,
+        904,
+        1280,
+        45,
+        516,
+        805,
+        1095
+      ],
+      "timings_ms": {
+        "embed": 30.0,
+        "retrieve": 71.44
+      },
+      "wall_ms": 101.46,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q06",
+      "query": "What was Nortel's Canadian accounting probe about?",
+      "mode": "naive",
+      "relevant_count": 1
+    },
+    {
+      "retrieved_ids": [
+        1179,
+        281,
+        598,
+        729,
+        869,
+        904,
+        1095,
+        906,
+        1113,
+        666
+      ],
+      "timings_ms": {
+        "retrieve": 77.57
+      },
+      "wall_ms": 77.58,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q06",
+      "query": "What was Nortel's Canadian accounting probe about?",
+      "mode": "bm25",
+      "relevant_count": 1
+    },
+    {
+      "retrieved_ids": [
+        1179,
+        904,
+        572,
+        598,
+        156,
+        1095,
+        805,
+        1113,
+        1280,
+        1135
+      ],
+      "timings_ms": {
+        "embed": 27.6,
+        "retrieve_dense": 70.02,
+        "retrieve_bm25": 67.63,
+        "fuse": 0.05
+      },
+      "wall_ms": 165.33,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q06",
+      "query": "What was Nortel's Canadian accounting probe about?",
+      "mode": "rrf",
+      "relevant_count": 1
+    },
+    {
+      "retrieved_ids": [
+        1179,
+        1135,
+        45,
+        1280,
+        964,
+        904,
+        135,
+        57,
+        572,
+        869
+      ],
+      "timings_ms": {
+        "embed": 29.15,
+        "retrieve_dense": 64.79,
+        "retrieve_bm25": 90.93,
+        "fuse": 0.05,
+        "rerank": 387.71
+      },
+      "wall_ms": 572.66,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q06",
+      "query": "What was Nortel's Canadian accounting probe about?",
+      "mode": "rerank",
+      "relevant_count": 1
+    },
+    {
+      "retrieved_ids": [
+        519,
+        778,
+        1083,
+        1084,
+        575,
+        989,
+        1032,
+        177,
+        781,
+        833
+      ],
+      "timings_ms": {
+        "embed": 33.49,
+        "retrieve": 76.52
+      },
+      "wall_ms": 110.03,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q07",
+      "query": "What happened to the British journalist held hostage in Iraq?",
+      "mode": "naive",
+      "relevant_count": 1
+    },
+    {
+      "retrieved_ids": [
+        989,
+        177,
+        519,
+        1032,
+        1045,
+        570,
+        778,
+        911,
+        517,
+        580
+      ],
+      "timings_ms": {
+        "retrieve": 73.59
+      },
+      "wall_ms": 73.6,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q07",
+      "query": "What happened to the British journalist held hostage in Iraq?",
+      "mode": "bm25",
+      "relevant_count": 1
+    },
+    {
+      "retrieved_ids": [
+        519,
+        989,
+        177,
+        778,
+        1032,
+        575,
+        3,
+        616,
+        622,
+        1083
+      ],
+      "timings_ms": {
+        "embed": 27.71,
+        "retrieve_dense": 76.65,
+        "retrieve_bm25": 59.97,
+        "fuse": 0.05
+      },
+      "wall_ms": 164.4,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q07",
+      "query": "What happened to the British journalist held hostage in Iraq?",
+      "mode": "rrf",
+      "relevant_count": 1
+    },
+    {
+      "retrieved_ids": [
+        519,
+        778,
+        1084,
+        1083,
+        1032,
+        989,
+        177,
+        575,
+        3,
+        1045
+      ],
+      "timings_ms": {
+        "embed": 27.42,
+        "retrieve_dense": 62.34,
+        "retrieve_bm25": 61.11,
+        "fuse": 0.05,
+        "rerank": 584.97
+      },
+      "wall_ms": 735.93,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q07",
+      "query": "What happened to the British journalist held hostage in Iraq?",
+      "mode": "rerank",
+      "relevant_count": 1
+    },
+    {
+      "retrieved_ids": [
+        513,
+        496,
+        666,
+        638,
+        497,
+        639,
+        943,
+        838,
+        839,
+        837
+      ],
+      "timings_ms": {
+        "embed": 27.78,
+        "retrieve": 80.83
+      },
+      "wall_ms": 108.63,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q08",
+      "query": "Rwandan troops deployed to Darfur",
+      "mode": "naive",
+      "relevant_count": 6
+    },
+    {
+      "retrieved_ids": [
+        496,
+        666,
+        639,
+        638,
+        497,
+        513,
+        956,
+        539,
+        580,
+        493
+      ],
+      "timings_ms": {
+        "retrieve": 79.29
+      },
+      "wall_ms": 79.3,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q08",
+      "query": "Rwandan troops deployed to Darfur",
+      "mode": "bm25",
+      "relevant_count": 6
+    },
+    {
+      "retrieved_ids": [
+        666,
+        496,
+        513,
+        639,
+        638,
+        497,
+        838,
+        837,
+        839,
+        539
+      ],
+      "timings_ms": {
+        "embed": 27.99,
+        "retrieve_dense": 78.4,
+        "retrieve_bm25": 72.39,
+        "fuse": 0.06
+      },
+      "wall_ms": 178.85,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q08",
+      "query": "Rwandan troops deployed to Darfur",
+      "mode": "rrf",
+      "relevant_count": 6
+    },
+    {
+      "retrieved_ids": [
+        496,
+        666,
+        638,
+        497,
+        639,
+        513,
+        943,
+        839,
+        837,
+        838
+      ],
+      "timings_ms": {
+        "embed": 16.83,
+        "retrieve_dense": 58.0,
+        "retrieve_bm25": 63.03,
+        "fuse": 0.04,
+        "rerank": 343.64
+      },
+      "wall_ms": 481.58,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q08",
+      "query": "Rwandan troops deployed to Darfur",
+      "mode": "rerank",
+      "relevant_count": 6
+    },
+    {
+      "retrieved_ids": [
+        827,
+        882,
+        823,
+        888,
+        824,
+        1115,
+        1343,
+        884,
+        1279,
+        893
+      ],
+      "timings_ms": {
+        "embed": 28.81,
+        "retrieve": 70.79
+      },
+      "wall_ms": 99.62,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q09",
+      "query": "Did Wal-Mart maintain its August sales forecast?",
+      "mode": "naive",
+      "relevant_count": 1
+    },
+    {
+      "retrieved_ids": [
+        827,
+        708,
+        882,
+        915,
+        1077,
+        1229,
+        1279,
+        1115,
+        707,
+        705
+      ],
+      "timings_ms": {
+        "retrieve": 58.68
+      },
+      "wall_ms": 58.68,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q09",
+      "query": "Did Wal-Mart maintain its August sales forecast?",
+      "mode": "bm25",
+      "relevant_count": 1
+    },
+    {
+      "retrieved_ids": [
+        827,
+        882,
+        1115,
+        1077,
+        1279,
+        1343,
+        1229,
+        915,
+        708,
+        823
+      ],
+      "timings_ms": {
+        "embed": 27.59,
+        "retrieve_dense": 76.2,
+        "retrieve_bm25": 72.27,
+        "fuse": 0.04
+      },
+      "wall_ms": 176.12,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q09",
+      "query": "Did Wal-Mart maintain its August sales forecast?",
+      "mode": "rrf",
+      "relevant_count": 1
+    },
+    {
+      "retrieved_ids": [
+        827,
+        882,
+        1229,
+        1279,
+        1115,
+        915,
+        1077,
+        893,
+        884,
+        708
+      ],
+      "timings_ms": {
+        "embed": 29.24,
+        "retrieve_dense": 72.15,
+        "retrieve_bm25": 68.19,
+        "fuse": 0.04,
+        "rerank": 336.78
+      },
+      "wall_ms": 506.45,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q09",
+      "query": "Did Wal-Mart maintain its August sales forecast?",
+      "mode": "rerank",
+      "relevant_count": 1
+    },
+    {
+      "retrieved_ids": [
+        457,
+        880,
+        656,
+        657,
+        564,
+        675,
+        647,
+        630,
+        661,
+        698
+      ],
+      "timings_ms": {
+        "embed": 29.45,
+        "retrieve": 77.73
+      },
+      "wall_ms": 107.2,
+      "recall@5": 0.6666666666666666,
+      "recall@10": 1.0,
+      "id": "q10",
+      "query": "How did Tiger Woods finish the 2004 PGA Championship?",
+      "mode": "naive",
+      "relevant_count": 3
+    },
+    {
+      "retrieved_ids": [
+        457,
+        656,
+        880,
+        661,
+        630,
+        675,
+        657,
+        564,
+        467,
+        724
+      ],
+      "timings_ms": {
+        "retrieve": 73.98
+      },
+      "wall_ms": 73.98,
+      "recall@5": 0.3333333333333333,
+      "recall@10": 1.0,
+      "id": "q10",
+      "query": "How did Tiger Woods finish the 2004 PGA Championship?",
+      "mode": "bm25",
+      "relevant_count": 3
+    },
+    {
+      "retrieved_ids": [
+        457,
+        880,
+        656,
+        657,
+        564,
+        675,
+        661,
+        630,
+        647,
+        698
+      ],
+      "timings_ms": {
+        "embed": 17.51,
+        "retrieve_dense": 63.29,
+        "retrieve_bm25": 73.05,
+        "fuse": 0.05
+      },
+      "wall_ms": 153.94,
+      "recall@5": 0.6666666666666666,
+      "recall@10": 1.0,
+      "id": "q10",
+      "query": "How did Tiger Woods finish the 2004 PGA Championship?",
+      "mode": "rrf",
+      "relevant_count": 3
+    },
+    {
+      "retrieved_ids": [
+        457,
+        675,
+        564,
+        630,
+        656,
+        661,
+        813,
+        704,
+        880,
+        728
+      ],
+      "timings_ms": {
+        "embed": 18.34,
+        "retrieve_dense": 60.7,
+        "retrieve_bm25": 80.69,
+        "fuse": 0.05,
+        "rerank": 324.9
+      },
+      "wall_ms": 484.71,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q10",
+      "query": "How did Tiger Woods finish the 2004 PGA Championship?",
+      "mode": "rerank",
+      "relevant_count": 3
+    },
+    {
+      "retrieved_ids": [
+        880,
+        656,
+        657,
+        698,
+        813,
+        695,
+        647,
+        661,
+        630,
+        564
+      ],
+      "timings_ms": {
+        "embed": 27.59,
+        "retrieve": 47.51
+      },
+      "wall_ms": 75.12,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q11",
+      "query": "Who won the 2004 PGA Championship?",
+      "mode": "naive",
+      "relevant_count": 6
+    },
+    {
+      "retrieved_ids": [
+        656,
+        880,
+        657,
+        630,
+        698,
+        661,
+        562,
+        457,
+        564,
+        704
+      ],
+      "timings_ms": {
+        "retrieve": 78.78
+      },
+      "wall_ms": 78.78,
+      "recall@5": 0.8,
+      "recall@10": 0.6666666666666666,
+      "id": "q11",
+      "query": "Who won the 2004 PGA Championship?",
+      "mode": "bm25",
+      "relevant_count": 6
+    },
+    {
+      "retrieved_ids": [
+        880,
+        656,
+        657,
+        630,
+        813,
+        698,
+        704,
+        564,
+        661,
+        728
+      ],
+      "timings_ms": {
+        "embed": 17.71,
+        "retrieve_dense": 64.74,
+        "retrieve_bm25": 66.8,
+        "fuse": 0.04
+      },
+      "wall_ms": 149.31,
+      "recall@5": 0.8,
+      "recall@10": 0.8333333333333334,
+      "id": "q11",
+      "query": "Who won the 2004 PGA Championship?",
+      "mode": "rrf",
+      "relevant_count": 6
+    },
+    {
+      "retrieved_ids": [
+        656,
+        698,
+        880,
+        657,
+        813,
+        695,
+        463,
+        564,
+        630,
+        728
+      ],
+      "timings_ms": {
+        "embed": 27.65,
+        "retrieve_dense": 64.96,
+        "retrieve_bm25": 76.15,
+        "fuse": 0.04,
+        "rerank": 325.51
+      },
+      "wall_ms": 494.34,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q11",
+      "query": "Who won the 2004 PGA Championship?",
+      "mode": "rerank",
+      "relevant_count": 6
+    },
+    {
+      "retrieved_ids": [
+        1586,
+        471,
+        1484,
+        718,
+        797,
+        865,
+        1592,
+        461,
+        805,
+        1446
+      ],
+      "timings_ms": {
+        "embed": 29.03,
+        "retrieve": 64.8
+      },
+      "wall_ms": 93.85,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q12",
+      "query": "Kostas Kenteris Olympic suspension",
+      "mode": "naive",
+      "relevant_count": 8
+    },
+    {
+      "retrieved_ids": [
+        1586,
+        471,
+        1484,
+        260,
+        616,
+        797,
+        815,
+        462,
+        450,
+        718
+      ],
+      "timings_ms": {
+        "retrieve": 78.1
+      },
+      "wall_ms": 78.1,
+      "recall@5": 0.6,
+      "recall@10": 0.625,
+      "id": "q12",
+      "query": "Kostas Kenteris Olympic suspension",
+      "mode": "bm25",
+      "relevant_count": 8
+    },
+    {
+      "retrieved_ids": [
+        1586,
+        471,
+        1484,
+        718,
+        865,
+        1523,
+        797,
+        260,
+        1320,
+        1519
+      ],
+      "timings_ms": {
+        "embed": 27.38,
+        "retrieve_dense": 64.49,
+        "retrieve_bm25": 70.26,
+        "fuse": 0.04
+      },
+      "wall_ms": 162.19,
+      "recall@5": 1.0,
+      "recall@10": 0.75,
+      "id": "q12",
+      "query": "Kostas Kenteris Olympic suspension",
+      "mode": "rrf",
+      "relevant_count": 8
+    },
+    {
+      "retrieved_ids": [
+        471,
+        1586,
+        1484,
+        865,
+        797,
+        718,
+        1446,
+        461,
+        1562,
+        805
+      ],
+      "timings_ms": {
+        "embed": 16.99,
+        "retrieve_dense": 67.67,
+        "retrieve_bm25": 73.47,
+        "fuse": 0.05,
+        "rerank": 391.67
+      },
+      "wall_ms": 549.88,
+      "recall@5": 1.0,
+      "recall@10": 0.875,
+      "id": "q12",
+      "query": "Kostas Kenteris Olympic suspension",
+      "mode": "rerank",
+      "relevant_count": 8
+    },
+    {
+      "retrieved_ids": [
+        211,
+        786,
+        193,
+        1276,
+        210,
+        327,
+        205,
+        315,
+        1061,
+        159
+      ],
+      "timings_ms": {
+        "embed": 28.94,
+        "retrieve": 66.71
+      },
+      "wall_ms": 95.66,
+      "recall@5": 0.8,
+      "recall@10": 1.0,
+      "id": "q13",
+      "query": "Microsoft Windows XP Service Pack 2 security",
+      "mode": "naive",
+      "relevant_count": 6
+    },
+    {
+      "retrieved_ids": [
+        205,
+        211,
+        1276,
+        184,
+        183,
+        315,
+        786,
+        536,
+        193,
+        327
+      ],
+      "timings_ms": {
+        "retrieve": 79.53
+      },
+      "wall_ms": 79.53,
+      "recall@5": 0.6,
+      "recall@10": 1.0,
+      "id": "q13",
+      "query": "Microsoft Windows XP Service Pack 2 security",
+      "mode": "bm25",
+      "relevant_count": 6
+    },
+    {
+      "retrieved_ids": [
+        211,
+        1276,
+        786,
+        205,
+        193,
+        184,
+        327,
+        315,
+        183,
+        159
+      ],
+      "timings_ms": {
+        "embed": 27.36,
+        "retrieve_dense": 56.73,
+        "retrieve_bm25": 90.49,
+        "fuse": 0.04
+      },
+      "wall_ms": 174.65,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q13",
+      "query": "Microsoft Windows XP Service Pack 2 security",
+      "mode": "rrf",
+      "relevant_count": 6
+    },
+    {
+      "retrieved_ids": [
+        211,
+        193,
+        786,
+        1276,
+        210,
+        327,
+        184,
+        205,
+        964,
+        315
+      ],
+      "timings_ms": {
+        "embed": 28.12,
+        "retrieve_dense": 61.33,
+        "retrieve_bm25": 67.64,
+        "fuse": 0.05,
+        "rerank": 338.38
+      },
+      "wall_ms": 495.55,
+      "recall@5": 0.8,
+      "recall@10": 1.0,
+      "id": "q13",
+      "query": "Microsoft Windows XP Service Pack 2 security",
+      "mode": "rerank",
+      "relevant_count": 6
+    },
+    {
+      "retrieved_ids": [
+        126,
+        105,
+        139,
+        156,
+        267,
+        102,
+        249,
+        91,
+        301,
+        128
+      ],
+      "timings_ms": {
+        "embed": 28.17,
+        "retrieve": 67.1
+      },
+      "wall_ms": 95.29,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q14",
+      "query": "SpaceShipOne and the X Prize",
+      "mode": "naive",
+      "relevant_count": 4
+    },
+    {
+      "retrieved_ids": [
+        105,
+        126,
+        273,
+        139,
+        156,
+        269,
+        90,
+        192,
+        767
+      ],
+      "timings_ms": {
+        "retrieve": 77.8
+      },
+      "wall_ms": 77.8,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q14",
+      "query": "SpaceShipOne and the X Prize",
+      "mode": "bm25",
+      "relevant_count": 4
+    },
+    {
+      "retrieved_ids": [
+        126,
+        105,
+        139,
+        156,
+        273,
+        267,
+        102,
+        269,
+        249,
+        90
+      ],
+      "timings_ms": {
+        "embed": 19.71,
+        "retrieve_dense": 71.09,
+        "retrieve_bm25": 57.57,
+        "fuse": 0.05
+      },
+      "wall_ms": 148.45,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q14",
+      "query": "SpaceShipOne and the X Prize",
+      "mode": "rrf",
+      "relevant_count": 4
+    },
+    {
+      "retrieved_ids": [
+        126,
+        105,
+        139,
+        156,
+        188,
+        102,
+        90,
+        224,
+        249,
+        128
+      ],
+      "timings_ms": {
+        "embed": 29.65,
+        "retrieve_dense": 84.72,
+        "retrieve_bm25": 65.04,
+        "fuse": 0.05,
+        "rerank": 373.3
+      },
+      "wall_ms": 552.79,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q14",
+      "query": "SpaceShipOne and the X Prize",
+      "mode": "rerank",
+      "relevant_count": 4
+    },
+    {
+      "retrieved_ids": [
+        1131,
+        86,
+        312,
+        42,
+        1043,
+        1041,
+        1283,
+        316,
+        909,
+        45
+      ],
+      "timings_ms": {
+        "embed": 30.55,
+        "retrieve": 66.22
+      },
+      "wall_ms": 96.79,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q15",
+      "query": "PeopleSoft Oracle antitrust trial",
+      "mode": "naive",
+      "relevant_count": 3
+    },
+    {
+      "retrieved_ids": [
+        1131,
+        86,
+        1283,
+        1041,
+        852,
+        312,
+        730,
+        1043,
+        1071,
+        1079
+      ],
+      "timings_ms": {
+        "retrieve": 82.68
+      },
+      "wall_ms": 82.68,
+      "recall@5": 0.6666666666666666,
+      "recall@10": 1.0,
+      "id": "q15",
+      "query": "PeopleSoft Oracle antitrust trial",
+      "mode": "bm25",
+      "relevant_count": 3
+    },
+    {
+      "retrieved_ids": [
+        1131,
+        86,
+        312,
+        1283,
+        1041,
+        1043,
+        730,
+        316,
+        909,
+        1071
+      ],
+      "timings_ms": {
+        "embed": 29.43,
+        "retrieve_dense": 76.22,
+        "retrieve_bm25": 65.79,
+        "fuse": 0.05
+      },
+      "wall_ms": 171.51,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q15",
+      "query": "PeopleSoft Oracle antitrust trial",
+      "mode": "rrf",
+      "relevant_count": 3
+    },
+    {
+      "retrieved_ids": [
+        1131,
+        312,
+        86,
+        316,
+        68,
+        45,
+        964,
+        219,
+        42,
+        1079
+      ],
+      "timings_ms": {
+        "embed": 29.78,
+        "retrieve_dense": 65.1,
+        "retrieve_bm25": 85.0,
+        "fuse": 0.05,
+        "rerank": 344.8
+      },
+      "wall_ms": 524.75,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q15",
+      "query": "PeopleSoft Oracle antitrust trial",
+      "mode": "rerank",
+      "relevant_count": 3
+    },
+    {
+      "retrieved_ids": [
+        933,
+        180,
+        1277,
+        907,
+        1004,
+        41,
+        306,
+        502,
+        500,
+        623
+      ],
+      "timings_ms": {
+        "embed": 29.6,
+        "retrieve": 67.45
+      },
+      "wall_ms": 97.06,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q16",
+      "query": "Bush Kerry campaign advertisements",
+      "mode": "naive",
+      "relevant_count": 3
+    },
+    {
+      "retrieved_ids": [
+        180,
+        502,
+        500,
+        1277,
+        1004,
+        933,
+        306,
+        783,
+        907,
+        910
+      ],
+      "timings_ms": {
+        "retrieve": 68.75
+      },
+      "wall_ms": 68.75,
+      "recall@5": 0.6666666666666666,
+      "recall@10": 1.0,
+      "id": "q16",
+      "query": "Bush Kerry campaign advertisements",
+      "mode": "bm25",
+      "relevant_count": 3
+    },
+    {
+      "retrieved_ids": [
+        180,
+        1277,
+        1004,
+        933,
+        502,
+        907,
+        500,
+        306,
+        783,
+        501
+      ],
+      "timings_ms": {
+        "embed": 26.57,
+        "retrieve_dense": 57.34,
+        "retrieve_bm25": 65.03,
+        "fuse": 0.06
+      },
+      "wall_ms": 149.02,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q16",
+      "query": "Bush Kerry campaign advertisements",
+      "mode": "rrf",
+      "relevant_count": 3
+    },
+    {
+      "retrieved_ids": [
+        933,
+        180,
+        1004,
+        1277,
+        907,
+        306,
+        41,
+        623,
+        502,
+        780
+      ],
+      "timings_ms": {
+        "embed": 27.9,
+        "retrieve_dense": 62.41,
+        "retrieve_bm25": 60.93,
+        "fuse": 0.04,
+        "rerank": 348.77
+      },
+      "wall_ms": 500.09,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q16",
+      "query": "Bush Kerry campaign advertisements",
+      "mode": "rerank",
+      "relevant_count": 3
+    },
+    {
+      "retrieved_ids": [
+        995,
+        1090,
+        960,
+        928,
+        944,
+        895,
+        1077,
+        1229,
+        915,
+        882
+      ],
+      "timings_ms": {
+        "embed": 30.34,
+        "retrieve": 77.4
+      },
+      "wall_ms": 107.76,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q17",
+      "query": "Stocks rebound after oil prices ease",
+      "mode": "naive",
+      "relevant_count": 14
+    },
+    {
+      "retrieved_ids": [
+        895,
+        960,
+        995,
+        928,
+        944,
+        1090,
+        1077,
+        868,
+        803,
+        915
+      ],
+      "timings_ms": {
+        "retrieve": 61.97
+      },
+      "wall_ms": 61.98,
+      "recall@5": 1.0,
+      "recall@10": 0.8,
+      "id": "q17",
+      "query": "Stocks rebound after oil prices ease",
+      "mode": "bm25",
+      "relevant_count": 14
+    },
+    {
+      "retrieved_ids": [
+        995,
+        960,
+        1090,
+        895,
+        928,
+        944,
+        1077,
+        915,
+        1229,
+        882
+      ],
+      "timings_ms": {
+        "embed": 17.65,
+        "retrieve_dense": 68.66,
+        "retrieve_bm25": 81.69,
+        "fuse": 0.05
+      },
+      "wall_ms": 168.07,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q17",
+      "query": "Stocks rebound after oil prices ease",
+      "mode": "rrf",
+      "relevant_count": 14
+    },
+    {
+      "retrieved_ids": [
+        995,
+        1090,
+        895,
+        960,
+        928,
+        1077,
+        944,
+        882,
+        915,
+        1279
+      ],
+      "timings_ms": {
+        "embed": 26.83,
+        "retrieve_dense": 77.5,
+        "retrieve_bm25": 66.41,
+        "fuse": 0.05,
+        "rerank": 316.11
+      },
+      "wall_ms": 486.94,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q17",
+      "query": "Stocks rebound after oil prices ease",
+      "mode": "rerank",
+      "relevant_count": 14
+    },
+    {
+      "retrieved_ids": [
+        1045,
+        925,
+        177,
+        919,
+        525,
+        911,
+        624,
+        505,
+        569,
+        3
+      ],
+      "timings_ms": {
+        "embed": 29.69,
+        "retrieve": 70.17
+      },
+      "wall_ms": 99.87,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q18",
+      "query": "Iraq interim president Al-Yawer and Kurdish rebels",
+      "mode": "naive",
+      "relevant_count": 1
+    },
+    {
+      "retrieved_ids": [
+        1045,
+        177,
+        176,
+        911,
+        776,
+        622,
+        3,
+        173,
+        1114,
+        181
+      ],
+      "timings_ms": {
+        "retrieve": 75.09
+      },
+      "wall_ms": 75.09,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q18",
+      "query": "Iraq interim president Al-Yawer and Kurdish rebels",
+      "mode": "bm25",
+      "relevant_count": 1
+    },
+    {
+      "retrieved_ids": [
+        1045,
+        177,
+        911,
+        3,
+        525,
+        955,
+        1024,
+        575,
+        925,
+        176
+      ],
+      "timings_ms": {
+        "embed": 29.19,
+        "retrieve_dense": 66.79,
+        "retrieve_bm25": 76.99,
+        "fuse": 0.05
+      },
+      "wall_ms": 173.06,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q18",
+      "query": "Iraq interim president Al-Yawer and Kurdish rebels",
+      "mode": "rrf",
+      "relevant_count": 1
+    },
+    {
+      "retrieved_ids": [
+        1045,
+        925,
+        919,
+        510,
+        3,
+        177,
+        624,
+        505,
+        569,
+        525
+      ],
+      "timings_ms": {
+        "embed": 27.49,
+        "retrieve_dense": 78.27,
+        "retrieve_bm25": 73.58,
+        "fuse": 0.06,
+        "rerank": 312.87
+      },
+      "wall_ms": 492.3,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q18",
+      "query": "Iraq interim president Al-Yawer and Kurdish rebels",
+      "mode": "rerank",
+      "relevant_count": 1
+    },
+    {
+      "retrieved_ids": [
+        680,
+        602,
+        632,
+        593,
+        832,
+        1550,
+        1050,
+        450,
+        1422,
+        1301
+      ],
+      "timings_ms": {
+        "embed": 27.99,
+        "retrieve": 83.61
+      },
+      "wall_ms": 111.62,
+      "recall@5": 1.0,
+      "recall@10": 0.8,
+      "id": "q19",
+      "query": "US Dream Team basketball loss in Athens",
+      "mode": "naive",
+      "relevant_count": 11
+    },
+    {
+      "retrieved_ids": [
+        680,
+        1301,
+        602,
+        593,
+        632,
+        1110,
+        450,
+        591,
+        769,
+        1422
+      ],
+      "timings_ms": {
+        "retrieve": 74.48
+      },
+      "wall_ms": 74.48,
+      "recall@5": 1.0,
+      "recall@10": 0.8,
+      "id": "q19",
+      "query": "US Dream Team basketball loss in Athens",
+      "mode": "bm25",
+      "relevant_count": 11
+    },
+    {
+      "retrieved_ids": [
+        680,
+        602,
+        632,
+        593,
+        1301,
+        450,
+        1422,
+        832,
+        591,
+        1134
+      ],
+      "timings_ms": {
+        "embed": 26.43,
+        "retrieve_dense": 78.39,
+        "retrieve_bm25": 83.72,
+        "fuse": 0.04
+      },
+      "wall_ms": 188.61,
+      "recall@5": 1.0,
+      "recall@10": 0.9,
+      "id": "q19",
+      "query": "US Dream Team basketball loss in Athens",
+      "mode": "rrf",
+      "relevant_count": 11
+    },
+    {
+      "retrieved_ids": [
+        602,
+        680,
+        632,
+        593,
+        1050,
+        832,
+        450,
+        1422,
+        1134,
+        591
+      ],
+      "timings_ms": {
+        "embed": 26.74,
+        "retrieve_dense": 85.93,
+        "retrieve_bm25": 63.16,
+        "fuse": 0.05,
+        "rerank": 347.1
+      },
+      "wall_ms": 523.02,
+      "recall@5": 0.8,
+      "recall@10": 0.8,
+      "id": "q19",
+      "query": "US Dream Team basketball loss in Athens",
+      "mode": "rerank",
+      "relevant_count": 11
+    },
+    {
+      "retrieved_ids": [
+        300,
+        125,
+        98,
+        234,
+        195,
+        143,
+        816,
+        232,
+        70,
+        194
+      ],
+      "timings_ms": {
+        "embed": 29.42,
+        "retrieve": 77.9
+      },
+      "wall_ms": 107.34,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q20",
+      "query": "Britain approves human cloning research license",
+      "mode": "naive",
+      "relevant_count": 4
+    },
+    {
+      "retrieved_ids": [
+        300,
+        125,
+        98,
+        234,
+        143,
+        206,
+        816,
+        38,
+        81,
+        128
+      ],
+      "timings_ms": {
+        "retrieve": 74.53
+      },
+      "wall_ms": 74.53,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q20",
+      "query": "Britain approves human cloning research license",
+      "mode": "bm25",
+      "relevant_count": 4
+    },
+    {
+      "retrieved_ids": [
+        300,
+        125,
+        98,
+        234,
+        143,
+        816,
+        38,
+        195,
+        81,
+        232
+      ],
+      "timings_ms": {
+        "embed": 28.1,
+        "retrieve_dense": 67.6,
+        "retrieve_bm25": 73.3,
+        "fuse": 0.05
+      },
+      "wall_ms": 169.08,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q20",
+      "query": "Britain approves human cloning research license",
+      "mode": "rrf",
+      "relevant_count": 4
+    },
+    {
+      "retrieved_ids": [
+        300,
+        125,
+        98,
+        234,
+        816,
+        232,
+        143,
+        654,
+        195,
+        70
+      ],
+      "timings_ms": {
+        "embed": 25.54,
+        "retrieve_dense": 81.4,
+        "retrieve_bm25": 57.02,
+        "fuse": 0.04,
+        "rerank": 347.14
+      },
+      "wall_ms": 511.18,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q20",
+      "query": "Britain approves human cloning research license",
+      "mode": "rerank",
+      "relevant_count": 4
+    },
+    {
+      "retrieved_ids": [
+        306,
+        125,
+        300,
+        692,
+        573,
+        1004,
+        98,
+        232,
+        90,
+        134
+      ],
+      "timings_ms": {
+        "embed": 23.68,
+        "retrieve": 81.11
+      },
+      "wall_ms": 104.81,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q21",
+      "query": "What did Laura Bush say about stem cell research?",
+      "mode": "naive",
+      "relevant_count": 1
+    },
+    {
+      "retrieved_ids": [
+        306,
+        300,
+        125,
+        1047,
+        910,
+        933,
+        956,
+        735,
+        780,
+        692
+      ],
+      "timings_ms": {
+        "retrieve": 82.66
+      },
+      "wall_ms": 82.66,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q21",
+      "query": "What did Laura Bush say about stem cell research?",
+      "mode": "bm25",
+      "relevant_count": 1
+    },
+    {
+      "retrieved_ids": [
+        306,
+        125,
+        300,
+        1004,
+        692,
+        41,
+        1047,
+        573,
+        94,
+        98
+      ],
+      "timings_ms": {
+        "embed": 28.21,
+        "retrieve_dense": 79.99,
+        "retrieve_bm25": 93.78,
+        "fuse": 0.06
+      },
+      "wall_ms": 202.06,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q21",
+      "query": "What did Laura Bush say about stem cell research?",
+      "mode": "rrf",
+      "relevant_count": 1
+    },
+    {
+      "retrieved_ids": [
+        306,
+        125,
+        300,
+        232,
+        90,
+        1004,
+        692,
+        234,
+        41,
+        98
+      ],
+      "timings_ms": {
+        "embed": 27.41,
+        "retrieve_dense": 78.62,
+        "retrieve_bm25": 58.15,
+        "fuse": 0.04,
+        "rerank": 322.12
+      },
+      "wall_ms": 486.39,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q21",
+      "query": "What did Laura Bush say about stem cell research?",
+      "mode": "rerank",
+      "relevant_count": 1
+    },
+    {
+      "retrieved_ids": [
+        507,
+        539,
+        641,
+        955,
+        525,
+        658,
+        613,
+        911,
+        540,
+        1033
+      ],
+      "timings_ms": {
+        "embed": 29.54,
+        "retrieve": 93.41
+      },
+      "wall_ms": 122.97,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q22",
+      "query": "US troops fighting Sadr militia in Najaf",
+      "mode": "naive",
+      "relevant_count": 8
+    },
+    {
+      "retrieved_ids": [
+        539,
+        507,
+        525,
+        613,
+        911,
+        1013,
+        955,
+        641,
+        580,
+        956
+      ],
+      "timings_ms": {
+        "retrieve": 76.26
+      },
+      "wall_ms": 76.27,
+      "recall@5": 1.0,
+      "recall@10": 0.875,
+      "id": "q22",
+      "query": "US troops fighting Sadr militia in Najaf",
+      "mode": "bm25",
+      "relevant_count": 8
+    },
+    {
+      "retrieved_ids": [
+        539,
+        507,
+        525,
+        955,
+        641,
+        911,
+        613,
+        1033,
+        658,
+        540
+      ],
+      "timings_ms": {
+        "embed": 28.2,
+        "retrieve_dense": 64.95,
+        "retrieve_bm25": 75.59,
+        "fuse": 0.05
+      },
+      "wall_ms": 168.8,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q22",
+      "query": "US troops fighting Sadr militia in Najaf",
+      "mode": "rrf",
+      "relevant_count": 8
+    },
+    {
+      "retrieved_ids": [
+        507,
+        641,
+        539,
+        658,
+        525,
+        540,
+        1033,
+        613,
+        955,
+        1024
+      ],
+      "timings_ms": {
+        "embed": 27.16,
+        "retrieve_dense": 57.53,
+        "retrieve_bm25": 72.61,
+        "fuse": 0.04,
+        "rerank": 364.8
+      },
+      "wall_ms": 522.17,
+      "recall@5": 0.8,
+      "recall@10": 0.875,
+      "id": "q22",
+      "query": "US troops fighting Sadr militia in Najaf",
+      "mode": "rerank",
+      "relevant_count": 8
+    },
+    {
+      "retrieved_ids": [
+        281,
+        131,
+        275,
+        120,
+        22,
+        104,
+        509,
+        116,
+        239,
+        135
+      ],
+      "timings_ms": {
+        "embed": 29.71,
+        "retrieve": 65.85
+      },
+      "wall_ms": 95.58,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q23",
+      "query": "Japanese lunar probe delays",
+      "mode": "naive",
+      "relevant_count": 2
+    },
+    {
+      "retrieved_ids": [
+        281,
+        131,
+        88,
+        840,
+        118,
+        296,
+        1195,
+        805,
+        1046,
+        1006
+      ],
+      "timings_ms": {
+        "retrieve": 57.75
+      },
+      "wall_ms": 57.76,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q23",
+      "query": "Japanese lunar probe delays",
+      "mode": "bm25",
+      "relevant_count": 2
+    },
+    {
+      "retrieved_ids": [
+        281,
+        131,
+        805,
+        1264,
+        275,
+        88,
+        120,
+        840,
+        22,
+        104
+      ],
+      "timings_ms": {
+        "embed": 28.01,
+        "retrieve_dense": 74.43,
+        "retrieve_bm25": 68.78,
+        "fuse": 0.04
+      },
+      "wall_ms": 171.3,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q23",
+      "query": "Japanese lunar probe delays",
+      "mode": "rrf",
+      "relevant_count": 2
+    },
+    {
+      "retrieved_ids": [
+        131,
+        281,
+        120,
+        1264,
+        116,
+        275,
+        509,
+        30,
+        22,
+        135
+      ],
+      "timings_ms": {
+        "embed": 27.92,
+        "retrieve_dense": 73.53,
+        "retrieve_bm25": 78.15,
+        "fuse": 0.05,
+        "rerank": 366.29
+      },
+      "wall_ms": 545.96,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q23",
+      "query": "Japanese lunar probe delays",
+      "mode": "rerank",
+      "relevant_count": 2
+    },
+    {
+      "retrieved_ids": [
+        616,
+        626,
+        680,
+        594,
+        177,
+        770,
+        771,
+        602,
+        1122,
+        1093
+      ],
+      "timings_ms": {
+        "embed": 27.87,
+        "retrieve": 63.21
+      },
+      "wall_ms": 91.1,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q24",
+      "query": "Iraq Olympic soccer team fairytale run",
+      "mode": "naive",
+      "relevant_count": 1
+    },
+    {
+      "retrieved_ids": [
+        616,
+        459,
+        177,
+        1093,
+        471,
+        491,
+        450,
+        680,
+        1045,
+        602
+      ],
+      "timings_ms": {
+        "retrieve": 84.51
+      },
+      "wall_ms": 84.51,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q24",
+      "query": "Iraq Olympic soccer team fairytale run",
+      "mode": "bm25",
+      "relevant_count": 1
+    },
+    {
+      "retrieved_ids": [
+        616,
+        177,
+        1093,
+        602,
+        680,
+        626,
+        459,
+        594,
+        1045,
+        770
+      ],
+      "timings_ms": {
+        "embed": 18.37,
+        "retrieve_dense": 76.18,
+        "retrieve_bm25": 55.96,
+        "fuse": 0.05
+      },
+      "wall_ms": 150.59,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q24",
+      "query": "Iraq Olympic soccer team fairytale run",
+      "mode": "rrf",
+      "relevant_count": 1
+    },
+    {
+      "retrieved_ids": [
+        616,
+        177,
+        595,
+        1307,
+        1093,
+        771,
+        1045,
+        1586,
+        491,
+        471
+      ],
+      "timings_ms": {
+        "embed": 27.76,
+        "retrieve_dense": 68.85,
+        "retrieve_bm25": 77.06,
+        "fuse": 0.04,
+        "rerank": 329.1
+      },
+      "wall_ms": 502.85,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q24",
+      "query": "Iraq Olympic soccer team fairytale run",
+      "mode": "rerank",
+      "relevant_count": 1
+    },
+    {
+      "retrieved_ids": [
+        839,
+        837,
+        838,
+        750,
+        666,
+        29,
+        496,
+        639,
+        943,
+        638
+      ],
+      "timings_ms": {
+        "embed": 28.47,
+        "retrieve": 78.28
+      },
+      "wall_ms": 106.77,
+      "recall@5": 0.8,
+      "recall@10": 1.0,
+      "id": "q25",
+      "query": "Sudan Darfur villagers displaced by militia",
+      "mode": "naive",
+      "relevant_count": 5
+    },
+    {
+      "retrieved_ids": [
+        839,
+        837,
+        666,
+        513,
+        496,
+        639,
+        497,
+        838,
+        638,
+        539
+      ],
+      "timings_ms": {
+        "retrieve": 81.18
+      },
+      "wall_ms": 81.18,
+      "recall@5": 0.4,
+      "recall@10": 0.6,
+      "id": "q25",
+      "query": "Sudan Darfur villagers displaced by militia",
+      "mode": "bm25",
+      "relevant_count": 5
+    },
+    {
+      "retrieved_ids": [
+        839,
+        837,
+        666,
+        838,
+        639,
+        496,
+        497,
+        750,
+        513,
+        29
+      ],
+      "timings_ms": {
+        "embed": 26.83,
+        "retrieve_dense": 65.83,
+        "retrieve_bm25": 74.57,
+        "fuse": 0.04
+      },
+      "wall_ms": 167.29,
+      "recall@5": 0.6,
+      "recall@10": 0.8,
+      "id": "q25",
+      "query": "Sudan Darfur villagers displaced by militia",
+      "mode": "rrf",
+      "relevant_count": 5
+    },
+    {
+      "retrieved_ids": [
+        837,
+        839,
+        838,
+        750,
+        29,
+        943,
+        496,
+        513,
+        666,
+        639
+      ],
+      "timings_ms": {
+        "embed": 27.22,
+        "retrieve_dense": 69.3,
+        "retrieve_bm25": 72.51,
+        "fuse": 0.04,
+        "rerank": 364.72
+      },
+      "wall_ms": 533.82,
+      "recall@5": 0.8,
+      "recall@10": 1.0,
+      "id": "q25",
+      "query": "Sudan Darfur villagers displaced by militia",
+      "mode": "rerank",
+      "relevant_count": 5
+    },
+    {
+      "retrieved_ids": [
+        565,
+        595,
+        1546,
+        456,
+        515,
+        856,
+        792,
+        1523,
+        818,
+        735
+      ],
+      "timings_ms": {
+        "embed": 28.83,
+        "retrieve": 61.13
+      },
+      "wall_ms": 89.99,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q26",
+      "query": "Iran Olympic judo boycott Israel",
+      "mode": "naive",
+      "relevant_count": 3
+    },
+    {
+      "retrieved_ids": [
+        565,
+        1546,
+        595,
+        1586,
+        515,
+        456,
+        1599,
+        260,
+        575,
+        856
+      ],
+      "timings_ms": {
+        "retrieve": 74.14
+      },
+      "wall_ms": 74.14,
+      "recall@5": 0.6666666666666666,
+      "recall@10": 1.0,
+      "id": "q26",
+      "query": "Iran Olympic judo boycott Israel",
+      "mode": "bm25",
+      "relevant_count": 3
+    },
+    {
+      "retrieved_ids": [
+        565,
+        1546,
+        595,
+        515,
+        456,
+        1599,
+        856,
+        735,
+        818,
+        575
+      ],
+      "timings_ms": {
+        "embed": 28.72,
+        "retrieve_dense": 59.42,
+        "retrieve_bm25": 76.0,
+        "fuse": 0.06
+      },
+      "wall_ms": 164.22,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q26",
+      "query": "Iran Olympic judo boycott Israel",
+      "mode": "rrf",
+      "relevant_count": 3
+    },
+    {
+      "retrieved_ids": [
+        565,
+        595,
+        456,
+        1546,
+        515,
+        1599,
+        733,
+        736,
+        735,
+        818
+      ],
+      "timings_ms": {
+        "embed": 27.37,
+        "retrieve_dense": 77.81,
+        "retrieve_bm25": 86.75,
+        "fuse": 0.07,
+        "rerank": 353.63
+      },
+      "wall_ms": 545.66,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q26",
+      "query": "Iran Olympic judo boycott Israel",
+      "mode": "rerank",
+      "relevant_count": 3
+    },
+    {
+      "retrieved_ids": [
+        762,
+        697,
+        894,
+        1137,
+        731,
+        1257,
+        872,
+        4,
+        1261,
+        803
+      ],
+      "timings_ms": {
+        "embed": 27.36,
+        "retrieve": 55.57
+      },
+      "wall_ms": 82.96,
+      "recall@5": 0.5,
+      "recall@10": 1.0,
+      "id": "q27",
+      "query": "Oil prices hit record high above 47",
+      "mode": "naive",
+      "relevant_count": 2
+    },
+    {
+      "retrieved_ids": [
+        762,
+        894,
+        731,
+        732,
+        803,
+        868,
+        697,
+        727,
+        4,
+        1060
+      ],
+      "timings_ms": {
+        "retrieve": 74.04
+      },
+      "wall_ms": 74.05,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q27",
+      "query": "Oil prices hit record high above 47",
+      "mode": "bm25",
+      "relevant_count": 2
+    },
+    {
+      "retrieved_ids": [
+        762,
+        894,
+        731,
+        1137,
+        732,
+        803,
+        1257,
+        697,
+        1261,
+        4
+      ],
+      "timings_ms": {
+        "embed": 26.42,
+        "retrieve_dense": 72.81,
+        "retrieve_bm25": 84.39,
+        "fuse": 0.04
+      },
+      "wall_ms": 183.68,
+      "recall@5": 0.5,
+      "recall@10": 1.0,
+      "id": "q27",
+      "query": "Oil prices hit record high above 47",
+      "mode": "rrf",
+      "relevant_count": 2
+    },
+    {
+      "retrieved_ids": [
+        762,
+        894,
+        1257,
+        731,
+        1137,
+        732,
+        872,
+        4,
+        803,
+        697
+      ],
+      "timings_ms": {
+        "embed": 26.75,
+        "retrieve_dense": 78.56,
+        "retrieve_bm25": 76.81,
+        "fuse": 0.04,
+        "rerank": 368.26
+      },
+      "wall_ms": 550.45,
+      "recall@5": 0.5,
+      "recall@10": 1.0,
+      "id": "q27",
+      "query": "Oil prices hit record high above 47",
+      "mode": "rerank",
+      "relevant_count": 2
+    },
+    {
+      "retrieved_ids": [
+        1038,
+        1118,
+        1154,
+        1023,
+        1002,
+        533,
+        537,
+        1014,
+        679,
+        582
+      ],
+      "timings_ms": {
+        "embed": 17.98,
+        "retrieve": 71.56
+      },
+      "wall_ms": 89.56,
+      "recall@5": 0.6,
+      "recall@10": 0.8,
+      "id": "q28",
+      "query": "Ian Thorpe 200m freestyle Athens gold",
+      "mode": "naive",
+      "relevant_count": 5
+    },
+    {
+      "retrieved_ids": [
+        537,
+        533,
+        582,
+        1038,
+        774,
+        448,
+        1002,
+        1023,
+        1154,
+        1014
+      ],
+      "timings_ms": {
+        "retrieve": 75.77
+      },
+      "wall_ms": 75.77,
+      "recall@5": 0.2,
+      "recall@10": 0.8,
+      "id": "q28",
+      "query": "Ian Thorpe 200m freestyle Athens gold",
+      "mode": "bm25",
+      "relevant_count": 5
+    },
+    {
+      "retrieved_ids": [
+        1038,
+        537,
+        533,
+        1154,
+        1023,
+        1002,
+        582,
+        1118,
+        1014,
+        774
+      ],
+      "timings_ms": {
+        "embed": 27.15,
+        "retrieve_dense": 74.09,
+        "retrieve_bm25": 74.61,
+        "fuse": 0.04
+      },
+      "wall_ms": 175.92,
+      "recall@5": 0.4,
+      "recall@10": 0.8,
+      "id": "q28",
+      "query": "Ian Thorpe 200m freestyle Athens gold",
+      "mode": "rrf",
+      "relevant_count": 5
+    },
+    {
+      "retrieved_ids": [
+        1038,
+        1118,
+        1154,
+        1023,
+        1002,
+        1014,
+        514,
+        774,
+        1185,
+        679
+      ],
+      "timings_ms": {
+        "embed": 27.27,
+        "retrieve_dense": 76.74,
+        "retrieve_bm25": 60.24,
+        "fuse": 0.06,
+        "rerank": 342.85
+      },
+      "wall_ms": 507.2,
+      "recall@5": 0.6,
+      "recall@10": 1.0,
+      "id": "q28",
+      "query": "Ian Thorpe 200m freestyle Athens gold",
+      "mode": "rerank",
+      "relevant_count": 5
+    },
+    {
+      "retrieved_ids": [
+        455,
+        912,
+        1014,
+        1038,
+        533,
+        537,
+        767,
+        1023,
+        617,
+        1002
+      ],
+      "timings_ms": {
+        "embed": 28.56,
+        "retrieve": 70.95
+      },
+      "wall_ms": 99.53,
+      "recall@5": 0.5,
+      "recall@10": 0.5,
+      "id": "q29",
+      "query": "Phelps first gold medal Athens 400 individual medley",
+      "mode": "naive",
+      "relevant_count": 2
+    },
+    {
+      "retrieved_ids": [
+        912,
+        626,
+        664,
+        1110,
+        594,
+        455,
+        601,
+        1320,
+        617,
+        537
+      ],
+      "timings_ms": {
+        "retrieve": 97.46
+      },
+      "wall_ms": 97.46,
+      "recall@5": 0.0,
+      "recall@10": 0.5,
+      "id": "q29",
+      "query": "Phelps first gold medal Athens 400 individual medley",
+      "mode": "bm25",
+      "relevant_count": 2
+    },
+    {
+      "retrieved_ids": [
+        912,
+        455,
+        1014,
+        1110,
+        1023,
+        594,
+        664,
+        533,
+        626,
+        537
+      ],
+      "timings_ms": {
+        "embed": 26.56,
+        "retrieve_dense": 74.96,
+        "retrieve_bm25": 72.81,
+        "fuse": 0.04
+      },
+      "wall_ms": 174.39,
+      "recall@5": 0.5,
+      "recall@10": 0.5,
+      "id": "q29",
+      "query": "Phelps first gold medal Athens 400 individual medley",
+      "mode": "rrf",
+      "relevant_count": 2
+    },
+    {
+      "retrieved_ids": [
+        455,
+        912,
+        582,
+        664,
+        1110,
+        601,
+        1014,
+        767,
+        537,
+        626
+      ],
+      "timings_ms": {
+        "embed": 18.6,
+        "retrieve_dense": 82.33,
+        "retrieve_bm25": 67.19,
+        "fuse": 0.05,
+        "rerank": 330.21
+      },
+      "wall_ms": 498.4,
+      "recall@5": 0.5,
+      "recall@10": 0.5,
+      "id": "q29",
+      "query": "Phelps first gold medal Athens 400 individual medley",
+      "mode": "rerank",
+      "relevant_count": 2
+    },
+    {
+      "retrieved_ids": [
+        1072,
+        876,
+        1005,
+        531,
+        588,
+        843,
+        50,
+        581,
+        777,
+        881
+      ],
+      "timings_ms": {
+        "embed": 30.56,
+        "retrieve": 66.33
+      },
+      "wall_ms": 96.9,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "id": "q30",
+      "query": "Insurers tally Hurricane Charley losses",
+      "mode": "naive",
+      "relevant_count": 4
+    },
+    {
+      "retrieved_ids": [
+        876,
+        531,
+        1072,
+        777,
+        843,
+        588,
+        50,
+        881,
+        914,
+        1005
+      ],
+      "timings_ms": {
+        "retrieve": 77.08
+      },
+      "wall_ms": 77.08,
+      "recall@5": 0.75,
+      "recall@10": 1.0,
+      "id": "q30",
+      "query": "Insurers tally Hurricane Charley losses",
+      "mode": "bm25",
+      "relevant_count": 4
+    },
+    {
+      "retrieved_ids": [
+        876,
+        1072,
+        531,
+        843,
+        588,
+        1005,
+        777,
+        50,
+        881,
+        914
+      ],
+      "timings_ms": {
+        "embed": 19.25,
+        "retrieve_dense": 68.63,
+        "retrieve_bm25": 61.64,
+        "fuse": 0.06
+      },
+      "wall_ms": 149.61,
+      "recall@5": 0.75,
+      "recall@10": 1.0,
+      "id": "q30",
+      "query": "Insurers tally Hurricane Charley losses",
+      "mode": "rrf",
+      "relevant_count": 4
+    },
+    {
+      "retrieved_ids": [
+        1072,
+        1005,
+        876,
+        588,
+        843,
+        531,
+        581,
+        50,
+        777,
+        914
+      ],
+      "timings_ms": {
+        "embed": 17.97,
+        "retrieve_dense": 78.51,
+        "retrieve_bm25": 75.45,
+        "fuse": 0.05,
+        "rerank": 355.73
+      },
+      "wall_ms": 527.76,
+      "recall@5": 0.75,
+      "recall@10": 1.0,
+      "id": "q30",
+      "query": "Insurers tally Hurricane Charley losses",
+      "mode": "rerank",
+      "relevant_count": 4
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+================= naive =================
+Q: Who did Michael Phelps lose to in the 200 meter freestyle at the Athens Olympics?   [mode=naive, k=5]
+
+Retrieved:
+  [1023] Sports    Olympics: Thorpe Beats Phelps as U.S. Suffers Gold Gap  ATHENS (Reuters) - Australian swim
+  [1002] Sports    Olympics: Thorpe Beats Phelps as U.S. Fights Gold Gap  ATHENS (Reuters) - Australian swimm
+  [ 582] World     Phelps, Rival Thorpe in 200M-Free Semis ATHENS, Greece - Michael Phelps took care of quali
+  [1014] World     Thorpedo Sinks Phelps' Shot at Record ATHENS, Greece - The kid couldn't catch the Thorpedo
+  [ 533] World     Phelps, Thorpe Advance in 200 Freestyle ATHENS, Greece - Michael Phelps took care of quali
+
+A: Ian Thorpe beat Michael Phelps in the 200-meter freestyle at the Athens Olympics. Sources: [1023, 1002, 582, 1014, 533]
+
+Timings (ms): embed=44.52  retrieve=74.43  generate_first_token=88.66  generate_total=1653.78
+================= rrf =================
+Q: Who did Michael Phelps lose to in the 200 meter freestyle at the Athens Olympics?   [mode=rrf, k=5]
+
+Retrieved:
+  [1023] Sports    Olympics: Thorpe Beats Phelps as U.S. Suffers Gold Gap  ATHENS (Reuters) - Australian swim
+  [ 537] World     Phelps, Thorpe Advance in 200 Freestyle ATHENS, Greece - Michael Phelps took care of quali
+  [ 533] World     Phelps, Thorpe Advance in 200 Freestyle ATHENS, Greece - Michael Phelps took care of quali
+  [ 582] World     Phelps, Rival Thorpe in 200M-Free Semis ATHENS, Greece - Michael Phelps took care of quali
+  [1002] Sports    Olympics: Thorpe Beats Phelps as U.S. Fights Gold Gap  ATHENS (Reuters) - Australian swimm
+
+A: Ian Thorpe beat Michael Phelps in the 200-meter freestyle at the Athens Olympics. Sources: [1023, 1002]
+
+Timings (ms): embed=35.85  retrieve_dense=64.96  retrieve_bm25=73.87  fuse=0.05  generate_first_token=84.66  generate_total=1249.58
+================= rerank =================
+Q: Who did Michael Phelps lose to in the 200 meter freestyle at the Athens Olympics?   [mode=rerank, k=5]
+
+Retrieved:
+  [1014] World     Thorpedo Sinks Phelps' Shot at Record ATHENS, Greece - The kid couldn't catch the Thorpedo
+  [1002] Sports    Olympics: Thorpe Beats Phelps as U.S. Fights Gold Gap  ATHENS (Reuters) - Australian swimm
+  [ 774] Sports    Phelps, Thorpe Face Dutch Threat  ATHENS (Reuters) - Michael Phelps, one gold won but one 
+  [1023] Sports    Olympics: Thorpe Beats Phelps as U.S. Suffers Gold Gap  ATHENS (Reuters) - Australian swim
+  [ 533] World     Phelps, Thorpe Advance in 200 Freestyle ATHENS, Greece - Michael Phelps took care of quali
+
+A: Ian Thorpe. Sources: [1002, 774, 1023, 533]
+
+Timings (ms): embed=35.37  retrieve_dense=83.42  retrieve_bm25=68.43  fuse=0.05  rerank=342.9  generate_first_token=79.21  generate_total=928.93

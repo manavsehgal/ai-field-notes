@@ -1,0 +1,56 @@
+================= naive =================
+Q: Did Google have an IPO in 2004?   [mode=naive, k=5]
+
+Retrieved:
+  [  71] Business  Play Boys: Google IPO a Go Anyway Even though Google's two founders gave an interview to P
+  [  36] Business  Google IPO: Type in 'confusing,' 'secrecy' I've submitted my bid to buy shares of Google I
+  [  20] Business  Google IPO faces Playboy slip-up The bidding gets underway for Google's public offering, d
+  [  13] Business  Google IPO Auction Off to Rocky Start  WASHINGTON/NEW YORK (Reuters) - The auction for Goo
+  [1136] Business  Google IPO statement ready to go Google's planned flotation moves another step closer afte
+
+A: The provided context does not contain the answer.
+
+Timings (ms): embed=45.0  retrieve=67.1  generate_first_token=50.97  generate_total=427.91
+
+================= bm25 =================
+Q: Did Google have an IPO in 2004?   [mode=bm25, k=5]
+
+Retrieved:
+  [  71] Business  Play Boys: Google IPO a Go Anyway Even though Google's two founders gave an interview to P
+  [  13] Business  Google IPO Auction Off to Rocky Start  WASHINGTON/NEW YORK (Reuters) - The auction for Goo
+  [  20] Business  Google IPO faces Playboy slip-up The bidding gets underway for Google's public offering, d
+  [  36] Business  Google IPO: Type in 'confusing,' 'secrecy' I've submitted my bid to buy shares of Google I
+  [1136] Business  Google IPO statement ready to go Google's planned flotation moves another step closer afte
+
+A: The provided context does not contain the answer.
+
+Timings (ms): retrieve=78.14  generate_first_token=86.35  generate_total=450.32
+
+================= rrf =================
+Q: Did Google have an IPO in 2004?   [mode=rrf, k=5]
+
+Retrieved:
+  [  71] Business  Play Boys: Google IPO a Go Anyway Even though Google's two founders gave an interview to P
+  [  20] Business  Google IPO faces Playboy slip-up The bidding gets underway for Google's public offering, d
+  [  36] Business  Google IPO: Type in 'confusing,' 'secrecy' I've submitted my bid to buy shares of Google I
+  [  13] Business  Google IPO Auction Off to Rocky Start  WASHINGTON/NEW YORK (Reuters) - The auction for Goo
+  [1136] Business  Google IPO statement ready to go Google's planned flotation moves another step closer afte
+
+A: The provided context does not contain the answer.
+
+Timings (ms): embed=35.87  retrieve_dense=65.23  retrieve_bm25=68.2  fuse=0.05  generate_first_token=73.56  generate_total=442.59
+
+================= rerank =================
+Q: Did Google have an IPO in 2004?   [mode=rerank, k=5]
+
+Retrieved:
+  [  13] Business  Google IPO Auction Off to Rocky Start  WASHINGTON/NEW YORK (Reuters) - The auction for Goo
+  [  36] Business  Google IPO: Type in 'confusing,' 'secrecy' I've submitted my bid to buy shares of Google I
+  [1151] Business  Google Could Make Market Debut Wednesday  NEW YORK/SAN FRANCISCO (Reuters) - Google Inc. a
+  [1091] Business  Google Could Make Its Market Debut Wed.  NEW YORK/SAN FRANCISCO (Reuters) - Google Inc. ap
+  [  71] Business  Play Boys: Google IPO a Go Anyway Even though Google's two founders gave an interview to P
+
+A: The provided context does not contain the answer.
+
+Timings (ms): embed=37.18  retrieve_dense=78.3  retrieve_bm25=58.05  fuse=0.05  rerank=337.02  generate_first_token=62.18  generate_total=438.23
+
