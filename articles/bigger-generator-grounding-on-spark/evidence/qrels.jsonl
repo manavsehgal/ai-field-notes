@@ -1,0 +1,30 @@
+{"id": "q01", "query": "Did Google have an IPO in 2004?", "relevant_ids": [13, 20, 26, 36, 71, 72, 215, 220, 1091, 1112, 1136, 1151, 1245]}
+{"id": "q02", "query": "What was the Playboy controversy around the Google IPO?", "relevant_ids": [20, 71, 72, 215, 220]}
+{"id": "q03", "query": "Who beat Michael Phelps in the 200m freestyle in Athens?", "relevant_ids": [1002, 1014, 1023, 1185]}
+{"id": "q04", "query": "How much damage did Hurricane Charley cause in Florida?", "relevant_ids": [530, 531, 532, 581, 588, 610, 692, 777, 876, 881, 914, 1005, 1072]}
+{"id": "q05", "query": "Did Chavez win the Venezuela recall referendum?", "relevant_ids": [534, 629, 653, 755, 758, 761, 776, 831, 879, 1007, 1016, 1080, 1114]}
+{"id": "q06", "query": "What was Nortel's Canadian accounting probe about?", "relevant_ids": [1179]}
+{"id": "q07", "query": "What happened to the British journalist held hostage in Iraq?", "relevant_ids": [519]}
+{"id": "q08", "query": "Rwandan troops deployed to Darfur", "relevant_ids": [496, 497, 513, 638, 639, 666]}
+{"id": "q09", "query": "Did Wal-Mart maintain its August sales forecast?", "relevant_ids": [827]}
+{"id": "q10", "query": "How did Tiger Woods finish the 2004 PGA Championship?", "relevant_ids": [457, 564, 675]}
+{"id": "q11", "query": "Who won the 2004 PGA Championship?", "relevant_ids": [656, 657, 695, 698, 813, 880]}
+{"id": "q12", "query": "Kostas Kenteris Olympic suspension", "relevant_ids": [461, 471, 718, 797, 865, 1484, 1586, 1592]}
+{"id": "q13", "query": "Microsoft Windows XP Service Pack 2 security", "relevant_ids": [193, 205, 211, 315, 786, 1276]}
+{"id": "q14", "query": "SpaceShipOne and the X Prize", "relevant_ids": [105, 126, 139, 156]}
+{"id": "q15", "query": "PeopleSoft Oracle antitrust trial", "relevant_ids": [86, 312, 1131]}
+{"id": "q16", "query": "Bush Kerry campaign advertisements", "relevant_ids": [180, 933, 1004]}
+{"id": "q17", "query": "Stocks rebound after oil prices ease", "relevant_ids": [882, 895, 915, 928, 944, 960, 995, 1060, 1077, 1090, 1115, 1229, 1279, 1343]}
+{"id": "q18", "query": "Iraq interim president Al-Yawer and Kurdish rebels", "relevant_ids": [1045]}
+{"id": "q19", "query": "US Dream Team basketball loss in Athens", "relevant_ids": [450, 591, 593, 602, 605, 632, 648, 680, 832, 1301, 1422]}
+{"id": "q20", "query": "Britain approves human cloning research license", "relevant_ids": [98, 125, 234, 300]}
+{"id": "q21", "query": "What did Laura Bush say about stem cell research?", "relevant_ids": [306]}
+{"id": "q22", "query": "US troops fighting Sadr militia in Najaf", "relevant_ids": [507, 525, 539, 613, 641, 911, 955, 1033]}
+{"id": "q23", "query": "Japanese lunar probe delays", "relevant_ids": [131, 281]}
+{"id": "q24", "query": "Iraq Olympic soccer team fairytale run", "relevant_ids": [616]}
+{"id": "q25", "query": "Sudan Darfur villagers displaced by militia", "relevant_ids": [750, 837, 838, 839, 943]}
+{"id": "q26", "query": "Iran Olympic judo boycott Israel", "relevant_ids": [456, 565, 595]}
+{"id": "q27", "query": "Oil prices hit record high above 47", "relevant_ids": [762, 803]}
+{"id": "q28", "query": "Ian Thorpe 200m freestyle Athens gold", "relevant_ids": [1002, 1023, 1038, 1014, 1185]}
+{"id": "q29", "query": "Phelps first gold medal Athens 400 individual medley", "relevant_ids": [455, 1154]}
+{"id": "q30", "query": "Insurers tally Hurricane Charley losses", "relevant_ids": [531, 876, 1005, 1072]}
