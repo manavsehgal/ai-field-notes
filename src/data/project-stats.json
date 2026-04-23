@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-23T15:16:34Z",
+  "generated_at": "2026-04-23T16:00:39Z",
   "articles": {
     "total": 10,
     "published": 10,
@@ -17,12 +17,12 @@
   },
   "code": {
     "evidence_loc": 1795,
-    "src_loc": 3555,
-    "total_loc": 5350,
+    "src_loc": 3596,
+    "total_loc": 5391,
     "by_language": {
-      "astro": 1938,
+      "astro": 1958,
       "python": 1780,
-      "css": 1501,
+      "css": 1522,
       "javascript": 66,
       "typescript": 50,
       "sql": 15
@@ -81,13 +81,13 @@
   ],
   "products": [
     {
-      "id": "dgx-spark",
-      "label": "DGX Spark",
+      "id": "nim",
+      "label": "NVIDIA NIM",
       "articles": 10
     },
     {
-      "id": "nim",
-      "label": "NVIDIA NIM",
+      "id": "dgx-spark",
+      "label": "DGX Spark",
       "articles": 10
     },
     {
@@ -139,24 +139,24 @@
   "metrics": {
     "latency": [
       {
-        "label": "a cloud api answers in",
-        "value": "200 ms",
-        "article_slug": "nim-first-inference-dgx-spark"
-      },
-      {
         "label": "streams the first token in",
         "value": "80 milliseconds",
         "article_slug": "naive-rag-on-spark"
       },
       {
-        "label": "hosted endpoint returns in roughly",
-        "value": "340 milliseconds",
-        "article_slug": "rerank-fusion-retrieval-on-spark"
+        "label": "pgvector returns the top-5 in",
+        "value": "70 milliseconds",
+        "article_slug": "naive-rag-on-spark"
       },
       {
-        "label": "the hosted 49b is within",
-        "value": "500 ms",
-        "article_slug": "bigger-generator-grounding-on-spark"
+        "label": "on the task one call",
+        "value": "40 milliseconds",
+        "article_slug": "naive-rag-on-spark"
+      },
+      {
+        "label": "works embedding a query costs",
+        "value": "40 milliseconds",
+        "article_slug": "naive-rag-on-spark"
       }
     ],
     "accuracy": [
