@@ -551,7 +551,7 @@ main { flex: 1; padding-top: 4rem; /* offset for fixed nav */ }
   margin-left: 1.1rem;
   color: var(--color-text-dim);
 }
-.card__paper { color: var(--color-primary); }
+.card__article { color: var(--color-primary); }
 .card__title {
   font-family: var(--font-display);
   font-weight: 700;
