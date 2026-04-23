@@ -39,6 +39,10 @@ I'll use "access layer" throughout this piece. What I mean by it, in five roles:
         <stop offset="0%"   stop-color="var(--svg-accent-blue)" stop-opacity="0.22"/>
         <stop offset="100%" stop-color="var(--svg-accent-blue)" stop-opacity="0"/>
       </radialGradient>
+      <linearGradient id="d01-access-hub-accent-grad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"   stop-color="var(--color-primary)" stop-opacity="0.55"/>
+        <stop offset="100%" stop-color="var(--color-primary)" stop-opacity="0.18"/>
+      </linearGradient>
     </defs>
     <rect x="290" y="140" width="320" height="320" fill="url(#d01-access-hub-halo-grad)" stroke="none"/>
     <g class="fn-diagram__edges">
@@ -49,7 +53,7 @@ I'll use "access layer" throughout this piece. What I mean by it, in five roles:
       <path class="fn-diagram__edge" pathLength="100" d="M 450 300 L 250 235" />
     </g>
     <g class="fn-diagram__nodes">
-      <path class="fn-diagram__node fn-diagram__node--accent fn-diagram__pulse" d="M 510 300 L 480 248 L 420 248 L 390 300 L 420 352 L 480 352 Z" />
+      <path class="fn-diagram__node fn-diagram__node--accent fn-diagram__pulse" d="M 510 300 L 480 248 L 420 248 L 390 300 L 420 352 L 480 352 Z" style="fill: url(#d01-access-hub-accent-grad)" />
       <rect class="fn-diagram__node" x="355" y="37" width="190" height="106" rx="8" />
       <rect class="fn-diagram__node" x="555" y="182" width="190" height="106" rx="8" />
       <rect class="fn-diagram__node" x="478" y="417" width="190" height="106" rx="8" />
@@ -184,6 +188,10 @@ The `tech-writer` skill lives at `~/.claude/skills/tech-writer/`. It has an enfo
         <stop offset="0%"   stop-color="var(--svg-accent-blue)" stop-opacity="0.22"/>
         <stop offset="100%" stop-color="var(--svg-accent-blue)" stop-opacity="0"/>
       </radialGradient>
+      <linearGradient id="d02-public-accent-grad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"   stop-color="var(--color-primary)" stop-opacity="0.55"/>
+        <stop offset="100%" stop-color="var(--color-primary)" stop-opacity="0.18"/>
+      </linearGradient>
     </defs>
     <rect x="20" y="100" width="860" height="60" rx="4" fill="url(#d02-flow-band-grad)" stroke="none"/>
     <rect x="640" y="50" width="200" height="160" fill="url(#d02-endpoint-halo-grad)" stroke="none"/>
@@ -194,13 +202,13 @@ The `tech-writer` skill lives at `~/.claude/skills/tech-writer/`. It has an enfo
       <path class="fn-diagram__edge" pathLength="100" d="M 490 130 L 510 130" />
       <path class="fn-diagram__edge" pathLength="100" d="M 650 130 L 670 130" />
     </g>
-    <circle class="fn-diagram__flow" r="7" cx="170" cy="130"><animateMotion dur="3.8s" repeatCount="indefinite" calcMode="spline" keyTimes="0;1" keySplines="0.4 0 0.2 1" begin="1.6s"><mpath href="#d02-flow-path" /></animateMotion></circle>
+    <circle class="fn-diagram__flow" r="7"><animateMotion dur="3.8s" repeatCount="indefinite" calcMode="spline" keyTimes="0;1" keySplines="0.4 0 0.2 1" begin="1.6s"><mpath href="#d02-flow-path" /></animateMotion></circle>
     <g class="fn-diagram__nodes">
       <rect class="fn-diagram__node" x="30" y="70" width="140" height="120" rx="8" />
       <rect class="fn-diagram__node" x="190" y="70" width="140" height="120" rx="8" />
       <rect class="fn-diagram__node" x="350" y="70" width="140" height="120" rx="8" />
       <rect class="fn-diagram__node" x="510" y="70" width="140" height="120" rx="8" />
-      <rect class="fn-diagram__node fn-diagram__node--accent fn-diagram__pulse" x="670" y="70" width="140" height="120" rx="8" />
+      <rect class="fn-diagram__node fn-diagram__node--accent fn-diagram__pulse" x="670" y="70" width="140" height="120" rx="8" style="fill: url(#d02-public-accent-grad)" />
     </g>
     <g class="fn-diagram__labels">
       <text class="fn-diagram__label fn-diagram__label--accent" x="100" y="138" text-anchor="middle">SESSION</text>

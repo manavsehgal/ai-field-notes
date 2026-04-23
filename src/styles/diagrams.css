@@ -69,12 +69,22 @@
 }
 
 /* --- SVG primitive classes ----------------------------------------------- */
+/*
+ * Motion contract: every animated element starts INVISIBLE (opacity: 0) and
+ * stays that way until an ancestor `.fn-diagram` gains the `.fn-diagram--visible`
+ * class. That class is added by BaseLayout.astro's IntersectionObserver when
+ * the figure scrolls into view — matching the behaviour of signature figures.
+ * Putting `animation: ...` only inside the `.fn-diagram--visible` branch means
+ * the whole diagram is silent until the reader actually reaches it.
+ */
 
 .fn-diagram__node {
   fill: var(--color-surface-overlay);
   stroke: var(--color-text-muted);
   stroke-width: 1.25;
   opacity: 0;
+}
+.fn-diagram--visible .fn-diagram__node {
   animation: fn-fade-rise var(--fn-dur-med) var(--fn-ease) forwards;
 }
 
@@ -105,6 +115,8 @@
   stroke-dasharray: 100;
   stroke-dashoffset: 100;
   opacity: 0;
+}
+.fn-diagram--visible .fn-diagram__edge {
   animation: fn-stroke-draw var(--fn-dur-long) var(--fn-ease) forwards;
 }
 
@@ -117,6 +129,9 @@
   stroke-dasharray: 5 4;
   stroke-dashoffset: 0;
   opacity: 0;
+  animation: none;
+}
+.fn-diagram--visible .fn-diagram__edge--dashed {
   animation: fn-fade-in var(--fn-dur-med) var(--fn-ease) forwards;
 }
 
@@ -124,15 +139,23 @@
   stroke: var(--color-border);
   stroke-width: 1;
   opacity: 0;
-  animation: fn-fade-in var(--fn-dur-med) var(--fn-ease) forwards;
+  animation: none;
   stroke-dasharray: 0;
   stroke-dashoffset: 0;
 }
+.fn-diagram--visible .fn-diagram__edge--ghost {
+  animation: fn-fade-in var(--fn-dur-med) var(--fn-ease) forwards;
+}
 
-/* Flow particle — circle with <animateMotion>. Appears after edges draw. */
+/* Flow particle — circle with <animateMotion>. Appears after edges draw.
+ * The circle MUST NOT set cx/cy: animateMotion applies as an additional
+ * translate() on top of the element's intrinsic position, so any non-zero
+ * cx/cy compounds with the motion path and displaces the dot. */
 .fn-diagram__flow {
   fill: var(--color-primary);
   opacity: 0;
+}
+.fn-diagram--visible .fn-diagram__flow {
   animation: fn-fade-in var(--fn-dur-short) var(--fn-ease) forwards;
   animation-delay: var(--fn-dur-long);
 }
@@ -141,6 +164,8 @@
 .fn-diagram__pulse {
   transform-origin: center;
   transform-box: fill-box;
+}
+.fn-diagram--visible .fn-diagram__pulse {
   animation: fn-soft-pulse 2800ms var(--fn-ease) infinite;
   animation-delay: calc(var(--fn-dur-long) + 200ms);
 }
@@ -150,6 +175,8 @@
   fill: var(--color-text-muted);
   stroke: none;
   opacity: 0;
+}
+.fn-diagram--visible .fn-diagram__dot {
   animation: fn-fade-in var(--fn-dur-short) var(--fn-ease) forwards;
   animation-delay: var(--fn-dur-long);
 }
@@ -165,9 +192,11 @@
   stroke-linecap: round;
   stroke-linejoin: round;
   opacity: 0;
+  pointer-events: none;
+}
+.fn-diagram--visible .fn-diagram__icon {
   animation: fn-fade-in var(--fn-dur-med) var(--fn-ease) forwards;
   animation-delay: var(--fn-dur-med);
-  pointer-events: none;
 }
 
 .fn-diagram__icon--accent { stroke: var(--color-primary); }
@@ -180,6 +209,8 @@
   transform-box: fill-box;
   transform: scaleX(0);
   opacity: 0;
+}
+.fn-diagram--visible .fn-diagram__bar {
   animation: fn-bar-grow var(--fn-dur-long) var(--fn-ease) forwards;
 }
 
@@ -190,6 +221,8 @@
   font-size: 14px;
   fill: var(--color-text);
   opacity: 0;
+}
+.fn-diagram--visible .fn-diagram__label {
   animation: fn-fade-rise var(--fn-dur-med) var(--fn-ease) forwards;
   animation-delay: var(--fn-dur-short);
 }
@@ -223,6 +256,8 @@
   font-size: 11px;
   fill: var(--color-text-dim);
   opacity: 0;
+}
+.fn-diagram--visible .fn-diagram__annotation {
   animation: fn-fade-rise var(--fn-dur-med) var(--fn-ease) forwards;
   animation-delay: var(--fn-dur-long);
 }

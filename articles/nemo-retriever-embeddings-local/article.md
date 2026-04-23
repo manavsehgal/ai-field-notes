@@ -41,6 +41,10 @@ NIM is still the packaging layer, but the engine inside the embed container is d
         <stop offset="0%" stop-color="var(--svg-accent-blue)" stop-opacity="0.18"/>
         <stop offset="100%" stop-color="var(--svg-accent-blue)" stop-opacity="0"/>
       </radialGradient>
+      <linearGradient id="d02-nim-accent-grad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"   stop-color="var(--color-primary)" stop-opacity="0.55"/>
+        <stop offset="100%" stop-color="var(--color-primary)" stop-opacity="0.18"/>
+      </linearGradient>
     </defs>
     <rect x="20" y="40" width="200" height="140" rx="10" fill="url(#d02-query-lane-grad)" stroke="none"/>
     <rect x="20" y="180" width="200" height="140" rx="10" fill="url(#d02-passage-lane-grad)" stroke="none"/>
@@ -50,11 +54,11 @@ NIM is still the packaging layer, but the engine inside the embed container is d
       <path class="fn-diagram__edge" pathLength="100" d="M 200 250 L 420 180" />
       <path class="fn-diagram__edge fn-diagram__edge--dashed" pathLength="100" d="M 580 180 L 700 180" />
     </g>
-    <circle class="fn-diagram__flow" r="6" cx="200" cy="110"><animateMotion dur="3.4s" repeatCount="indefinite" calcMode="spline" keyTimes="0;1" keySplines="0.4 0 0.2 1" begin="1.4s"><mpath href="#d02-embed-query-path" /></animateMotion></circle>
+    <circle class="fn-diagram__flow" r="6"><animateMotion dur="3.4s" repeatCount="indefinite" calcMode="spline" keyTimes="0;1" keySplines="0.4 0 0.2 1" begin="1.4s"><mpath href="#d02-embed-query-path" /></animateMotion></circle>
     <g class="fn-diagram__nodes">
       <rect class="fn-diagram__node" x="40" y="60" width="160" height="100" rx="8" />
       <rect class="fn-diagram__node" x="40" y="200" width="160" height="100" rx="8" />
-      <rect class="fn-diagram__node fn-diagram__node--accent fn-diagram__pulse" x="420" y="120" width="160" height="120" rx="10" />
+      <rect class="fn-diagram__node fn-diagram__node--accent fn-diagram__pulse" x="420" y="120" width="160" height="120" rx="10" style="fill: url(#d02-nim-accent-grad)" />
       <rect class="fn-diagram__node fn-diagram__node--ghost" x="700" y="120" width="160" height="120" rx="8" />
     </g>
     <g class="fn-diagram__labels">

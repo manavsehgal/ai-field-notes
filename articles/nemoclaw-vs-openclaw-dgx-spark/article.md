@@ -51,6 +51,10 @@ Both stacks ultimately call the same Ollama process on the host:
         <stop offset="0%"   stop-color="var(--svg-accent-blue)" stop-opacity="0.20"/>
         <stop offset="100%" stop-color="var(--svg-accent-blue)" stop-opacity="0"/>
       </radialGradient>
+      <linearGradient id="d01-ollama-accent-grad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"   stop-color="var(--color-primary)" stop-opacity="0.55"/>
+        <stop offset="100%" stop-color="var(--color-primary)" stop-opacity="0.18"/>
+      </linearGradient>
     </defs>
     <rect x="50" y="20" width="260" height="155" rx="10" fill="url(#d01-host-lane-grad)" stroke="none"/>
     <rect x="30" y="255" width="410" height="170" rx="10" fill="url(#d01-sandbox-lane-grad)" stroke="none"/>
@@ -67,8 +71,8 @@ Both stacks ultimately call the same Ollama process on the host:
       <rect class="fn-diagram__node" x="80" y="295" width="160" height="90" rx="8" />
       <path class="fn-diagram__node" d="M 395 340 L 367.5 292.4 L 312.5 292.4 L 285 340 L 312.5 387.6 L 367.5 387.6 Z" />
       <rect class="fn-diagram__node" x="470" y="295" width="140" height="90" rx="8" />
-      <path class="fn-diagram__node fn-diagram__node--accent fn-diagram__pulse" d="M 690 170 L 690 290 A 70 18 0 0 0 830 290 L 830 170" />
-      <ellipse class="fn-diagram__node fn-diagram__node--accent" cx="760" cy="170" rx="70" ry="18" />
+      <path class="fn-diagram__node fn-diagram__node--accent fn-diagram__pulse" d="M 690 170 L 690 290 A 70 18 0 0 0 830 290 L 830 170" style="fill: url(#d01-ollama-accent-grad)" />
+      <ellipse class="fn-diagram__node fn-diagram__node--accent" cx="760" cy="170" rx="70" ry="18" style="fill: url(#d01-ollama-accent-grad)" />
     </g>
     <g class="fn-diagram__labels">
       <text class="fn-diagram__label fn-diagram__label--accent" x="50" y="245" text-anchor="start">NEMOCLAW SANDBOX</text>

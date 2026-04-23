@@ -38,6 +38,10 @@ NIM is not a new inference engine. It's NVIDIA's packaging layer around existing
         <stop offset="0%" stop-color="var(--svg-accent-blue)" stop-opacity="0.22"/>
         <stop offset="100%" stop-color="var(--svg-accent-blue)" stop-opacity="0"/>
       </radialGradient>
+      <linearGradient id="d01-endpoint-accent-grad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"   stop-color="var(--color-primary)" stop-opacity="0.55"/>
+        <stop offset="100%" stop-color="var(--color-primary)" stop-opacity="0.18"/>
+      </linearGradient>
     </defs>
     <rect x="20" y="110" width="860" height="60" rx="4" fill="url(#d01-pipeline-band-grad)" stroke="none"/>
     <rect x="640" y="60" width="200" height="160" fill="url(#d01-endpoint-halo-grad)" stroke="none"/>
@@ -48,13 +52,13 @@ NIM is not a new inference engine. It's NVIDIA's packaging layer around existing
       <path class="fn-diagram__edge" pathLength="100" d="M 490 140 L 510 140" />
       <path class="fn-diagram__edge" pathLength="100" d="M 650 140 L 670 140" />
     </g>
-    <circle class="fn-diagram__flow" r="7" cx="170" cy="140"><animateMotion dur="3.8s" repeatCount="indefinite" calcMode="spline" keyTimes="0;1" keySplines="0.4 0 0.2 1" begin="1.6s"><mpath href="#d01-nim-flow-path" /></animateMotion></circle>
+    <circle class="fn-diagram__flow" r="7"><animateMotion dur="3.8s" repeatCount="indefinite" calcMode="spline" keyTimes="0;1" keySplines="0.4 0 0.2 1" begin="1.6s"><mpath href="#d01-nim-flow-path" /></animateMotion></circle>
     <g class="fn-diagram__nodes">
       <rect class="fn-diagram__node fn-diagram__node--ghost" x="30" y="80" width="140" height="120" rx="8" />
       <rect class="fn-diagram__node" x="190" y="80" width="140" height="120" rx="8" />
       <rect class="fn-diagram__node" x="350" y="80" width="140" height="120" rx="8" />
       <rect class="fn-diagram__node" x="510" y="80" width="140" height="120" rx="8" />
-      <rect class="fn-diagram__node fn-diagram__node--accent fn-diagram__pulse" x="670" y="80" width="140" height="120" rx="8" />
+      <rect class="fn-diagram__node fn-diagram__node--accent fn-diagram__pulse" x="670" y="80" width="140" height="120" rx="8" style="fill: url(#d01-endpoint-accent-grad)" />
     </g>
     <g class="fn-diagram__labels">
       <text class="fn-diagram__label fn-diagram__label--muted" x="100" y="138" text-anchor="middle">REMOTE</text>
