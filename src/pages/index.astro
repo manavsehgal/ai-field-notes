@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import StageFilter from '../components/StageFilter.astro';
 import ArticleCard from '../components/ArticleCard.astro';
+import ProjectStats from '../components/ProjectStats.astro';
 import { publishOrdinals } from '../lib/article-order.mjs';
 
 // Ordinal — earliest article = №01, derived from git first-add time so ties
@@ -33,6 +34,8 @@ const volLabel = new Intl.DateTimeFormat('en-GB', { month: 'short', year: 'numer
       <span class="masthead__rule"></span>
       <span>Apache 2.0 · by Manav Sehgal</span>
     </div>
+
+    <ProjectStats />
   </header>
 
   <StageFilter current={null} />

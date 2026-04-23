@@ -1,0 +1,194 @@
+{
+  "generated_at": "2026-04-23T14:45:20Z",
+  "articles": {
+    "total": 10,
+    "published": 10,
+    "drafts": 0
+  },
+  "words": {
+    "total": 25520,
+    "mean_per_article": 2552,
+    "longest": {
+      "slug": "nim-first-inference-dgx-spark",
+      "title": "Your First NIM on a DGX Spark \u2014 What 24.8 Tokens Per Second Doesn't Tell You",
+      "words": 3476
+    }
+  },
+  "code": {
+    "evidence_loc": 1795,
+    "src_loc": 3375,
+    "total_loc": 5170,
+    "by_language": {
+      "astro": 1871,
+      "python": 1780,
+      "css": 1398,
+      "javascript": 66,
+      "typescript": 40,
+      "sql": 15
+    },
+    "data_lines": {
+      "json": 7343,
+      "yaml": 45
+    }
+  },
+  "stages": {
+    "foundations": 2,
+    "inference": 7,
+    "training": 0,
+    "agentic": 1,
+    "observability": 0,
+    "dev-tools": 0
+  },
+  "models": [
+    {
+      "id": "llama-3.1-8b-instruct",
+      "label": "Llama 3.1 8B Instruct",
+      "articles": 8
+    },
+    {
+      "id": "nemotron-reranker-1b",
+      "label": "Nemotron Reranker 1B",
+      "articles": 4
+    },
+    {
+      "id": "nemotron-super-49b",
+      "label": "Nemotron Super 49B",
+      "articles": 3
+    },
+    {
+      "id": "nemotron-embed-1b-v2",
+      "label": "Nemotron Embed 1B v2",
+      "articles": 2
+    },
+    {
+      "id": "llama-3.3-70b-instruct",
+      "label": "Llama 3.3 70B Instruct",
+      "articles": 1
+    }
+  ],
+  "products": [
+    {
+      "id": "dgx-spark",
+      "label": "DGX Spark",
+      "articles": 10
+    },
+    {
+      "id": "nim",
+      "label": "NVIDIA NIM",
+      "articles": 10
+    },
+    {
+      "id": "nemo-retriever",
+      "label": "NeMo Retriever",
+      "articles": 7
+    },
+    {
+      "id": "nemo",
+      "label": "NeMo Framework",
+      "articles": 6
+    },
+    {
+      "id": "pgvector",
+      "label": "pgvector",
+      "articles": 6
+    },
+    {
+      "id": "nemoclaw",
+      "label": "NemoClaw",
+      "articles": 5
+    },
+    {
+      "id": "tensorrt-llm",
+      "label": "TensorRT-LLM",
+      "articles": 4
+    },
+    {
+      "id": "triton",
+      "label": "Triton Inference Server",
+      "articles": 3
+    },
+    {
+      "id": "ollama",
+      "label": "Ollama",
+      "articles": 3
+    },
+    {
+      "id": "nemo-guardrails",
+      "label": "NeMo Guardrails",
+      "articles": 2
+    },
+    {
+      "id": "openclaw",
+      "label": "OpenClaw",
+      "articles": 1
+    }
+  ],
+  "metrics": {
+    "latency": [
+      {
+        "label": "a cloud api answers in",
+        "value": "200 ms",
+        "article_slug": "nim-first-inference-dgx-spark"
+      },
+      {
+        "label": "streams the first token in",
+        "value": "80 milliseconds",
+        "article_slug": "naive-rag-on-spark"
+      },
+      {
+        "label": "hosted endpoint returns in roughly",
+        "value": "340 milliseconds",
+        "article_slug": "rerank-fusion-retrieval-on-spark"
+      },
+      {
+        "label": "the hosted 49b is within",
+        "value": "500 ms",
+        "article_slug": "bigger-generator-grounding-on-spark"
+      }
+    ],
+    "accuracy": [
+      {
+        "label": "queries where retrieval was perfect",
+        "value": "recall@5 = 1.0",
+        "article_slug": "bigger-generator-grounding-on-spark"
+      },
+      {
+        "label": "three refused with partial retrieval",
+        "value": "recall@5 = 0.50",
+        "article_slug": "bigger-generator-grounding-on-spark"
+      },
+      {
+        "label": "a configuration that loses at",
+        "value": "recall@10",
+        "article_slug": "rerank-fusion-retrieval-on-spark"
+      },
+      {
+        "label": "four points below it on",
+        "value": "NDCG@10",
+        "article_slug": "pgvector-on-spark"
+      }
+    ],
+    "throughput": [
+      {
+        "label": "fp8 engine runs at roughly",
+        "value": "25 tokens per second",
+        "article_slug": "naive-rag-on-spark"
+      },
+      {
+        "label": "clawnav is pinned to nemotron",
+        "value": "22 tok/s",
+        "article_slug": "nemoclaw-vs-openclaw-dgx-spark"
+      },
+      {
+        "label": "throughput per token is within",
+        "value": "0.2 tok/s",
+        "article_slug": "nim-first-inference-dgx-spark"
+      },
+      {
+        "label": "in 8 9 seconds at",
+        "value": "24.8 tokens per second",
+        "article_slug": "nim-first-inference-dgx-spark"
+      }
+    ]
+  }
+}
