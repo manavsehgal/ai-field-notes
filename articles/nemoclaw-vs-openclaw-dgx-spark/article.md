@@ -37,7 +37,24 @@ NemoClaw and OpenClaw are the kind of near-homophones that, combined with shared
 Both stacks ultimately call the same Ollama process on the host:
 
 <figure class="fn-diagram" aria-label="Two paths to one Ollama. Host OpenClaw reaches Ollama directly on port 11434. The NemoClaw sandbox (OpenClaw inside a dashed container with a hexagonal k3s gateway offering the inference.local route) reaches the same Ollama by crossing the sandbox boundary and passing through an auth-proxy on port 11435. Both paths converge on the Ollama cylinder, which pulses softly.">
-  <svg viewBox="0 0 900 440" role="img" preserveAspectRatio="xMidYMid meet">
+  <svg viewBox="0 0 900 440" role="img" aria-label="Two paths to one Ollama. Host OpenClaw reaches Ollama directly on port 11434. The NemoClaw sandbox (OpenClaw inside a dashed container with a hexagonal k3s gateway offering the inference.local route) reaches the same Ollama by crossing the sandbox boundary and passing through an auth-proxy on port 11435. Both paths converge on the Ollama cylinder, which pulses softly." preserveAspectRatio="xMidYMid meet">
+    <defs>
+      <linearGradient id="d01-host-lane-grad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"   stop-color="var(--svg-accent-blue)" stop-opacity="0.10"/>
+        <stop offset="100%" stop-color="var(--svg-accent-blue)" stop-opacity="0.02"/>
+      </linearGradient>
+      <linearGradient id="d01-sandbox-lane-grad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"   stop-color="var(--svg-accent-teal)" stop-opacity="0.10"/>
+        <stop offset="100%" stop-color="var(--svg-accent-teal)" stop-opacity="0.02"/>
+      </linearGradient>
+      <radialGradient id="d01-ollama-halo-grad" cx="0.5" cy="0.5" r="0.6">
+        <stop offset="0%"   stop-color="var(--svg-accent-blue)" stop-opacity="0.20"/>
+        <stop offset="100%" stop-color="var(--svg-accent-blue)" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <rect x="50" y="20" width="260" height="155" rx="10" fill="url(#d01-host-lane-grad)" stroke="none"/>
+    <rect x="30" y="255" width="410" height="170" rx="10" fill="url(#d01-sandbox-lane-grad)" stroke="none"/>
+    <rect x="650" y="130" width="220" height="200" fill="url(#d01-ollama-halo-grad)" stroke="none"/>
     <g class="fn-diagram__edges">
       <path class="fn-diagram__edge" pathLength="100" d="M 270 100 L 690 180" />
       <path class="fn-diagram__edge" pathLength="100" d="M 240 340 L 285 340" />
@@ -73,10 +90,10 @@ Both stacks ultimately call the same Ollama process on the host:
       <text class="fn-diagram__annotation" x="760" y="395" text-anchor="middle">one blob, two routes</text>
     </g>
     <g class="fn-diagram__symbols">
-      <g class="fn-diagram__icon" transform="translate(168 58)"><path d="M6.75 7.5l3 2.25-3 2.25m4.5 0h3m-9 8.25h13.5A2.25 2.25 0 0021 18V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v12a2.25 2.25 0 002.25 2.25z"/></g>
-      <g class="fn-diagram__icon" transform="translate(148 308)"><path d="M6.75 7.5l3 2.25-3 2.25m4.5 0h3m-9 8.25h13.5A2.25 2.25 0 0021 18V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v12a2.25 2.25 0 002.25 2.25z"/></g>
-      <g class="fn-diagram__icon" transform="translate(328 310)"><path d="M21 7.5l-2.25-1.313M21 7.5v2.25m0-2.25l-2.25 1.313M3 7.5l2.25-1.313M3 7.5l2.25 1.313M3 7.5v2.25m9 3l2.25-1.313M12 12.75l-2.25-1.313M12 12.75V15m0 6.75l2.25-1.313M12 21.75V19.5m0 2.25l-2.25-1.313m0-16.875L12 2.25l2.25 1.313M21 14.25v2.25l-2.25 1.313m-13.5 0L3 16.5v-2.25"/></g>
-      <g class="fn-diagram__icon" transform="translate(528 308)"><path d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z"/></g>
+      <g class="fn-diagram__icon" transform="translate(168 44)"><path d="M6.75 7.5l3 2.25-3 2.25m4.5 0h3m-9 8.25h13.5A2.25 2.25 0 0021 18V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v12a2.25 2.25 0 002.25 2.25z"/></g>
+      <g class="fn-diagram__icon" transform="translate(148 296)"><path d="M6.75 7.5l3 2.25-3 2.25m4.5 0h3m-9 8.25h13.5A2.25 2.25 0 0021 18V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v12a2.25 2.25 0 002.25 2.25z"/></g>
+      <g class="fn-diagram__icon" transform="translate(328 300)"><path d="M21 7.5l-2.25-1.313M21 7.5v2.25m0-2.25l-2.25 1.313M3 7.5l2.25-1.313M3 7.5l2.25 1.313M3 7.5v2.25m9 3l2.25-1.313M12 12.75l-2.25-1.313M12 12.75V15m0 6.75l2.25-1.313M12 21.75V19.5m0 2.25l-2.25-1.313m0-16.875L12 2.25l2.25 1.313M21 14.25v2.25l-2.25 1.313m-13.5 0L3 16.5v-2.25"/></g>
+      <g class="fn-diagram__icon" transform="translate(528 296)"><path d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z"/></g>
       <g class="fn-diagram__icon fn-diagram__icon--accent" transform="translate(748 128)"><path d="M5.25 14.25h13.5m-13.5 0a3 3 0 01-3-3m3 3a3 3 0 100 6h13.5a3 3 0 100-6m-16.5-3a3 3 0 013-3h13.5a3 3 0 013 3m-19.5 0a4.5 4.5 0 01.9-2.7L5.737 5.1a3.375 3.375 0 012.7-1.35h7.126c1.062 0 2.062.5 2.7 1.35l2.587 3.45a4.5 4.5 0 01.9 2.7m0 0a3 3 0 01-3 3"/></g>
     </g>
   </svg>
@@ -225,7 +242,14 @@ The 10-second raw baseline is what Ollama does on its own. The 140-second sandbo
 | Host OpenClaw `--local` | stuck in USER.md bootstrap | n/a |
 
 <figure class="fn-diagram" aria-label="Per-turn wall-clock across the first two turns of interaction. Raw Ollama stays low at 10 and 26 seconds. NemoClaw sandbox drops sharply from 140 seconds at turn 1 to 52 seconds at turn 2, converging toward the raw baseline. The host OpenClaw measures 77 seconds at turn 1 and then stalls in USER.md onboarding, never returning an answer — indicated by a dashed trajectory diverging upward with a warning glyph.">
-  <svg viewBox="0 0 900 440" role="img" preserveAspectRatio="xMidYMid meet">
+  <svg viewBox="0 0 900 440" role="img" aria-label="Per-turn wall-clock across the first two turns of interaction. Raw Ollama stays low at 10 and 26 seconds. NemoClaw sandbox drops sharply from 140 seconds at turn 1 to 52 seconds at turn 2, converging toward the raw baseline. The host OpenClaw measures 77 seconds at turn 1 and then stalls in USER.md onboarding, never returning an answer — indicated by a dashed trajectory diverging upward with a warning glyph." preserveAspectRatio="xMidYMid meet">
+    <defs>
+      <linearGradient id="d02-plot-grad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"   stop-color="var(--svg-accent-blue)" stop-opacity="0.12"/>
+        <stop offset="100%" stop-color="var(--svg-accent-blue)" stop-opacity="0.02"/>
+      </linearGradient>
+    </defs>
+    <rect x="110" y="40" width="730" height="320" fill="url(#d02-plot-grad)" stroke="none"/>
     <g class="fn-diagram__edges">
       <path class="fn-diagram__edge fn-diagram__edge--ghost" d="M 110 360 L 840 360" />
       <path class="fn-diagram__edge fn-diagram__edge--ghost" d="M 110 280 L 840 280" />
@@ -266,8 +290,8 @@ The 10-second raw baseline is what Ollama does on its own. The 140-second sandbo
       <text class="fn-diagram__annotation" x="300" y="156" text-anchor="end">onboarding pre-paid at install (28 min)</text>
     </g>
     <g class="fn-diagram__symbols">
-      <g class="fn-diagram__icon fn-diagram__icon--accent" transform="translate(360 110) scale(0.9)"><path d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941"/></g>
-      <g class="fn-diagram__icon fn-diagram__icon--muted" transform="translate(660 308) scale(0.8)"><path d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5m.75-9l3-3 2.148 2.148A12.061 12.061 0 0116.5 7.605"/></g>
+      <g class="fn-diagram__icon fn-diagram__icon--accent" transform="translate(485 110) scale(0.9)"><path d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941"/></g>
+      <g class="fn-diagram__icon fn-diagram__icon--muted" transform="translate(630 320) scale(0.8)"><path d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5m.75-9l3-3 2.148 2.148A12.061 12.061 0 0116.5 7.605"/></g>
       <g class="fn-diagram__icon" transform="translate(810 24) scale(0.9)"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.008v.008H12v-.008z"/></g>
     </g>
   </svg>

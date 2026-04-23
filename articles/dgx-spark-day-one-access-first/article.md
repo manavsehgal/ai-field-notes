@@ -33,7 +33,14 @@ The DGX Spark is uniquely well-suited to this posture because it's *one* machine
 I'll use "access layer" throughout this piece. What I mean by it, in five roles:
 
 <figure class="fn-diagram" aria-label="The access layer stack — a hexagonal You hub at centre connects via five spokes to a pentagon of tool chips: Sunshine+Moonlight for reach, Claude Code for collaboration, Playwright-MCP for browser exploration, NemoClaw for safe sandboxed automation, and git+blog for publishing.">
-  <svg viewBox="0 0 900 600" role="img" preserveAspectRatio="xMidYMid meet">
+  <svg viewBox="0 0 900 600" role="img" aria-label="The access layer stack — a hexagonal You hub at centre connects via five spokes to a pentagon of tool chips: Sunshine+Moonlight for reach, Claude Code for collaboration, Playwright-MCP for browser exploration, NemoClaw for safe sandboxed automation, and git+blog for publishing." preserveAspectRatio="xMidYMid meet">
+    <defs>
+      <radialGradient id="d01-access-hub-halo-grad" cx="0.5" cy="0.5" r="0.55">
+        <stop offset="0%"   stop-color="var(--svg-accent-blue)" stop-opacity="0.22"/>
+        <stop offset="100%" stop-color="var(--svg-accent-blue)" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <rect x="290" y="140" width="320" height="320" fill="url(#d01-access-hub-halo-grad)" stroke="none"/>
     <g class="fn-diagram__edges">
       <path class="fn-diagram__edge fn-diagram__edge--accent" pathLength="100" d="M 450 300 L 450 90" />
       <path class="fn-diagram__edge" pathLength="100" d="M 450 300 L 650 235" />
@@ -69,11 +76,11 @@ I'll use "access layer" throughout this piece. What I mean by it, in five roles:
     </g>
     <g class="fn-diagram__symbols">
       <g class="fn-diagram__icon fn-diagram__icon--accent" transform="translate(434 268) scale(1.33)"><path d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></g>
-      <g class="fn-diagram__icon" transform="translate(438 45)"><path d="M9.348 14.651a3.75 3.75 0 010-5.303m5.304 0a3.75 3.75 0 010 5.303m-7.425 2.122a6.75 6.75 0 010-9.546m9.546 0a6.75 6.75 0 010 9.546M5.106 18.894c-3.808-3.807-3.808-9.98 0-13.788m13.788 0c3.808 3.807 3.808 9.98 0 13.788"/></g>
-      <g class="fn-diagram__icon" transform="translate(638 190)"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/></g>
-      <g class="fn-diagram__icon" transform="translate(561 425)"><path d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582"/></g>
-      <g class="fn-diagram__icon" transform="translate(315 425)"><path d="M9 12.75L11.25 15 15 9.75M12 21.75l-7.5-4.5V7.5L12 3l7.5 4.5v9.75l-7.5 4.5z"/></g>
-      <g class="fn-diagram__icon" transform="translate(238 190)"><path d="M6 12L3.269 3.125A59.769 59.769 0 0121.485 12 59.768 59.768 0 013.27 20.875L5.999 12zm0 0h7.5"/></g>
+      <g class="fn-diagram__icon" transform="translate(438 39)"><path d="M9.348 14.651a3.75 3.75 0 010-5.303m5.304 0a3.75 3.75 0 010 5.303m-7.425 2.122a6.75 6.75 0 010-9.546m9.546 0a6.75 6.75 0 010 9.546M5.106 18.894c-3.808-3.807-3.808-9.98 0-13.788m13.788 0c3.808 3.807 3.808 9.98 0 13.788"/></g>
+      <g class="fn-diagram__icon" transform="translate(638 184)"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/></g>
+      <g class="fn-diagram__icon" transform="translate(561 419)"><path d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582"/></g>
+      <g class="fn-diagram__icon" transform="translate(315 419)"><path d="M9 12.75L11.25 15 15 9.75M12 21.75l-7.5-4.5V7.5L12 3l7.5 4.5v9.75l-7.5 4.5z"/></g>
+      <g class="fn-diagram__icon" transform="translate(238 184)"><path d="M6 12L3.269 3.125A59.769 59.769 0 0121.485 12 59.768 59.768 0 013.27 20.875L5.999 12zm0 0h7.5"/></g>
     </g>
   </svg>
   <figcaption>The tools are interchangeable; the breadth of the surface is what compounds.</figcaption>
@@ -166,15 +173,28 @@ Most setup posts treat publishing as something you do *if you feel like it*. I w
 The `tech-writer` skill lives at `~/.claude/skills/tech-writer/`. It has an enforced editorial voice ("deep-dive essay, not cookbook"), a mandatory privacy scrub pass on every commit, and a shell script that blocks commits containing API keys, personal IPs, or other leakage patterns. The article you're reading was produced by it — first draft written by the skill, this polish by me.
 
 <figure class="fn-diagram" aria-label="The publishing pipeline — five horizontal stages transforming a working session into a public learning artifact: session transcript, tech-writer draft, privacy scrub, git commit, public reader. An oxblood particle travels the path continuously, representing the feedback loop closing.">
-  <svg viewBox="0 0 900 240" role="img" preserveAspectRatio="xMidYMid meet">
+  <svg viewBox="0 0 900 240" role="img" aria-label="The publishing pipeline — five horizontal stages transforming a working session into a public learning artifact: session transcript, tech-writer draft, privacy scrub, git commit, public reader. An oxblood particle travels the path continuously, representing the feedback loop closing." preserveAspectRatio="xMidYMid meet">
+    <defs>
+      <linearGradient id="d02-flow-band-grad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"   stop-color="var(--svg-accent-blue)" stop-opacity="0.02"/>
+        <stop offset="50%"  stop-color="var(--svg-accent-blue)" stop-opacity="0.12"/>
+        <stop offset="100%" stop-color="var(--svg-accent-blue)" stop-opacity="0.02"/>
+      </linearGradient>
+      <radialGradient id="d02-endpoint-halo-grad" cx="0.5" cy="0.5" r="0.6">
+        <stop offset="0%"   stop-color="var(--svg-accent-blue)" stop-opacity="0.22"/>
+        <stop offset="100%" stop-color="var(--svg-accent-blue)" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <rect x="20" y="100" width="860" height="60" rx="4" fill="url(#d02-flow-band-grad)" stroke="none"/>
+    <rect x="640" y="50" width="200" height="160" fill="url(#d02-endpoint-halo-grad)" stroke="none"/>
     <g class="fn-diagram__edges">
-      <path id="d02-flow-path" class="fn-diagram__edge fn-diagram__edge--accent" pathLength="100" d="M 100 130 L 740 130" />
+      <path id="d02-flow-path" class="fn-diagram__edge fn-diagram__edge--accent" pathLength="100" d="M 170 130 L 740 130" />
       <path class="fn-diagram__edge" pathLength="100" d="M 170 130 L 190 130" />
       <path class="fn-diagram__edge" pathLength="100" d="M 330 130 L 350 130" />
       <path class="fn-diagram__edge" pathLength="100" d="M 490 130 L 510 130" />
       <path class="fn-diagram__edge" pathLength="100" d="M 650 130 L 670 130" />
     </g>
-    <circle class="fn-diagram__flow" r="7"><animateMotion dur="3.8s" repeatCount="indefinite" calcMode="spline" keyTimes="0;1" keySplines="0.4 0 0.2 1" begin="1.6s"><mpath href="#d02-flow-path" /></animateMotion></circle>
+    <circle class="fn-diagram__flow" r="7" cx="170" cy="130"><animateMotion dur="3.8s" repeatCount="indefinite" calcMode="spline" keyTimes="0;1" keySplines="0.4 0 0.2 1" begin="1.6s"><mpath href="#d02-flow-path" /></animateMotion></circle>
     <g class="fn-diagram__nodes">
       <rect class="fn-diagram__node" x="30" y="70" width="140" height="120" rx="8" />
       <rect class="fn-diagram__node" x="190" y="70" width="140" height="120" rx="8" />

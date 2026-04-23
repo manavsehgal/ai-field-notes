@@ -12,7 +12,18 @@
       <stop offset="0%"  stop-color="var(--svg-accent-teal)" stop-opacity="0.9"/>
       <stop offset="100%" stop-color="var(--svg-accent-teal)" stop-opacity="0.4"/>
     </linearGradient>
+    <radialGradient id="embed-space-grad" cx="0.5" cy="0.5" r="0.7">
+      <stop offset="0%"   stop-color="var(--svg-accent-teal)" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="var(--svg-accent-teal)" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="embed-lane-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="var(--svg-accent-blue)" stop-opacity="0.10"/>
+      <stop offset="100%" stop-color="var(--svg-accent-blue)" stop-opacity="0.02"/>
+    </linearGradient>
   </defs>
+  <!-- atmospheric washes (background layer) -->
+  <rect x="8" y="38" width="72" height="128" rx="6" fill="url(#embed-lane-grad)" stroke="none"/>
+  <rect x="210" y="38" width="78" height="128" rx="6" fill="url(#embed-space-grad)" stroke="none"/>
   <!-- flow connectors (drawn left-to-right) -->
   <g fill="none" stroke="var(--svg-connector)" stroke-width="1" stroke-linecap="round">
     <path class="line-draw svg-reveal-d1" d="M 76 60  L 112 92" />
@@ -61,10 +72,13 @@
           fill="var(--svg-text-faint)" font-family="var(--font-mono)"
           font-size="8" letter-spacing="0.15em">2048-D SPACE</text>
   </g>
-  <!-- near-cluster dots (accent, the "matches") -->
+  <!-- near-cluster dots (accent "matches"): halo + core for depth -->
   <g fill="var(--svg-accent-teal)">
+    <circle class="dot-pop svg-reveal-d5" cx="231" cy="88"  r="8"  opacity="0.22"/>
     <circle class="dot-pop svg-reveal-d5" cx="231" cy="88"  r="3"/>
+    <circle class="dot-pop svg-reveal-d5" cx="245" cy="84"  r="8"  opacity="0.22"/>
     <circle class="dot-pop svg-reveal-d5" cx="245" cy="84"  r="3"/>
+    <circle class="dot-pop svg-reveal-d6" cx="238" cy="98"  r="8"  opacity="0.22"/>
     <circle class="dot-pop svg-reveal-d6" cx="238" cy="98"  r="3"/>
   </g>
   <!-- background cloud (muted) -->
@@ -81,6 +95,6 @@
   <g class="svg-reveal svg-reveal-d8">
     <circle cx="238" cy="92" r="8"
             fill="none" stroke="var(--svg-accent-teal)"
-            stroke-width="0.75" stroke-dasharray="2 2"/>
+            stroke-width="0.5" stroke-dasharray="2 2"/>
   </g>
 </svg>

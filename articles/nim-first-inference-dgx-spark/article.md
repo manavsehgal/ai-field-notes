@@ -27,15 +27,28 @@ The DGX Spark's 128 GB of unified memory makes this a flatter tradeoff than any 
 NIM is not a new inference engine. It's NVIDIA's packaging layer around existing engines — in the Spark variant I pulled, the engine is **vLLM**, compiled against FP8 weights, running single-GPU (tp=1, pp=1) on the Grace-Blackwell GB10 chip. What NIM adds is the opinionated bundle: weights, tokenizer, prompt templates, health and readiness probes, an OpenAI-compatible HTTP server on port 8000, and — in the Spark-specific build — a JupyterLab plus TensorBoard workbench bundled alongside the inference endpoint. The image is 9.4 GB compressed; cached weights land in a host volume you mount, roughly 8.5 GB for this model at this precision. The net effect: one `docker run` command places a production-looking inference service on your desk, speaking the same API your cloud clients already know.
 
 <figure class="fn-diagram" aria-label="The Spark NIM install pipeline — five stages from NVIDIA's remote NGC registry to an OpenAI-compatible local endpoint. One-time pull on the left flows into a persistent local endpoint on the right, marked as the thesis-critical destination.">
-  <svg viewBox="0 0 900 260" role="img" preserveAspectRatio="xMidYMid meet">
+  <svg viewBox="0 0 900 260" role="img" aria-label="The Spark NIM install pipeline — five stages from NVIDIA's remote NGC registry to an OpenAI-compatible local endpoint. One-time pull on the left flows into a persistent local endpoint on the right, marked as the thesis-critical destination." preserveAspectRatio="xMidYMid meet">
+    <defs>
+      <linearGradient id="d01-pipeline-band-grad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="var(--svg-accent-blue)" stop-opacity="0.02"/>
+        <stop offset="50%" stop-color="var(--svg-accent-blue)" stop-opacity="0.12"/>
+        <stop offset="100%" stop-color="var(--svg-accent-blue)" stop-opacity="0.02"/>
+      </linearGradient>
+      <radialGradient id="d01-endpoint-halo-grad" cx="0.5" cy="0.5" r="0.6">
+        <stop offset="0%" stop-color="var(--svg-accent-blue)" stop-opacity="0.22"/>
+        <stop offset="100%" stop-color="var(--svg-accent-blue)" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <rect x="20" y="110" width="860" height="60" rx="4" fill="url(#d01-pipeline-band-grad)" stroke="none"/>
+    <rect x="640" y="60" width="200" height="160" fill="url(#d01-endpoint-halo-grad)" stroke="none"/>
     <g class="fn-diagram__edges">
-      <path id="d01-nim-flow-path" class="fn-diagram__edge fn-diagram__edge--accent" pathLength="100" d="M 100 140 L 740 140" />
+      <path id="d01-nim-flow-path" class="fn-diagram__edge fn-diagram__edge--accent" pathLength="100" d="M 170 140 L 740 140" />
       <path class="fn-diagram__edge" pathLength="100" d="M 170 140 L 190 140" />
       <path class="fn-diagram__edge" pathLength="100" d="M 330 140 L 350 140" />
       <path class="fn-diagram__edge" pathLength="100" d="M 490 140 L 510 140" />
       <path class="fn-diagram__edge" pathLength="100" d="M 650 140 L 670 140" />
     </g>
-    <circle class="fn-diagram__flow" r="7"><animateMotion dur="3.8s" repeatCount="indefinite" calcMode="spline" keyTimes="0;1" keySplines="0.4 0 0.2 1" begin="1.6s"><mpath href="#d01-nim-flow-path" /></animateMotion></circle>
+    <circle class="fn-diagram__flow" r="7" cx="170" cy="140"><animateMotion dur="3.8s" repeatCount="indefinite" calcMode="spline" keyTimes="0;1" keySplines="0.4 0 0.2 1" begin="1.6s"><mpath href="#d01-nim-flow-path" /></animateMotion></circle>
     <g class="fn-diagram__nodes">
       <rect class="fn-diagram__node fn-diagram__node--ghost" x="30" y="80" width="140" height="120" rx="8" />
       <rect class="fn-diagram__node" x="190" y="80" width="140" height="120" rx="8" />
@@ -61,11 +74,11 @@ NIM is not a new inference engine. It's NVIDIA's packaging layer around existing
       <text class="fn-diagram__label fn-diagram__label--mono fn-diagram__label--muted" x="740" y="176" text-anchor="middle">OpenAI API</text>
     </g>
     <g class="fn-diagram__symbols">
-      <g class="fn-diagram__icon" transform="translate(88 98)"><path d="M2.25 15a4.5 4.5 0 004.5 4.5H18a3.75 3.75 0 001.332-7.257 3 3 0 00-3.758-3.848 5.25 5.25 0 00-10.233 2.33A4.502 4.502 0 002.25 15z"/></g>
-      <g class="fn-diagram__icon" transform="translate(248 98)"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></g>
-      <g class="fn-diagram__icon" transform="translate(408 98)"><path d="M21 7.5l-2.25-1.313M21 7.5v2.25m0-2.25l-2.25 1.313M3 7.5l2.25-1.313M3 7.5l2.25 1.313M3 7.5v2.25m9 3l2.25-1.313M12 12.75l-2.25-1.313M12 12.75V15m0 6.75l2.25-1.313M12 21.75V19.5m0 2.25l-2.25-1.313m0-16.875L12 2.25l2.25 1.313M21 14.25v2.25l-2.25 1.313m-13.5 0L3 16.5v-2.25"/></g>
-      <g class="fn-diagram__icon fn-diagram__icon--accent" transform="translate(568 98)"><path d="M5.25 14.25h13.5m-13.5 0a3 3 0 01-3-3m3 3a3 3 0 100 6h13.5a3 3 0 100-6m-16.5-3a3 3 0 013-3h13.5a3 3 0 013 3m-19.5 0a4.5 4.5 0 01.9-2.7L5.737 5.1a3.375 3.375 0 012.7-1.35h7.126c1.062 0 2.062.5 2.7 1.35l2.587 3.45a4.5 4.5 0 01.9 2.7m0 0a3 3 0 01-3 3m0 3h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008zm-3 6h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008z"/></g>
-      <g class="fn-diagram__icon fn-diagram__icon--accent" transform="translate(728 98)"><path d="M6.75 7.5l3 2.25-3 2.25m4.5 0h3m-9 8.25h13.5A2.25 2.25 0 0021 18V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v12a2.25 2.25 0 002.25 2.25z"/></g>
+      <g class="fn-diagram__icon" transform="translate(88 90)"><path d="M2.25 15a4.5 4.5 0 004.5 4.5H18a3.75 3.75 0 001.332-7.257 3 3 0 00-3.758-3.848 5.25 5.25 0 00-10.233 2.33A4.502 4.502 0 002.25 15z"/></g>
+      <g class="fn-diagram__icon" transform="translate(248 90)"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></g>
+      <g class="fn-diagram__icon" transform="translate(408 90)"><path d="M21 7.5l-2.25-1.313M21 7.5v2.25m0-2.25l-2.25 1.313M3 7.5l2.25-1.313M3 7.5l2.25 1.313M3 7.5v2.25m9 3l2.25-1.313M12 12.75l-2.25-1.313M12 12.75V15m0 6.75l2.25-1.313M12 21.75V19.5m0 2.25l-2.25-1.313m0-16.875L12 2.25l2.25 1.313M21 14.25v2.25l-2.25 1.313m-13.5 0L3 16.5v-2.25"/></g>
+      <g class="fn-diagram__icon fn-diagram__icon--accent" transform="translate(568 90)"><path d="M5.25 14.25h13.5m-13.5 0a3 3 0 01-3-3m3 3a3 3 0 100 6h13.5a3 3 0 100-6m-16.5-3a3 3 0 013-3h13.5a3 3 0 013 3m-19.5 0a4.5 4.5 0 01.9-2.7L5.737 5.1a3.375 3.375 0 012.7-1.35h7.126c1.062 0 2.062.5 2.7 1.35l2.587 3.45a4.5 4.5 0 01.9 2.7m0 0a3 3 0 01-3 3m0 3h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008zm-3 6h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008z"/></g>
+      <g class="fn-diagram__icon fn-diagram__icon--accent" transform="translate(728 90)"><path d="M6.75 7.5l3 2.25-3 2.25m4.5 0h3m-9 8.25h13.5A2.25 2.25 0 0021 18V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v12a2.25 2.25 0 002.25 2.25z"/></g>
     </g>
   </svg>
   <figcaption>One-time flow on the left; the endpoint on the right is where everything downstream — RAG generators, agent loops, editor plugins — connects.</figcaption>

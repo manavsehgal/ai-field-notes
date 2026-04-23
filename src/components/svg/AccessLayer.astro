@@ -9,10 +9,17 @@
       <stop offset="0%"  stop-color="var(--svg-accent-blue)" stop-opacity="0.9"/>
       <stop offset="100%" stop-color="var(--svg-accent-blue)" stop-opacity="0.45"/>
     </linearGradient>
+    <radialGradient id="access-hub-halo-grad" cx="0.5" cy="0.5" r="0.55">
+      <stop offset="0%"   stop-color="var(--svg-accent-blue)" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="var(--svg-accent-blue)" stop-opacity="0"/>
+    </radialGradient>
   </defs>
 
+  <!-- hub halo (background atmosphere around the YOU hexagon) -->
+  <rect x="80" y="30" width="140" height="140" fill="url(#access-hub-halo-grad)" stroke="none"/>
+
   <!-- spokes (drawn first so nodes overlap them) -->
-  <g fill="none" stroke="var(--svg-connector)" stroke-width="1.1" stroke-linecap="round">
+  <g fill="none" stroke="var(--svg-connector)" stroke-width="1" stroke-linecap="round">
     <path class="line-draw svg-reveal-d1" d="M 150 100 L 60  50"/>
     <path class="line-draw svg-reveal-d2" d="M 150 100 L 240 50"/>
     <path class="line-draw svg-reveal-d3" d="M 150 100 L 40  120"/>

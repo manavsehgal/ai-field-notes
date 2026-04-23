@@ -17,9 +17,20 @@ const yAt = (v: number) => plotBottom - (v / yMax) * (plotBottom - plotTop);
 const barW = 24;
 ---
 <svg viewBox="0 0 300 200" role="img" aria-label="Per-turn wall-clock comparison across three agent stacks" data-svg-animate xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="nct-turn-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="var(--svg-accent-blue)" stop-opacity="0.10"/>
+      <stop offset="100%" stop-color="var(--svg-accent-blue)" stop-opacity="0.02"/>
+    </linearGradient>
+  </defs>
+  <!-- atmospheric columns behind each turn group -->
+  <rect x={xAt(0) - (barW * 1.5 + 4)} y={plotTop} width={barW * 3 + 8} height={plotBottom - plotTop}
+        fill="url(#nct-turn-grad)" stroke="none"/>
+  <rect x={xAt(1) - (barW * 1.5 + 4)} y={plotTop} width={barW * 3 + 8} height={plotBottom - plotTop}
+        fill="url(#nct-turn-grad)" stroke="none"/>
   <!-- grid baseline -->
   <g class="svg-reveal svg-reveal-d1">
-    <line x1={plotLeft} y1={plotBottom} x2={plotRight} y2={plotBottom} stroke="var(--svg-stroke)" stroke-width="0.75"/>
+    <line x1={plotLeft} y1={plotBottom} x2={plotRight} y2={plotBottom} stroke="var(--svg-stroke)" stroke-width="0.5"/>
     <text x={plotLeft - 6} y={plotBottom + 3} text-anchor="end"
           fill="var(--svg-text-faint)" font-family="var(--font-mono)" font-size="9">0s</text>
     <line x1={plotLeft} y1={yAt(80)} x2={plotRight} y2={yAt(80)}

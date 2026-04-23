@@ -27,44 +27,57 @@ Put the same endpoint on your desk and both costs go to zero. *The embed call ne
 NIM is still the packaging layer, but the engine inside the embed container is different from the LLM NIM's vLLM. Nemotron Retriever embeds ship on Triton 2.61 — the metrics, the HTTP server, the GRPC fan-out all come from Triton rather than a chat-oriented engine. The model itself is a transformer encoder fine-tuned bi-encoder-style for retrieval: query and passage go through the same weights independently, contrastive training pulls relevant query-passage pairs close in the output space and pushes irrelevant ones apart. Matryoshka training makes the output dimension adjustable at read time — the first 384 components of the full 2048-d vector are themselves a valid, shorter embedding. That's the knob you tune for pgvector index size later.
 
 <figure class="fn-diagram" aria-label="Embedding pipeline on DGX Spark — query and passages flow independently through the same Nemotron NIM into a 2048-dimensional space, where cosine similarity selects the matches.">
-  <svg viewBox="0 0 900 360" role="img" preserveAspectRatio="xMidYMid meet">
+  <svg viewBox="0 0 900 360" role="img" aria-label="Embedding pipeline on DGX Spark — query and passages flow independently through the same Nemotron NIM into a 2048-dimensional space, where cosine similarity selects the matches." preserveAspectRatio="xMidYMid meet">
+    <defs>
+      <linearGradient id="d02-query-lane-grad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="var(--svg-accent-blue)" stop-opacity="0.12"/>
+        <stop offset="100%" stop-color="var(--svg-accent-blue)" stop-opacity="0.03"/>
+      </linearGradient>
+      <linearGradient id="d02-passage-lane-grad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="var(--svg-accent-teal)" stop-opacity="0.12"/>
+        <stop offset="100%" stop-color="var(--svg-accent-teal)" stop-opacity="0.03"/>
+      </linearGradient>
+      <radialGradient id="d02-space-grad" cx="0.5" cy="0.5" r="0.7">
+        <stop offset="0%" stop-color="var(--svg-accent-blue)" stop-opacity="0.18"/>
+        <stop offset="100%" stop-color="var(--svg-accent-blue)" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <rect x="20" y="40" width="200" height="140" rx="10" fill="url(#d02-query-lane-grad)" stroke="none"/>
+    <rect x="20" y="180" width="200" height="140" rx="10" fill="url(#d02-passage-lane-grad)" stroke="none"/>
+    <rect x="700" y="120" width="160" height="120" rx="8" fill="url(#d02-space-grad)" stroke="none"/>
     <g class="fn-diagram__edges">
-      <path id="d02-embed-query-path" class="fn-diagram__edge fn-diagram__edge--accent" pathLength="100" d="M 120 110 L 420 110 L 580 180" />
-      <path class="fn-diagram__edge" pathLength="100" d="M 120 250 L 420 250 L 580 180" />
-      <path class="fn-diagram__edge fn-diagram__edge--dashed" pathLength="100" d="M 700 180 L 810 180" />
+      <path id="d02-embed-query-path" class="fn-diagram__edge fn-diagram__edge--accent" pathLength="100" d="M 200 110 L 420 180" />
+      <path class="fn-diagram__edge" pathLength="100" d="M 200 250 L 420 180" />
+      <path class="fn-diagram__edge fn-diagram__edge--dashed" pathLength="100" d="M 580 180 L 700 180" />
     </g>
-    <circle class="fn-diagram__flow" r="6"><animateMotion dur="3.4s" repeatCount="indefinite" calcMode="spline" keyTimes="0;1" keySplines="0.4 0 0.2 1" begin="1.4s"><mpath href="#d02-embed-query-path" /></animateMotion></circle>
+    <circle class="fn-diagram__flow" r="6" cx="200" cy="110"><animateMotion dur="3.4s" repeatCount="indefinite" calcMode="spline" keyTimes="0;1" keySplines="0.4 0 0.2 1" begin="1.4s"><mpath href="#d02-embed-query-path" /></animateMotion></circle>
     <g class="fn-diagram__nodes">
-      <rect class="fn-diagram__node" x="40" y="70" width="160" height="80" rx="8" />
-      <rect class="fn-diagram__node" x="40" y="210" width="160" height="80" rx="8" />
-      <rect class="fn-diagram__node fn-diagram__node--accent fn-diagram__pulse" x="420" y="130" width="160" height="100" rx="10" />
+      <rect class="fn-diagram__node" x="40" y="60" width="160" height="100" rx="8" />
+      <rect class="fn-diagram__node" x="40" y="200" width="160" height="100" rx="8" />
+      <rect class="fn-diagram__node fn-diagram__node--accent fn-diagram__pulse" x="420" y="120" width="160" height="120" rx="10" />
       <rect class="fn-diagram__node fn-diagram__node--ghost" x="700" y="120" width="160" height="120" rx="8" />
     </g>
     <g class="fn-diagram__labels">
-      <text class="fn-diagram__label fn-diagram__label--accent" x="120" y="68" text-anchor="middle">input_type=query</text>
-      <text class="fn-diagram__label fn-diagram__label--display" x="120" y="108" text-anchor="middle">your question</text>
-      <text class="fn-diagram__label fn-diagram__label--mono fn-diagram__label--muted" x="120" y="132" text-anchor="middle">"How do I…?"</text>
-      <text class="fn-diagram__label fn-diagram__label--muted" x="120" y="208" text-anchor="middle">input_type=passage</text>
-      <text class="fn-diagram__label fn-diagram__label--display" x="120" y="248" text-anchor="middle">your corpus</text>
-      <text class="fn-diagram__label fn-diagram__label--mono fn-diagram__label--muted" x="120" y="272" text-anchor="middle">chunks ≤ 8192 tok</text>
-      <text class="fn-diagram__label fn-diagram__label--accent" x="500" y="128" text-anchor="middle">LOCAL NIM</text>
-      <text class="fn-diagram__label fn-diagram__label--display" x="500" y="170" text-anchor="middle">nemotron-embed-1b</text>
-      <text class="fn-diagram__label fn-diagram__label--mono fn-diagram__label--muted" x="500" y="192" text-anchor="middle">:8001 · Triton · FP16</text>
-      <text class="fn-diagram__label fn-diagram__label--mono fn-diagram__label--muted" x="500" y="212" text-anchor="middle">GB10 · arm64</text>
-      <text class="fn-diagram__label fn-diagram__label--muted" x="780" y="118" text-anchor="middle">2048-D SPACE</text>
-      <text class="fn-diagram__label fn-diagram__label--display" x="780" y="172" text-anchor="middle">cosine(q, p)</text>
-      <text class="fn-diagram__label fn-diagram__label--mono fn-diagram__label--muted" x="780" y="196" text-anchor="middle">384 · 512 · 768</text>
-      <text class="fn-diagram__label fn-diagram__label--mono fn-diagram__label--muted" x="780" y="214" text-anchor="middle">1024 · 2048</text>
+      <text class="fn-diagram__label fn-diagram__label--display" x="120" y="118" text-anchor="middle">your question</text>
+      <text class="fn-diagram__label fn-diagram__label--mono fn-diagram__label--muted" x="120" y="142" text-anchor="middle">"How do I…?"</text>
+      <text class="fn-diagram__label fn-diagram__label--display" x="120" y="258" text-anchor="middle">your corpus</text>
+      <text class="fn-diagram__label fn-diagram__label--mono fn-diagram__label--muted" x="120" y="282" text-anchor="middle">chunks ≤ 8192 tok</text>
+      <text class="fn-diagram__label fn-diagram__label--accent" x="500" y="144" text-anchor="middle">LOCAL NIM</text>
+      <text class="fn-diagram__label fn-diagram__label--display" x="500" y="176" text-anchor="middle">nemotron-embed-1b</text>
+      <text class="fn-diagram__label fn-diagram__label--mono fn-diagram__label--muted" x="500" y="200" text-anchor="middle">:8001 · Triton · FP16</text>
+      <text class="fn-diagram__label fn-diagram__label--mono fn-diagram__label--muted" x="500" y="222" text-anchor="middle">GB10 · arm64</text>
+      <text class="fn-diagram__label fn-diagram__label--muted" x="780" y="144" text-anchor="middle">2048-D SPACE</text>
+      <text class="fn-diagram__label fn-diagram__label--display" x="780" y="180" text-anchor="middle">cosine(q, p)</text>
+      <text class="fn-diagram__label fn-diagram__label--mono fn-diagram__label--muted" x="780" y="208" text-anchor="middle">384 · 512 · 768</text>
+      <text class="fn-diagram__label fn-diagram__label--mono fn-diagram__label--muted" x="780" y="226" text-anchor="middle">1024 · 2048</text>
     </g>
     <g class="fn-diagram__symbols">
-      <g class="fn-diagram__icon fn-diagram__icon--accent" transform="translate(108 78)"><path d="M16.5 3.75V16.5L12 14.25 7.5 16.5V3.75m9 0H18A2.25 2.25 0 0120.25 6v12A2.25 2.25 0 0118 20.25H6A2.25 2.25 0 013.75 18V6A2.25 2.25 0 016 3.75h1.5m9 0h-9" /></g>
-      <g class="fn-diagram__icon" transform="translate(108 218)"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></g>
+      <g class="fn-diagram__icon fn-diagram__icon--accent" transform="translate(108 70)"><path d="M16.5 3.75V16.5L12 14.25 7.5 16.5V3.75m9 0H18A2.25 2.25 0 0120.25 6v12A2.25 2.25 0 0118 20.25H6A2.25 2.25 0 013.75 18V6A2.25 2.25 0 016 3.75h1.5m9 0h-9" /></g>
+      <g class="fn-diagram__icon" transform="translate(108 210)"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></g>
     </g>
   </svg>
   <figcaption>The same weights score query and passage independently; the verdict is a distance, not a decision. The Matryoshka dims on the right are the knob you'll turn when the index gets big.</figcaption>
 </figure>
-
-*The engine under the NIM is Triton, not vLLM — a detail that matters the first time you read the container logs and wonder why the familiar inference-engine lines aren't there.*
 
 ## The journey
 
