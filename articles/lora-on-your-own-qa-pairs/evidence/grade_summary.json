@@ -1,0 +1,55 @@
+{
+  "n_items": 44,
+  "refusal_rate": {
+    "base": 0.6136363636363636,
+    "adapter": 0.0
+  },
+  "judge_score": {
+    "base": {
+      "n": 44,
+      "mean": 1.2272727272727273,
+      "median": 1.0
+    },
+    "adapter": {
+      "n": 44,
+      "mean": 2,
+      "median": 1.0
+    }
+  },
+  "keyword_overlap": {
+    "base": {
+      "n": 44,
+      "mean": 0.10941558441558441,
+      "median": 0.0
+    },
+    "adapter": {
+      "n": 44,
+      "mean": 0.10227272727272728,
+      "median": 0.0
+    }
+  },
+  "answer_tokens": {
+    "base_mean": 69.72727272727273,
+    "adapter_mean": 9
+  },
+  "wall_seconds": {
+    "base_mean": 2.86420569636605,
+    "adapter_mean": 0.43885427713394165
+  },
+  "base_judge_distribution": {
+    "0": 12,
+    "1": 20,
+    "2": 6,
+    "3": 2,
+    "4": 4,
+    "5": 0
+  },
+  "adapter_judge_distribution": {
+    "0": 3,
+    "1": 22,
+    "2": 3,
+    "3": 8,
+    "4": 4,
+    "5": 4
+  }
+}

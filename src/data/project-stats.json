@@ -1,14 +1,14 @@
 {
-  "generated_at": "2026-04-23T17:34:08Z",
+  "generated_at": "2026-04-23T18:20:47Z",
   "articles": {
-    "total": 11,
-    "published": 11,
+    "total": 12,
+    "published": 12,
     "upcoming": 4,
     "drafts": 0
   },
   "words": {
-    "total": 28433,
-    "mean_per_article": 2584,
+    "total": 31409,
+    "mean_per_article": 2617,
     "longest": {
       "slug": "nim-first-inference-dgx-spark",
       "title": "Your First NIM on a DGX Spark \u2014 What 24.8 Tokens Per Second Doesn't Tell You",
@@ -16,26 +16,26 @@
     }
   },
   "code": {
-    "evidence_loc": 1910,
-    "src_loc": 3839,
-    "total_loc": 5749,
+    "evidence_loc": 2493,
+    "src_loc": 4007,
+    "total_loc": 6500,
     "by_language": {
-      "astro": 2074,
-      "python": 1895,
+      "python": 2478,
+      "astro": 2242,
       "css": 1649,
       "javascript": 66,
       "typescript": 50,
       "sql": 15
     },
     "data_lines": {
-      "json": 7442,
+      "json": 7553,
       "yaml": 45
     }
   },
   "stages": {
     "foundations": 2,
     "training": 0,
-    "fine-tuning": 0,
+    "fine-tuning": 1,
     "inference": 7,
     "deployment": 1,
     "agentic": 1,
@@ -56,7 +56,7 @@
     {
       "id": "llama-3.1-8b-instruct",
       "label": "Llama 3.1 8B Instruct",
-      "articles": 9
+      "articles": 10
     },
     {
       "id": "nemotron-super-49b",
@@ -83,42 +83,47 @@
     {
       "id": "nim",
       "label": "NVIDIA NIM",
-      "articles": 11
+      "articles": 12
     },
     {
       "id": "dgx-spark",
       "label": "DGX Spark",
-      "articles": 11
+      "articles": 12
     },
     {
       "id": "nemo-retriever",
       "label": "NeMo Retriever",
-      "articles": 7
+      "articles": 8
     },
     {
       "id": "pgvector",
       "label": "pgvector",
-      "articles": 7
+      "articles": 8
     },
     {
       "id": "nemo",
       "label": "NeMo Framework",
-      "articles": 6
+      "articles": 7
     },
     {
       "id": "nemoclaw",
       "label": "NemoClaw",
-      "articles": 5
+      "articles": 6
     },
     {
       "id": "tensorrt-llm",
       "label": "TensorRT-LLM",
-      "articles": 5
+      "articles": 6
     },
     {
       "id": "triton",
       "label": "Triton Inference Server",
-      "articles": 4
+      "articles": 5
+    },
+    {
+      "id": "nemo-guardrails",
+      "label": "NeMo Guardrails",
+      "articles": 3
     },
     {
       "id": "ollama",
@@ -126,14 +131,9 @@
       "articles": 3
     },
     {
-      "id": "nemo-guardrails",
-      "label": "NeMo Guardrails",
-      "articles": 2
-    },
-    {
       "id": "openclaw",
       "label": "OpenClaw",
-      "articles": 1
+      "articles": 2
     }
   ],
   "metrics": {
@@ -154,9 +154,9 @@
         "article_slug": "naive-rag-on-spark"
       },
       {
-        "label": "works embedding a query costs",
-        "value": "40 ms",
-        "article_slug": "naive-rag-on-spark"
+        "label": "deltas added on top roughly",
+        "value": "0.6 ms",
+        "article_slug": "lora-on-your-own-qa-pairs"
       }
     ],
     "accuracy": [

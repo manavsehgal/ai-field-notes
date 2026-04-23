@@ -1,0 +1,24 @@
+/usr/local/lib/python3.12/dist-packages/torch/cuda/__init__.py:63: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+torch 2.9.0a0+145a3a7bda.nv25.10  cuda True
+eval items: 44
+loading BASE model...
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [00:24<00:24, 24.89s/it]Loading checkpoint shards: 100%|██████████| 2/2 [00:37<00:00, 17.48s/it]Loading checkpoint shards: 100%|██████████| 2/2 [00:37<00:00, 18.59s/it]
+The following generation flags are not valid and may be ignored: ['top_k']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+  loaded in 37.6s
+generating with BASE...
+  done in 126.1s
+attaching adapter (no reload)...
+  attached in 1.1s
+generating with BASE+ADAPTER...
+  done in 19.3s
+{
+  "base_mean_s": 2.86420569636605,
+  "base_p50_s": 2.6240254640579224,
+  "adapter_mean_s": 0.43885427713394165,
+  "adapter_p50_s": 0.2490605115890503,
+  "base_mean_tokens": 69.72727272727273,
+  "adapter_mean_tokens": 9,
+  "base_tps": 24.34436633365367,
+  "adapter_tps": 20.5079464162386
+}
