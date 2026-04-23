@@ -1,14 +1,14 @@
 {
-  "generated_at": "2026-04-23T20:43:59Z",
+  "generated_at": "2026-04-23T22:20:33Z",
   "articles": {
-    "total": 13,
-    "published": 13,
+    "total": 14,
+    "published": 14,
     "upcoming": 4,
     "drafts": 0
   },
   "words": {
-    "total": 34114,
-    "mean_per_article": 2624,
+    "total": 36550,
+    "mean_per_article": 2610,
     "longest": {
       "slug": "nim-first-inference-dgx-spark",
       "title": "Your First NIM on a DGX Spark \u2014 What 24.8 Tokens Per Second Doesn't Tell You",
@@ -17,11 +17,11 @@
   },
   "code": {
     "evidence_loc": 3222,
-    "src_loc": 4125,
-    "total_loc": 7347,
+    "src_loc": 4245,
+    "total_loc": 7467,
     "by_language": {
       "python": 3207,
-      "astro": 2360,
+      "astro": 2480,
       "css": 1649,
       "javascript": 66,
       "typescript": 50,
@@ -33,9 +33,9 @@
     }
   },
   "stages": {
-    "foundations": 2,
+    "foundations": 3,
     "training": 0,
-    "fine-tuning": 2,
+    "fine-tuning": 3,
     "inference": 8,
     "deployment": 1,
     "agentic": 1,
@@ -88,22 +88,22 @@
     {
       "id": "dgx-spark",
       "label": "DGX Spark",
-      "articles": 13
+      "articles": 14
     },
     {
       "id": "nim",
       "label": "NVIDIA NIM",
-      "articles": 13
+      "articles": 14
+    },
+    {
+      "id": "nemo",
+      "label": "NeMo Framework",
+      "articles": 9
     },
     {
       "id": "pgvector",
       "label": "pgvector",
       "articles": 9
-    },
-    {
-      "id": "nemo",
-      "label": "NeMo Framework",
-      "articles": 8
     },
     {
       "id": "nemo-retriever",
@@ -159,9 +159,9 @@
         "article_slug": "naive-rag-on-spark"
       },
       {
-        "label": "deltas added on top roughly",
-        "value": "0.6 ms",
-        "article_slug": "lora-on-your-own-qa-pairs"
+        "label": "and step time jumps from",
+        "value": "300 ms",
+        "article_slug": "gpu-sizing-math-for-fine-tuning"
       }
     ],
     "accuracy": [
