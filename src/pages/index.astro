@@ -10,9 +10,14 @@ import { publishOrdinals } from '../lib/article-order.mjs';
 // on the same publish day stay deterministic. Display highest number first.
 const all = await getCollection('articles');
 const ordinalById = publishOrdinals(all, process.cwd());
-const byOrdinalDesc = [...all].sort((a, b) => ordinalById.get(b.id) - ordinalById.get(a.id));
+const published = all.filter((a) => a.data.status !== 'upcoming');
+const upcoming = all.filter((a) => a.data.status === 'upcoming');
+const publishedDesc = [...published].sort((a, b) => ordinalById.get(b.id) - ordinalById.get(a.id));
+// Upcoming sorted by planned date ascending so the nearest-planned pieces
+// surface first when the toggle is flipped on.
+const upcomingAsc = [...upcoming].sort((a, b) => a.data.date.getTime() - b.data.date.getTime());
 
-const countPadded = String(all.length).padStart(2, '0');
+const countPadded = String(published.length).padStart(2, '0');
 const volLabel = new Intl.DateTimeFormat('en-GB', { month: 'short', year: 'numeric' }).format(new Date());
 ---
 <BaseLayout title="nvidia-learn — field notes on the DGX Spark">
@@ -38,14 +43,34 @@ const volLabel = new Intl.DateTimeFormat('en-GB', { month: 'short', year: 'numer
     <ProjectStats />
   </header>
 
-  <StageFilter current={null} />
+  <div class="filter-strip">
+    <div class="filter-strip__toggle-row">
+      <button
+        type="button"
+        class="upcoming-toggle"
+        id="upcoming-toggle"
+        role="switch"
+        aria-pressed="false"
+        aria-controls="home-research-list"
+      >
+        <span class="upcoming-toggle__track" aria-hidden="true">
+          <span class="upcoming-toggle__thumb"></span>
+        </span>
+        <span class="upcoming-toggle__label">Show upcoming</span>
+      </button>
+    </div>
+    <StageFilter current={null} />
+  </div>
 
-  <section class="research-list">
-    {byOrdinalDesc.length === 0 ? (
+  <section class="research-list" id="home-research-list" data-show-upcoming="false">
+    {publishedDesc.length === 0 ? (
       <p class="research-list__empty">No entries yet.</p>
     ) : (
       <>
-        {byOrdinalDesc.map((article) => (
+        {publishedDesc.map((article) => (
+          <ArticleCard article={article} ordinal={ordinalById.get(article.id)!} />
+        ))}
+        {upcomingAsc.map((article) => (
           <ArticleCard article={article} ordinal={ordinalById.get(article.id)!} />
         ))}
         <div class="research-list__closer">
@@ -57,4 +82,18 @@ const volLabel = new Intl.DateTimeFormat('en-GB', { month: 'short', year: 'numer
       </>
     )}
   </section>
+
+  <script is:inline>
+    (() => {
+      const btn = document.getElementById('upcoming-toggle');
+      const list = document.getElementById('home-research-list');
+      if (!btn || !list) return;
+      btn.addEventListener('click', () => {
+        const on = btn.getAttribute('aria-pressed') === 'true';
+        const next = !on;
+        btn.setAttribute('aria-pressed', String(next));
+        list.setAttribute('data-show-upcoming', String(next));
+      });
+    })();
+  </script>
 </BaseLayout>

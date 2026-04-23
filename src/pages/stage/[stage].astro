@@ -51,8 +51,14 @@ export async function getStaticPaths() {
 
   return STAGES_LOCAL.map((stage) => {
     const entries = all
-      .filter((a) => a.data.stage === stage)
-      .sort((a, b) => ordinalById.get(b.id)! - ordinalById.get(a.id)!)
+      .filter((a) => a.data.stage === stage || (a.data.also_stages ?? []).includes(stage as any))
+      .sort((a, b) => {
+        // Upcoming last, then by ordinal desc within each group.
+        const aUp = a.data.status === 'upcoming' ? 1 : 0;
+        const bUp = b.data.status === 'upcoming' ? 1 : 0;
+        if (aUp !== bUp) return aUp - bUp;
+        return ordinalById.get(b.id)! - ordinalById.get(a.id)!;
+      })
       .map((article) => ({ article, ordinal: ordinalById.get(article.id)! }));
     return {
       params: { stage },

@@ -1,24 +1,28 @@
 ---
 import stats from '../data/project-stats.json';
 
-// Stages in the order the user reads them (foundations → agentic → training → observability → dev-tools)
-const STAGE_ORDER = ['foundations', 'inference', 'training', 'agentic', 'observability', 'dev-tools'] as const;
+// All eight stages, same order as the site's StageFilter chips.
+const STAGE_ORDER = ['foundations', 'training', 'fine-tuning', 'inference', 'deployment', 'agentic', 'observability', 'dev-tools'] as const;
 const STAGE_LABELS: Record<string, string> = {
-  foundations:   'Foundations',
-  inference:     'Inference',
-  training:      'Training',
-  agentic:       'Agentic',
-  observability: 'Observability',
-  'dev-tools':   'Dev-tools',
+  foundations:    'Foundations',
+  training:       'Training',
+  'fine-tuning':  'Fine-tuning',
+  inference:      'Inference',
+  deployment:     'Deployment',
+  agentic:        'Agentic',
+  observability:  'Observability',
+  'dev-tools':    'Dev-tools',
 };
 
 const s: any = stats;
 const ARTICLES = s.articles?.total ?? 0;
+const UPCOMING = s.articles?.upcoming ?? 0;
 const WORDS = s.words?.total ?? 0;
 const LOC = s.code?.total_loc ?? 0;
 const MODEL_COUNT = s.models?.length ?? 0;
 const PRODUCT_COUNT = s.products?.length ?? 0;
 const stageCounts: Record<string, number> = s.stages ?? {};
+const stageUpcoming: Record<string, number> = s.stages_upcoming ?? {};
 const products: { id: string; label: string; articles: number }[] = s.products ?? [];
 const models: { id: string; label: string; articles: number }[] = s.models ?? [];
 
@@ -42,7 +46,7 @@ const fmt = (n: number) => new Intl.NumberFormat('en-US').format(n);
         </svg>
         <div class="kpi__text">
           <div class="kpi__value">{ARTICLES}</div>
-          <div class="kpi__label">Articles</div>
+          <div class="kpi__label">Articles{UPCOMING > 0 ? ` · +${UPCOMING} upcoming` : ''}</div>
         </div>
       </article>
       <article class="kpi" role="listitem">
@@ -99,12 +103,14 @@ const fmt = (n: number) => new Intl.NumberFormat('en-US').format(n);
     <div class="stage-badges">
       {STAGE_ORDER.map((key) => {
         const count = stageCounts[key] ?? 0;
+        const upc = stageUpcoming[key] ?? 0;
         const cls = `stage-badge stage-badge--${key}${count === 0 ? ' stage-badge--empty' : ''}`;
         return (
           <span class={cls}>
             <span class="stage-badge__dot" aria-hidden="true"></span>
             <span class="stage-badge__label">{STAGE_LABELS[key]}</span>
             <span class="stage-badge__count">{count}</span>
+            {upc > 0 && <span class="stage-badge__upcoming">+{upc}</span>}
           </span>
         );
       })}

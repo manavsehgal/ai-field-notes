@@ -38,6 +38,16 @@ const articles = defineCollection({
     // src/components/svg/. Rendered as the card's thumbnail on the home
     // and stage-filter pages. Optional — cards without one show no aside.
     signature: z.string().optional(),
+    // Lifecycle. `published` = written and live. `upcoming` = placeholder
+    // preview with an abstract; rendered dimmed with an "Upcoming" badge
+    // and excluded from the home index (it still appears on its stage page
+    // so readers see what is coming next).
+    status: z.enum(['published', 'upcoming']).default('published'),
+    // Articles frequently span more than one stage (e.g. a foundations
+    // piece that also installs dev-tools). `stage` stays the primary
+    // bucket; `also_stages` lists secondary buckets so the article shows
+    // up on those stage pages too.
+    also_stages: z.array(z.enum(STAGES)).default([]),
   }),
 });
 
