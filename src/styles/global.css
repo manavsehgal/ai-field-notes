@@ -389,7 +389,7 @@ main { flex: 1; padding-top: 4rem; /* offset for fixed nav */ }
 .masthead {
   max-width: 72rem;
   margin-inline: auto;
-  padding: 7rem 1.5rem 3rem;
+  padding: 3.5rem 1.5rem 3rem;
 }
 .masthead__strip,
 .masthead__byline {
@@ -412,10 +412,10 @@ main { flex: 1; padding-top: 4rem; /* offset for fixed nav */ }
 .masthead__title {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: clamp(2.5rem, 7vw, 5.5rem);
+  font-size: clamp(2.5rem, 6vw, 4.75rem);
   line-height: 0.95;
   letter-spacing: -0.035em;
-  margin: 2.5rem 0 1.5rem;
+  margin: 0 0 1.5rem;
   color: var(--color-text);
   max-width: 16ch;
 }
@@ -432,6 +432,139 @@ main { flex: 1; padding-top: 4rem; /* offset for fixed nav */ }
   max-width: 58ch;
   margin: 0;
 }
+
+/* Title-section spread — two-column cover with the rig photo shown at its
+ * natural 4:3 ratio on one side and the headline group on the other. The
+ * photograph starts atmospheric (blurred, desaturated, dim, duotone-tinted)
+ * and comes into focus as the user scrolls it into frame, using CSS
+ * scroll-driven animations (animation-timeline: view). Fallback keeps a
+ * clean settled treatment for browsers without support. */
+.masthead__spread {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  gap: clamp(2rem, 5vw, 4.5rem);
+  align-items: center;
+  margin-top: 2.5rem;
+}
+.masthead__text { min-width: 0; }
+
+@media (max-width: 860px) {
+  .masthead__spread {
+    grid-template-columns: 1fr;
+    gap: 2.25rem;
+  }
+  .masthead__plate { order: 1; }
+  .masthead__text  { order: 2; }
+}
+
+.masthead__plate {
+  margin: 0;
+  /* Mild page-load reveal — the plate arrives a hair before the text does. */
+  animation: plateLoadRise 900ms 150ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.masthead__plate-frame {
+  position: relative;
+  aspect-ratio: 4 / 3; /* matches source 1600×1200 — shows full image, no crop */
+  overflow: hidden;
+  border-radius: 14px;
+  background: var(--color-surface-overlay);
+  /* Cream/light-brown mat board — hue 82 picks up the warm tones in the
+   * carpet without going as dark as the floor itself. Reads as classic
+   * gallery framing around the photograph. */
+  border: 2px solid oklch(0.86 0.04 82);
+  /* Inner darker-cream rule + ambient drop shadows. */
+  box-shadow:
+    inset 0 0 0 1px oklch(0.72 0.05 82 / 0.40),
+    0 45px 70px -30px oklch(0 0 0 / 0.55),
+    0 16px 30px -14px oklch(0 0 0 / 0.5);
+}
+html[data-theme="light"] .masthead__plate-frame {
+  /* In the light theme a pale cream would vanish into the surface — drop
+   * to a warm honey tone, same hue, still distinctly lighter than carpet. */
+  border-color: oklch(0.72 0.06 82);
+  box-shadow:
+    inset 0 0 0 1px oklch(0.60 0.06 82 / 0.45),
+    0 35px 60px -28px oklch(0.30 0.04 80 / 0.35),
+    0 12px 24px -12px oklch(0.30 0.04 80 / 0.25);
+}
+.masthead__plate-pan {
+  position: absolute;
+  inset: 0;
+  transform-origin: center;
+  /* Slow Ken Burns loop — zoom + pan through irregular waypoints so the
+   * motion reads as organic rather than a single back-and-forth. Ease-in-
+   * out curve per segment gives each waypoint a soft arrival and exit.
+   * 40s loop returns cleanly to scale 1 / translate 0 at the cycle seam. */
+  animation: platePanZoom 40s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  will-change: transform;
+}
+.masthead__plate-frame img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;          /* ratios match → full composition when scale = 1 */
+  object-position: center center;
+  filter: saturate(0.80) contrast(1.04) brightness(0.94);
+}
+html[data-theme="light"] .masthead__plate-frame img {
+  filter: saturate(0.90) contrast(1.02) brightness(1.0);
+}
+/* Duotone tint overlay — settled state. */
+.masthead__plate-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--color-primary-dim);
+  mix-blend-mode: color;
+  opacity: 0.18;
+  pointer-events: none;
+  transition: opacity 400ms ease-out;
+}
+/* Subtle corner vignette, constant across both themes. */
+.masthead__plate-frame::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background: radial-gradient(ellipse at center, transparent 58%, oklch(0.08 0.01 250 / 0.35) 100%);
+}
+html[data-theme="light"] .masthead__plate-frame::after { opacity: 0.10; }
+html[data-theme="light"] .masthead__plate-frame::before {
+  background: radial-gradient(ellipse at center, transparent 62%, oklch(0.98 0.002 250 / 0.50) 100%);
+}
+html[data-theme="light"] .masthead__plate-frame img {
+  filter: saturate(0.90) contrast(1.02) brightness(1.0);
+}
+/* Hover: the duotone recedes, rewarding inspection. */
+.masthead__plate:hover .masthead__plate-frame::after { opacity: 0.08; }
+
+/* Ken Burns loop keyframes — five irregularly-spaced waypoints so the
+ * motion doesn't read as a back-and-forth metronome. Both `scale` and
+ * `translate` are individual transform properties, composed via the
+ * combined shorthand on keyframe; returns cleanly to the origin at 100%
+ * so the loop seam is invisible. */
+@keyframes platePanZoom {
+  0%    { transform: scale(1.00) translate(0%, 0%); }
+  22%   { transform: scale(1.06) translate(-1.8%, -1.2%); }
+  46%   { transform: scale(1.09) translate(2.0%, -0.8%); }
+  68%   { transform: scale(1.05) translate(1.2%, 1.8%); }
+  84%   { transform: scale(1.08) translate(-2.0%, 0.6%); }
+  100%  { transform: scale(1.00) translate(0%, 0%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .masthead__plate,
+  .masthead__plate-pan,
+  .masthead__plate-frame img,
+  .masthead__plate-frame::after { animation: none !important; }
+  .masthead__plate-pan { transform: none; }
+  .masthead__plate-frame img {
+    filter: saturate(0.80) contrast(1.04) brightness(0.94);
+    transform: none;
+  }
+}
+
 
 /* ---------- Project stats infographic ---------- */
 .project-stats {
