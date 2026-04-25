@@ -1,14 +1,14 @@
 {
-  "generated_at": "2026-04-25T16:00:51Z",
+  "generated_at": "2026-04-25T16:31:46Z",
   "articles": {
-    "total": 16,
-    "published": 16,
+    "total": 17,
+    "published": 17,
     "upcoming": 4,
     "drafts": 0
   },
   "words": {
-    "total": 42402,
-    "mean_per_article": 2650,
+    "total": 44873,
+    "mean_per_article": 2639,
     "longest": {
       "slug": "nim-first-inference-dgx-spark",
       "title": "Your First NIM on a DGX Spark \u2014 What 24.8 Tokens Per Second Doesn't Tell You",
@@ -16,12 +16,12 @@
     }
   },
   "code": {
-    "evidence_loc": 3931,
-    "src_loc": 4713,
-    "total_loc": 8644,
+    "evidence_loc": 4193,
+    "src_loc": 4865,
+    "total_loc": 9058,
     "by_language": {
-      "python": 3903,
-      "astro": 2775,
+      "python": 4165,
+      "astro": 2927,
       "css": 1776,
       "javascript": 112,
       "typescript": 50,
@@ -29,13 +29,13 @@
       "shell": 13
     },
     "data_lines": {
-      "json": 7752,
+      "json": 7993,
       "yaml": 143
     }
   },
   "stages": {
-    "foundations": 4,
-    "training": 1,
+    "foundations": 5,
+    "training": 2,
     "fine-tuning": 3,
     "inference": 9,
     "deployment": 1,
@@ -87,19 +87,19 @@
   ],
   "products": [
     {
-      "id": "dgx-spark",
-      "label": "DGX Spark",
-      "articles": 16
-    },
-    {
       "id": "nim",
       "label": "NVIDIA NIM",
-      "articles": 16
+      "articles": 17
+    },
+    {
+      "id": "dgx-spark",
+      "label": "DGX Spark",
+      "articles": 17
     },
     {
       "id": "nemo",
       "label": "NeMo Framework",
-      "articles": 11
+      "articles": 12
     },
     {
       "id": "pgvector",
@@ -143,6 +143,28 @@
     }
   ],
   "metrics": {
+    "throughput": [
+      {
+        "label": "fp8 engine runs at roughly",
+        "value": "25 tok/s",
+        "article_slug": "naive-rag-on-spark"
+      },
+      {
+        "label": "the nim number scales from",
+        "value": "22 tok/s",
+        "article_slug": "trtllm-and-triton-on-spark"
+      },
+      {
+        "label": "that names the right number",
+        "value": "24.8 t/s",
+        "article_slug": "mcp-second-brain-in-claude-code"
+      },
+      {
+        "label": "clawnav is pinned to nemotron",
+        "value": "22 tok/s",
+        "article_slug": "nemoclaw-vs-openclaw-dgx-spark"
+      }
+    ],
     "latency": [
       {
         "label": "streams the first token in",
@@ -185,28 +207,6 @@
         "label": "four points below it on",
         "value": "NDCG@10",
         "article_slug": "pgvector-on-spark"
-      }
-    ],
-    "throughput": [
-      {
-        "label": "fp8 engine runs at roughly",
-        "value": "25 tok/s",
-        "article_slug": "naive-rag-on-spark"
-      },
-      {
-        "label": "the nim number scales from",
-        "value": "22 tok/s",
-        "article_slug": "trtllm-and-triton-on-spark"
-      },
-      {
-        "label": "that names the right number",
-        "value": "24.8 t/s",
-        "article_slug": "mcp-second-brain-in-claude-code"
-      },
-      {
-        "label": "clawnav is pinned to nemotron",
-        "value": "22 tok/s",
-        "article_slug": "nemoclaw-vs-openclaw-dgx-spark"
       }
     ]
   }
