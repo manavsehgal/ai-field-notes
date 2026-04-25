@@ -4,6 +4,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import StageFilter from '../components/StageFilter.astro';
 import ArticleCard from '../components/ArticleCard.astro';
 import ProjectStats from '../components/ProjectStats.astro';
+import Logo from '../components/Logo.astro';
 import { publishOrdinals } from '../lib/article-order.mjs';
 
 // Ordinal — earliest article = №01, derived from git first-add time so ties
@@ -46,6 +47,7 @@ const rigImage = `${import.meta.env.BASE_URL}dgx-rig.jpg`.replace(/\/+/g, '/');
         </div>
       </div>
       <div class="masthead__text">
+        <Logo size="hero" class="masthead__logo" />
         <h1 class="masthead__title">Field notes on the <em>DGX&nbsp;Spark</em>.</h1>
         <p class="masthead__tagline">
           One builder maximising the DGX Spark as a personal AI power user and edge AI rig.

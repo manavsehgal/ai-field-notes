@@ -409,6 +409,7 @@ main { flex: 1; padding-top: 4rem; /* offset for fixed nav */ }
   height: 1px;
   background: var(--color-border);
 }
+.masthead__logo { margin: 0 0 2rem; }
 .masthead__title {
   font-family: var(--font-display);
   font-weight: 700;
@@ -1197,6 +1198,9 @@ html[data-theme="light"] .masthead__plate-frame img {
   gap: 1rem;
 }
 .nav__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 1rem;
@@ -1205,6 +1209,7 @@ html[data-theme="light"] .masthead__plate-frame img {
   letter-spacing: -0.01em;
 }
 .nav__brand:hover { color: var(--color-primary); }
+.nav__brand:hover .logo-mark__spark { filter: drop-shadow(0 0 6.5px var(--color-primary-glow)); }
 .nav__links {
   display: flex;
   gap: 1.5rem;
@@ -1232,6 +1237,135 @@ html[data-theme="light"] .masthead__plate-frame img {
 }
 .nav__icon:hover { color: var(--color-primary); background: color-mix(in oklch, var(--color-primary) 10%, transparent); }
 .nav__icon:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+
+/* ---------- Logo (Marked Field) ---------- */
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.95rem;
+  text-decoration: none;
+  color: inherit;
+  line-height: 0;
+}
+.logo-mark {
+  display: block;
+  flex-shrink: 0;
+  color: var(--color-text);
+  overflow: visible; /* let the spark halo bleed past the viewBox */
+  width: 1.4rem;
+  height: 1.4rem;
+}
+.logo--hero .logo-mark { width: 4rem;    height: 4rem; }
+.logo--nav  .logo-mark { width: 1.25rem; height: 1.25rem; }
+
+.logo-mark__grid-dot { fill: var(--color-text-dim); opacity: 0.32; }
+.logo-mark__stub {
+  stroke: var(--color-text-dim);
+  stroke-width: 0.55;
+  stroke-linecap: round;
+  opacity: 0.45;
+}
+.logo-mark__edge {
+  stroke: var(--color-text);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  fill: none;
+}
+.logo-mark__node { fill: var(--color-text); }
+.logo-mark__spark {
+  fill: var(--color-primary-glow);
+  filter: drop-shadow(0 0 2.5px var(--color-primary-glow));
+}
+.logo-mark__spark-halo {
+  fill: var(--color-primary-glow);
+  opacity: 0.16;
+}
+
+/* Hero scale: staggered reveal. Default state is fully drawn; the no-preference
+ * media query swaps in animated start-states so reduced-motion users see the
+ * static mark without any keyframes triggering. */
+@media (prefers-reduced-motion: no-preference) {
+  .logo--hero .logo-mark__grid-dot {
+    opacity: 0;
+    animation: logo-grid-fade 700ms ease-out forwards;
+    animation-delay: calc(var(--i, 0) * 80ms);
+  }
+  .logo--hero .logo-mark__stub {
+    stroke-dasharray: 5;
+    stroke-dashoffset: 5;
+    animation: logo-line-draw 500ms ease-out 480ms forwards;
+  }
+  .logo--hero .logo-mark__edge {
+    stroke-dasharray: 8;
+    stroke-dashoffset: 8;
+  }
+  .logo--hero .logo-mark__edge--1 { animation: logo-line-draw 500ms ease-out 700ms forwards; }
+  .logo--hero .logo-mark__edge--2 { animation: logo-line-draw 500ms ease-out 880ms forwards; }
+  .logo--hero .logo-mark__node,
+  .logo--hero .logo-mark__spark,
+  .logo--hero .logo-mark__spark-halo {
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: center;
+    transform: scale(0.4);
+  }
+  .logo--hero .logo-mark__node--1 { animation: logo-node-pop 380ms cubic-bezier(0.34, 1.56, 0.64, 1) 760ms forwards; }
+  .logo--hero .logo-mark__node--2 { animation: logo-node-pop 380ms cubic-bezier(0.34, 1.56, 0.64, 1) 940ms forwards; }
+  .logo--hero .logo-mark__spark-halo {
+    animation: logo-halo-pop 700ms cubic-bezier(0.34, 1.56, 0.64, 1) 1180ms forwards;
+  }
+  .logo--hero .logo-mark__spark {
+    animation:
+      logo-node-pop 380ms cubic-bezier(0.34, 1.56, 0.64, 1) 1180ms forwards,
+      logo-spark-pulse 3.4s ease-in-out 1700ms infinite;
+  }
+}
+
+@keyframes logo-grid-fade { to { opacity: 0.32; } }
+@keyframes logo-line-draw { to { stroke-dashoffset: 0; } }
+@keyframes logo-node-pop  { to { opacity: 1;    transform: scale(1); } }
+@keyframes logo-halo-pop  { to { opacity: 0.16; transform: scale(1); } }
+@keyframes logo-spark-pulse {
+  0%, 100% { filter: drop-shadow(0 0 2.5px var(--color-primary-glow)); }
+  50%      { filter: drop-shadow(0 0 6px var(--color-primary-glow)); }
+}
+
+/* Wordmark — Geist Mono uppercase metadata-tag, sits beside the mark in hero. */
+.logo__wordmark {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  line-height: 1;
+}
+.logo__wordmark-text {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 0.78rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+.logo__wordmark-rule {
+  display: block;
+  width: 2.6rem;
+  height: 1px;
+  background: var(--color-border);
+}
+
+/* Hover affordance — only on the hero/nav versions where the logo is a link. */
+a.logo:hover .logo-mark__spark,
+.logo--nav:hover .logo-mark__spark {
+  filter: drop-shadow(0 0 6.5px var(--color-primary-glow));
+}
+a.logo:hover .logo__wordmark-text { color: var(--color-text); }
+
+@media (prefers-reduced-motion: reduce) {
+  .logo-mark *,
+  .logo--hero .logo-mark * {
+    animation: none !important;
+  }
+}
 
 /* ---------- Theme toggle ---------- */
 .theme-toggle {

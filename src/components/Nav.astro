@@ -1,11 +1,15 @@
 ---
 import ThemeToggle from './ThemeToggle.astro';
+import Logo from './Logo.astro';
 
 const base = import.meta.env.BASE_URL.replace(/\/+$/, '/') || '/';
 ---
 <nav class="nav" id="site-nav">
   <div class="nav__inner">
-    <a class="nav__brand" href={base}>ai-field-notes</a>
+    <a class="nav__brand" href={base}>
+      <Logo size="nav" />
+      <span>ai-field-notes</span>
+    </a>
     <div class="nav__links">
       <a href={base}>Home</a>
       <a href={`${base}stage/training/`}>Training</a>
