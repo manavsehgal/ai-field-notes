@@ -1,14 +1,14 @@
 {
-  "generated_at": "2026-04-25T17:18:31Z",
+  "generated_at": "2026-04-25T17:49:58Z",
   "articles": {
-    "total": 18,
-    "published": 18,
+    "total": 19,
+    "published": 19,
     "upcoming": 4,
     "drafts": 0
   },
   "words": {
-    "total": 47067,
-    "mean_per_article": 2614,
+    "total": 48956,
+    "mean_per_article": 2576,
     "longest": {
       "slug": "nim-first-inference-dgx-spark",
       "title": "Your First NIM on a DGX Spark \u2014 What 24.8 Tokens Per Second Doesn't Tell You",
@@ -16,12 +16,12 @@
     }
   },
   "code": {
-    "evidence_loc": 4747,
-    "src_loc": 4979,
-    "total_loc": 9726,
+    "evidence_loc": 5091,
+    "src_loc": 5099,
+    "total_loc": 10190,
     "by_language": {
-      "python": 4719,
-      "astro": 3041,
+      "python": 5063,
+      "astro": 3161,
       "css": 1776,
       "javascript": 112,
       "typescript": 50,
@@ -29,17 +29,17 @@
       "shell": 13
     },
     "data_lines": {
-      "json": 8203,
-      "yaml": 143
+      "json": 8682,
+      "yaml": 165
     }
   },
   "stages": {
-    "foundations": 6,
+    "foundations": 7,
     "training": 3,
     "fine-tuning": 3,
     "inference": 9,
     "deployment": 1,
-    "agentic": 2,
+    "agentic": 3,
     "observability": 1,
     "dev-tools": 2
   },
@@ -89,17 +89,17 @@
     {
       "id": "dgx-spark",
       "label": "DGX Spark",
-      "articles": 18
+      "articles": 19
     },
     {
       "id": "nim",
       "label": "NVIDIA NIM",
-      "articles": 18
+      "articles": 19
     },
     {
       "id": "nemo",
       "label": "NeMo Framework",
-      "articles": 13
+      "articles": 14
     },
     {
       "id": "pgvector",
@@ -129,7 +129,7 @@
     {
       "id": "nemo-guardrails",
       "label": "NeMo Guardrails",
-      "articles": 3
+      "articles": 4
     },
     {
       "id": "ollama",

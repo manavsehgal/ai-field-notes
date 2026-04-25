@@ -1,0 +1,41 @@
+define bot refuse schema
+  "Proposal blocked at R1 (schema): the agent's output is not a well-formed JSON object with exactly {knob, new_value, reason}."
+
+define bot refuse menu
+  "Proposal blocked at R2 (menu): the proposed knob is not on the perturbation_menu allowlist."
+
+define bot refuse range
+  "Proposal blocked at R3 (range): the new_value is outside the knob's declared type / range / choices."
+
+define bot refuse cross
+  "Proposal blocked at R4 (cross): the resulting cfg violates a cross-constraint."
+
+define bot refuse diff_lint
+  "Proposal blocked at R5 (diff_lint): the generated diff contains disallowed tokens or touches more than the declared knob."
+
+define flow check proposal schema
+  $verdict = execute rails_schema(text=$user_message)
+  if $verdict.blocked
+    bot refuse schema
+    stop
+
+define flow check proposal menu and range
+  $verdict = execute rails_menu_and_range(text=$user_message)
+  if $verdict.blocked
+    if $verdict.rail == "R2_menu"
+      bot refuse menu
+    else
+      bot refuse range
+    stop
+
+define flow check proposal cross constraints
+  $verdict = execute rails_cross(text=$user_message)
+  if $verdict.blocked
+    bot refuse cross
+    stop
+
+define flow check diff lint
+  $verdict = execute rails_diff_lint(text=$bot_message)
+  if $verdict.blocked
+    bot refuse diff_lint
+    stop

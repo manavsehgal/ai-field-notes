@@ -1,0 +1,23 @@
+{
+  "_doc": "Allowlisted perturbation knobs for the Autoresearch agent. The agent (NIM 8B) must propose exactly one perturbation per iteration as a JSON object {knob, new_value, reason}, where knob is one of the keys below and new_value satisfies the matching constraint. Anything outside this menu is blocked at the rails before any train.py mutation happens. This menu is the *safe interface*: the agent cannot write Python, can only twist a pre-defined knob.",
+  "_arms_race_logic": "If the agent finds a way to set a knob to a value that crashes training, the next-iteration prompt will see the crash + reason and the agent will avoid it. Crash != safety violation. Rails are about preventing the agent from doing things that would hurt the host (file writes outside scratch, shell escape, infinite memory) — they are NOT about preventing bad training runs.",
+  "knobs": {
+    "n_layer":      {"type": "int",   "range": [4, 48],         "default": 24,    "doc": "transformer block count"},
+    "n_head":       {"type": "int",   "choices": [4, 8, 16, 32], "default": 16,   "doc": "attention heads (must divide d_model)"},
+    "d_model":      {"type": "int",   "choices": [256, 512, 768, 1024, 1536, 2048], "default": 1024, "doc": "hidden dim (must be divisible by n_head)"},
+    "d_ff":         {"type": "int",   "choices": [1024, 2048, 4096, 6144, 8192], "default": 4096, "doc": "FFN hidden dim"},
+    "lr":           {"type": "float", "range": [1e-5, 1e-2],    "default": 3e-4,  "doc": "AdamW peak learning rate"},
+    "lr_warmup":    {"type": "int",   "range": [0, 50],         "default": 5,     "doc": "warmup steps before cosine decay"},
+    "grad_clip":    {"type": "float", "range": [0.1, 5.0],      "default": 1.0,   "doc": "gradient clip norm"},
+    "weight_decay": {"type": "float", "range": [0.0, 0.5],      "default": 0.0,   "doc": "AdamW weight_decay"},
+    "beta1":        {"type": "float", "range": [0.5, 0.99],     "default": 0.9,   "doc": "AdamW beta1"},
+    "beta2":        {"type": "float", "range": [0.8, 0.9999],   "default": 0.95,  "doc": "AdamW beta2"},
+    "batch_size":   {"type": "int",   "choices": [2, 4, 8, 16], "default": 16,    "doc": "micro-batch (A2 envelope)"},
+    "seq_len":      {"type": "int",   "choices": [512, 1024, 2048], "default": 1024, "doc": "sequence length"},
+    "precision":    {"type": "str",   "choices": ["bf16", "fp8"], "default": "fp8", "doc": "compute precision"}
+  },
+  "cross_constraints": [
+    {"id": "head_divides_model", "rule": "d_model % n_head == 0", "doc": "TransformerEngine attention requires d_model to be divisible by n_head — guaranteed by menu choices, included as defense in depth"},
+    {"id": "warmup_leaves_main_steps", "rule": "lr_warmup + 5 <= 30", "doc": "The Autoresearch evaluator runs 30 training steps; warmup must leave at least 5 post-warmup steps for the cosine decay schedule to mean anything"}
+  ]
+}

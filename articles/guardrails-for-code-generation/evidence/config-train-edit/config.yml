@@ -1,0 +1,24 @@
+models:
+  # The LLM in this config is *only* for the Colang flow's internal
+  # routing (e.g., "what bot response should accompany a refusal").
+  # It is NOT a rail — every actual rails check below is a programmatic
+  # action defined in actions.py.
+  - type: main
+    engine: openai
+    model: meta/llama-3.1-8b-instruct
+    parameters:
+      openai_api_base: http://localhost:8000/v1
+      openai_api_key: nim-local
+      temperature: 0.0
+
+rails:
+  input:
+    flows:
+      - check proposal schema
+      - check proposal menu and range
+      - check proposal cross constraints
+  output:
+    flows:
+      - check diff lint
+
+prompts: []
