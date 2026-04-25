@@ -1,0 +1,6 @@
+# Heavy generated artifacts — reproducible by re-running the harness.
+# Keep small JSON metadata + the scripts + Dockerfile under git.
+cleaned/
+raw_parquets_for_curator/
+packed.int32.npy
+wikitext103_train_*.parquet

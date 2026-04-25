@@ -1,0 +1,10 @@
+{
+  "tokenizer": "gpt2",
+  "vocab_size": 50257,
+  "eot_token_id": 50256,
+  "num_docs_after_dedup": 660773,
+  "num_docs_dropped_by_dedup": 8083,
+  "total_tokens": 109339897,
+  "packed_dtype": "int32",
+  "packed_path": "packed.int32.npy"
+}

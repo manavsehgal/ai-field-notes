@@ -1,0 +1,23 @@
+{
+  "stage": "curator_clean",
+  "raw_docs": 1801350,
+  "raw_chars": 538294333,
+  "cleaned_docs": 668856,
+  "cleaned_chars": 509478389,
+  "pipeline_wall_s": 82.9,
+  "drop_ratio_docs": 0.6287,
+  "drop_ratio_chars": 0.0535,
+  "input_parquets": [
+    "wikitext103_train_0.parquet",
+    "wikitext103_train_1.parquet"
+  ],
+  "filters": [
+    "WordCountFilter(min=50,max=100k)",
+    "RepeatingTopNGramsFilter(n=3,max_ratio=0.18)",
+    "SymbolsToWordsFilter(max_ratio=0.20)"
+  ],
+  "modifiers": [
+    "UnicodeReformatter",
+    "NewlineNormalizer"
+  ]
+}

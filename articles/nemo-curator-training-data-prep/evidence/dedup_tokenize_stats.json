@@ -1,0 +1,14 @@
+{
+  "stage": "dedup_tokenize_pack",
+  "load_jsonl_s": null,
+  "dedup_wall_s": null,
+  "tokenize_wall_s": 40.0,
+  "concat_wall_s": 0.2,
+  "write_wall_s": 0.0,
+  "input_docs": 668856,
+  "after_dedup_docs": 660773,
+  "dedup_drop_ratio": 0.0121,
+  "total_tokens": 109339897,
+  "packed_size_mib": 417.1,
+  "tokenize_throughput_tok_per_s": 2734269.0
+}
