@@ -1,0 +1,18 @@
+{
+  "n_test": 8,
+  "distilled": {
+    "validity_rate": 1.0,
+    "knob_match_rate": 0.125,
+    "exact_match_rate": 0.0,
+    "mean_latency_s": 1.6868660966249536,
+    "median_latency_s": 1.7009686299998066
+  },
+  "nim_8b": {
+    "validity_rate": 1.0,
+    "knob_match_rate": 0.5,
+    "exact_match_rate": 0.5,
+    "mean_latency_s": 1.3017474316250173,
+    "median_latency_s": 1.3187916560000303
+  },
+  "throughput_speedup": 0.7716957701796997
+}

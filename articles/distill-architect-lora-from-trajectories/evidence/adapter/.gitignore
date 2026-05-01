@@ -1,0 +1,10 @@
+# Adapter binaries are local-only; reproduce via train_lora.py.
+adapter_model.safetensors
+tokenizer.json
+vocab.json
+merges.txt
+chat_template.jinja
+added_tokens.json
+special_tokens_map.json
+tokenizer_config.json
+README.md

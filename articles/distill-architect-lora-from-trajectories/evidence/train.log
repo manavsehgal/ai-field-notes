@@ -1,0 +1,92 @@
+
+=============================
+== Triton Inference Server ==
+=============================
+
+NVIDIA Release 25.12 (build 246541573)
+Triton Server Version 2.64.0
+
+Copyright (c) 2018-2025, NVIDIA CORPORATION & AFFILIATES.  All rights reserved.
+
+Various files include modifications (c) NVIDIA CORPORATION & AFFILIATES.  All rights reserved.
+
+GOVERNING TERMS: The software and materials are governed by the NVIDIA Software License Agreement
+(found at https://www.nvidia.com/en-us/agreements/enterprise-software/nvidia-software-license-agreement/)
+and the Product-Specific Terms for NVIDIA AI Products
+(found at https://www.nvidia.com/en-us/agreements/enterprise-software/product-specific-terms-for-ai-products/).
+
+/usr/local/lib/python3.12/dist-packages/torch/cuda/__init__.py:63: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+torch 2.9.0a0+145a3a7bda.nv25.10  cuda True  dev NVIDIA GB10
+loading base model (bf16)...
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [00:24<00:24, 24.93s/it]Loading checkpoint shards: 100%|██████████| 2/2 [00:37<00:00, 17.69s/it]Loading checkpoint shards: 100%|██████████| 2/2 [00:37<00:00, 18.77s/it]
+  loaded in 37.9s, params=3.09B
+trainable: 29.93M / total: 3.12B  (0.961%)
+train=42  eval=8
+tokenizing...
+Map:   0%|          | 0/42 [00:00<?, ? examples/s]Map: 100%|██████████| 42/42 [00:00<00:00, 465.67 examples/s]
+Map:   0%|          | 0/8 [00:00<?, ? examples/s]Map: 100%|██████████| 8/8 [00:00<00:00, 449.80 examples/s]
+  0%|          | 0/30 [00:00<?, ?it/s]train supervised tokens — min=26 median=32 max=36
+eval  supervised tokens — min=26 median=32 max=36
+starting training...
+`use_cache=True` is incompatible with gradient checkpointing. Setting `use_cache=False`.
+  3%|▎         | 1/30 [00:09<04:38,  9.60s/it]  7%|▋         | 2/30 [00:18<04:10,  8.93s/it]                                                7%|▋         | 2/30 [00:18<04:10,  8.93s/it] 10%|█         | 3/30 [00:26<03:57,  8.78s/it] 13%|█▎        | 4/30 [00:35<03:44,  8.63s/it]                                               13%|█▎        | 4/30 [00:35<03:44,  8.63s/it] 17%|█▋        | 5/30 [00:43<03:33,  8.54s/it] 20%|██        | 6/30 [00:45<02:32,  6.34s/it]                                               20%|██        | 6/30 [00:45<02:32,  6.34s/it]
+  0%|          | 0/4 [00:00<?, ?it/s][A{'loss': 0.8595, 'grad_norm': 4.548800945281982, 'learning_rate': 9.999999999999999e-05, 'epoch': 0.38}
+{'loss': 0.7196, 'grad_norm': 5.925276756286621, 'learning_rate': 0.0003, 'epoch': 0.76}
+{'loss': 0.5764, 'grad_norm': 1.5873273611068726, 'learning_rate': 0.00029595673058697357, 'epoch': 1.0}
+
+ 50%|█████     | 2/4 [00:00<00:00,  2.72it/s][A
+ 75%|███████▌  | 3/4 [00:01<00:00,  2.60it/s][A
+100%|██████████| 4/4 [00:01<00:00,  2.24it/s][A                                              
+                                             [A 20%|██        | 6/30 [00:47<02:32,  6.34s/it]
+100%|██████████| 4/4 [00:01<00:00,  2.24it/s][A
+                                             [A 23%|██▎       | 7/30 [00:56<02:57,  7.72s/it] 27%|██▋       | 8/30 [01:04<02:55,  7.96s/it]                                               27%|██▋       | 8/30 [01:04<02:55,  7.96s/it] 30%|███       | 9/30 [01:13<02:52,  8.22s/it] 33%|███▎      | 10/30 [01:21<02:46,  8.33s/it]                                                33%|███▎      | 10/30 [01:21<02:46,  8.33s/it] 37%|███▋      | 11/30 [01:30<02:39,  8.41s/it] 40%|████      | 12/30 [01:32<01:57,  6.54s/it]                                                40%|████      | 12/30 [01:32<01:57,  6.54s/it]
+  0%|          | 0/4 [00:00<?, ?it/s][A{'eval_loss': 0.49504613876342773, 'eval_runtime': 2.2637, 'eval_samples_per_second': 3.534, 'eval_steps_per_second': 1.767, 'epoch': 1.0}
+{'loss': 0.369, 'grad_norm': 0.8519006967544556, 'learning_rate': 0.0002840448960485118, 'epoch': 1.38}
+{'loss': 0.3176, 'grad_norm': 0.6436675786972046, 'learning_rate': 0.00026490666646784665, 'epoch': 1.76}
+{'loss': 0.2854, 'grad_norm': 1.649276614189148, 'learning_rate': 0.00023957378875541792, 'epoch': 2.0}
+
+ 50%|█████     | 2/4 [00:00<00:00,  3.29it/s][A
+ 75%|███████▌  | 3/4 [00:01<00:00,  2.30it/s][A
+100%|██████████| 4/4 [00:01<00:00,  2.03it/s][A                                               
+                                             [A 40%|████      | 12/30 [01:35<01:57,  6.54s/it]
+100%|██████████| 4/4 [00:02<00:00,  2.03it/s][A
+                                             [A 43%|████▎     | 13/30 [01:44<02:15,  7.99s/it] 47%|████▋     | 14/30 [01:52<02:08,  8.02s/it]                                                47%|████▋     | 14/30 [01:52<02:08,  8.02s/it] 50%|█████     | 15/30 [02:00<02:02,  8.14s/it] 53%|█████▎    | 16/30 [02:08<01:54,  8.19s/it]                                                53%|█████▎    | 16/30 [02:08<01:54,  8.19s/it] 57%|█████▋    | 17/30 [02:17<01:47,  8.24s/it] 60%|██████    | 18/30 [02:19<01:16,  6.40s/it]                                                60%|██████    | 18/30 [02:19<01:16,  6.40s/it]{'eval_loss': 0.3735044598579407, 'eval_runtime': 2.4094, 'eval_samples_per_second': 3.32, 'eval_steps_per_second': 1.66, 'epoch': 2.0}
+{'loss': 0.2458, 'grad_norm': 0.7037926316261292, 'learning_rate': 0.0002094119649058735, 'epoch': 2.38}
+{'loss': 0.2233, 'grad_norm': 0.8679479956626892, 'learning_rate': 0.00017604722665003956, 'epoch': 2.76}
+{'loss': 0.2502, 'grad_norm': 1.6335445642471313, 'learning_rate': 0.00014127827566342863, 'epoch': 3.0}
+
+  0%|          | 0/4 [00:00<?, ?it/s][A
+ 50%|█████     | 2/4 [00:00<00:00,  3.58it/s][A
+ 75%|███████▌  | 3/4 [00:01<00:00,  2.49it/s][A
+100%|██████████| 4/4 [00:01<00:00,  2.17it/s][A                                               
+                                             [A 60%|██████    | 18/30 [02:21<01:16,  6.40s/it]
+100%|██████████| 4/4 [00:01<00:00,  2.17it/s][A
+                                             [A 63%|██████▎   | 19/30 [02:30<01:25,  7.74s/it] 67%|██████▋   | 20/30 [02:38<01:19,  7.91s/it]                                                67%|██████▋   | 20/30 [02:38<01:19,  7.91s/it] 70%|███████   | 21/30 [02:47<01:12,  8.07s/it] 73%|███████▎  | 22/30 [02:55<01:05,  8.17s/it]                                                73%|███████▎  | 22/30 [02:55<01:05,  8.17s/it] 77%|███████▋  | 23/30 [03:03<00:57,  8.22s/it] 80%|████████  | 24/30 [03:05<00:38,  6.40s/it]                                                80%|████████  | 24/30 [03:05<00:38,  6.40s/it]
+  0%|          | 0/4 [00:00<?, ?it/s][A{'eval_loss': 0.3471622169017792, 'eval_runtime': 2.2693, 'eval_samples_per_second': 3.525, 'eval_steps_per_second': 1.763, 'epoch': 3.0}
+{'loss': 0.1824, 'grad_norm': 0.5702316761016846, 'learning_rate': 0.0001069795150933365, 'epoch': 3.38}
+{'loss': 0.1921, 'grad_norm': 0.6216625571250916, 'learning_rate': 7.500000000000002e-05, 'epoch': 3.76}
+{'loss': 0.2065, 'grad_norm': 1.2261537313461304, 'learning_rate': 4.706375431968997e-05, 'epoch': 4.0}
+
+ 50%|█████     | 2/4 [00:00<00:00,  3.57it/s][A
+ 75%|███████▌  | 3/4 [00:01<00:00,  2.51it/s][A
+100%|██████████| 4/4 [00:01<00:00,  2.17it/s][A                                               
+                                             [A 80%|████████  | 24/30 [03:08<00:38,  6.40s/it]
+100%|██████████| 4/4 [00:01<00:00,  2.17it/s][A
+                                             [A 83%|████████▎ | 25/30 [03:16<00:38,  7.62s/it] 87%|████████▋ | 26/30 [03:24<00:31,  7.81s/it]                                                87%|████████▋ | 26/30 [03:24<00:31,  7.81s/it] 90%|█████████ | 27/30 [03:32<00:23,  7.90s/it] 93%|█████████▎| 28/30 [03:40<00:15,  7.99s/it]                                                93%|█████████▎| 28/30 [03:40<00:15,  7.99s/it] 97%|█████████▋| 29/30 [03:48<00:07,  7.94s/it]100%|██████████| 30/30 [03:50<00:00,  6.18s/it]                                               100%|██████████| 30/30 [03:50<00:00,  6.18s/it]{'eval_loss': 0.3325631618499756, 'eval_runtime': 2.2682, 'eval_samples_per_second': 3.527, 'eval_steps_per_second': 1.763, 'epoch': 4.0}
+{'loss': 0.1714, 'grad_norm': 0.5129208564758301, 'learning_rate': 2.4676828288059558e-05, 'epoch': 4.38}
+{'loss': 0.1566, 'grad_norm': 0.5461198091506958, 'learning_rate': 9.046106882113751e-06, 'epoch': 4.76}
+{'loss': 0.164, 'grad_norm': 1.2425326108932495, 'learning_rate': 1.0142463387085464e-06, 'epoch': 5.0}
+
+  0%|          | 0/4 [00:00<?, ?it/s][A
+ 50%|█████     | 2/4 [00:00<00:00,  3.66it/s][A
+ 75%|███████▌  | 3/4 [00:01<00:00,  2.54it/s][A
+100%|██████████| 4/4 [00:01<00:00,  2.20it/s][A                                               
+                                             [A100%|██████████| 30/30 [03:53<00:00,  6.18s/it]
+100%|██████████| 4/4 [00:01<00:00,  2.20it/s][A
+                                             [A                                               100%|██████████| 30/30 [03:53<00:00,  6.18s/it]100%|██████████| 30/30 [03:53<00:00,  7.77s/it]
+{'eval_loss': 0.3330349326133728, 'eval_runtime': 2.2306, 'eval_samples_per_second': 3.586, 'eval_steps_per_second': 1.793, 'epoch': 5.0}
+{'train_runtime': 233.0607, 'train_samples_per_second': 0.901, 'train_steps_per_second': 0.129, 'train_loss': 0.32799304723739625, 'epoch': 5.0}
+training finished in 3.9 min
+saving adapter to /work/adapter
+done.
