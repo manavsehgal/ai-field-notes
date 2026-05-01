@@ -10,6 +10,7 @@ hardware: "NVIDIA DGX Spark"
 tags: [fine-tuning, lora, peft, qwen, second-brain, dgx-spark]
 summary: "231 own-voice Q&A pairs, a rank-16 LoRA, 69 s of training on a GB10 Spark. The adapter won't memorize your exact numbers, but it will take a model that refuses 61% of questions about your work and turn it into one that answers all of them in your voice. For facts you still need RAG."
 signature: LoraVoiceTransfer
+series: Second Brain
 ---
 
 Everyone's first question about fine-tuning is the same: *"can I teach the model my stuff?"* The honest answer is that it depends entirely on what you mean by "teach". A rank-16 LoRA on 231 Q&A pairs of your own writing, trained for 69 seconds of GB10 wall clock, will change the model's behaviour measurably. It will not change the model's knowledge. The distinction matters — and it is also exactly the distinction the Second Brain arc has been circling since the very first RAG article.

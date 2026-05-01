@@ -888,6 +888,52 @@ html[data-theme="light"] .masthead__plate-frame img {
   background: color-mix(in oklch, var(--color-primary) 8%, transparent);
 }
 
+/* ---------- Series filter chips ---------- */
+/* Sits above the stage row on the home page; identical pill geometry to
+   .stage-filter__chip but with a bold-coloured leading "Series" label and
+   each chip carrying its own accent so readers learn the series colours. */
+.series-filter {
+  max-width: 72rem;
+  margin-inline: auto;
+  padding: 1.5rem 1.5rem 0.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+.filter-row .series-filter { display: contents; }
+
+.series-filter__label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--color-text-dim);
+  margin-right: 0.5rem;
+}
+.series-filter__chip {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-text-muted);
+  text-decoration: none;
+  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+  white-space: nowrap;
+}
+.series-filter__chip:hover {
+  color: var(--color-primary);
+  border-color: var(--color-primary-dim);
+}
+.series-filter__chip[aria-current="page"] {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  background: color-mix(in oklch, var(--color-primary) 8%, transparent);
+}
+
 /* ---------- Research list (home + stage page card grid) ---------- */
 .research-list {
   max-width: 72rem;
@@ -988,6 +1034,48 @@ html[data-theme="light"] .masthead__plate-frame img {
   color: var(--color-text-dim);
 }
 .card__article { color: var(--color-primary); }
+
+/* Series badge — small pill above the title on each card. Each series gets
+   its own hue via the [data-series] attribute so readers can scan a long
+   list and pick out, say, every Looking Beyond Spark piece by colour. */
+.card__series-badge {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  padding: 0.25rem 0.6rem 0.22rem;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  background: color-mix(in oklch, var(--color-text) 4%, transparent);
+  color: var(--color-text-muted);
+  margin-bottom: 0.85rem;
+}
+.card__series-badge[data-series="foundations"] {
+  color: var(--svg-accent-cyan);
+  border-color: color-mix(in oklch, var(--svg-accent-cyan) 50%, var(--color-border));
+  background: color-mix(in oklch, var(--svg-accent-cyan) 8%, transparent);
+}
+.card__series-badge[data-series="second-brain"] {
+  color: var(--svg-accent-teal);
+  border-color: color-mix(in oklch, var(--svg-accent-teal) 50%, var(--color-border));
+  background: color-mix(in oklch, var(--svg-accent-teal) 8%, transparent);
+}
+.card__series-badge[data-series="llm-wiki"] {
+  color: var(--svg-accent-purple);
+  border-color: color-mix(in oklch, var(--svg-accent-purple) 50%, var(--color-border));
+  background: color-mix(in oklch, var(--svg-accent-purple) 8%, transparent);
+}
+.card__series-badge[data-series="autoresearch"] {
+  color: var(--color-primary);
+  border-color: color-mix(in oklch, var(--color-primary) 50%, var(--color-border));
+  background: color-mix(in oklch, var(--color-primary) 10%, transparent);
+}
+.card__series-badge[data-series="looking-beyond-spark"] {
+  color: var(--svg-accent-orange);
+  border-color: color-mix(in oklch, var(--svg-accent-orange) 50%, var(--color-border));
+  background: color-mix(in oklch, var(--svg-accent-orange) 9%, transparent);
+}
 .card__title {
   font-family: var(--font-display);
   font-weight: 700;
@@ -1138,6 +1226,43 @@ html[data-theme="light"] .masthead__plate-frame img {
   max-width: 60ch;
   margin: 0 0 1.5rem;
 }
+
+/* Series badge on the article header — same colour palette as the card
+   badge but laid out as a clickable two-line chip ("Series" / name) so
+   the reader can jump to the series filter from inside an article. */
+.article__series-badge {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.5rem 0.85rem;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  background: color-mix(in oklch, var(--color-text) 4%, transparent);
+  text-decoration: none;
+  margin: 0 0 1.5rem;
+  transition: border-color 0.15s, background 0.15s;
+}
+.article__series-badge:hover { border-color: var(--color-primary-dim); }
+.article__series-badge-label {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--color-text-dim);
+}
+.article__series-badge-name {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--color-text);
+}
+.article__series-badge[data-series="foundations"] .article__series-badge-name { color: var(--svg-accent-cyan); }
+.article__series-badge[data-series="second-brain"] .article__series-badge-name { color: var(--svg-accent-teal); }
+.article__series-badge[data-series="llm-wiki"] .article__series-badge-name { color: var(--svg-accent-purple); }
+.article__series-badge[data-series="autoresearch"] .article__series-badge-name { color: var(--color-primary); }
+.article__series-badge[data-series="looking-beyond-spark"] .article__series-badge-name { color: var(--svg-accent-orange); }
+
 .article__meta {
   font-family: var(--font-mono);
   font-size: 0.8rem;

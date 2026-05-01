@@ -10,6 +10,7 @@ hardware: "NVIDIA DGX Spark"
 tags: [pgvector, postgres, hnsw, ivfflat, matryoshka, nemotron, retrieval, dgx-spark]
 summary: "The substrate between the embed call and the retrieve call — pgvector 0.8.2 running as a Postgres 16 container on GB10, with 1000 Nemotron vectors, HNSW and ivfflat both indexed, and a planner that prefers seq scan until you tell it otherwise."
 signature: PgvectorStore
+series: Foundations
 ---
 
 One inference endpoint became a NIM. One embedding endpoint became the Nemotron Retriever. This time the substrate becomes `pgvector` — the column where the vectors *live* between the embed call and the retrieve call. Three arcs share this table; only the query predicates differ. A Second Brain asks "which notes look like what I just wrote?", a personal wiki asks "which pages duplicate this passage?", and an autoresearch agent asks "which prior trajectories resembled this plan?". All three push the same row shape through the same operator, `<=>`, against the same index.

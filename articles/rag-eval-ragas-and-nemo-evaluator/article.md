@@ -11,6 +11,7 @@ tags: [ragas, nemo-evaluator, evaluation, rag, retrieval, rerank, second-brain, 
 summary: "A Ragas-style harness written in 200 lines of stdlib Python, run locally on the DGX Spark, against four variants of the Second Brain RAG chain. Naive RAG scores 3.30 / 5. Rerank RAG scores 4.27. LoRA+RAG is a surprise — it does not beat naive. Retrieval is where the points come from."
 signature: RagEvalCorrectness
 also_stages: [inference, fine-tuning]
+series: Second Brain
 ---
 
 The previous article closed with a promise: the LoRA on 231 of my own Q&A pairs taught the model *voice, not facts* — and the fact layer was about to come back in the form of RAG. One article later, with a retrieval chain bolted on and four variants benchmarked against 44 held-out questions, the scoreboard is here and the sharper finding is not where I expected it.

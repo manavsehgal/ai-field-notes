@@ -10,6 +10,7 @@ hardware: "NVIDIA DGX Spark"
 tags: [deployment, tensorrt-llm, triton, trtllm-serve, fp8, nvfp4, blackwell, gb10, second-brain, dgx-spark]
 summary: "Dropping below NIM to raw TensorRT-LLM on a GB10 Spark. FP8 beats NIM's vLLM by 10-15% — barely worth the rebuild. NVFP4 beats it by 76% on decode, 43% on TTFT, and ships a 34%-smaller engine. The reason to drop NIM is the Blackwell-native 4-bit kernel, not FP8."
 signature: TrtLlmBladeTriple
+series: Second Brain
 ---
 
 NIM 8B is the convenient answer. One `docker run`, an OpenAI-compatible endpoint on port 8000, 22 tokens per second of greedy decode on the DGX Spark, eleven gigabytes resident, and enough concurrency to carry a small team without breaking a sweat. The label on the container says `meta/llama-3.1-8b-instruct`, and the temptation is to treat it as a generic upstream. But the NIM ref hash is `hf-fp8-42d9515+chk1` and the environment declares `BACKEND_TYPE=vllm` — NVIDIA ships an FP8-quantized, Spark-specific build of vLLM 0.10.1 inside. The convenience tax is not buying you laziness; it is buying you a tuned stack.

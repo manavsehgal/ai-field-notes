@@ -10,6 +10,7 @@ hardware: "NVIDIA DGX Spark"
 tags: [rag, retrieval, llama, nemotron, pgvector, nim, grounding, hallucination, dgx-spark]
 summary: "Three endpoints in one curl chain — a query embeds through Nemotron, pgvector returns top-5 chunks in under 80 ms, and a Llama 3.1 8B NIM stuffs them into a strict-context prompt. The chain works; the 8B generator still refuses on questions its own context answers."
 signature: NaiveRagChain
+series: Foundations
 ---
 
 Four articles in. The Llama 3.1 8B NIM has been serving `:8000` for two weeks. The Nemotron Retriever NIM joined it at `:8001`. The `pgvector` container on `:5432` holds a thousand 1024-d vectors with both IVFFlat and HNSW indexes built. Each article stood its endpoint up in isolation. None of them *called each other*.

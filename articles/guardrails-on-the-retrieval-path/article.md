@@ -10,6 +10,7 @@ hardware: "NVIDIA DGX Spark"
 tags: [guardrails, nemo, rag, rails, colang, policy, pii, second-brain, llm-wiki, autoresearch, dgx-spark]
 summary: "NeMo Guardrails drops a policy gate between retrieval and generation. One install, three per-arc configs — PII for Second Brain, style for LLM Wiki, code-safety for Autoresearch — and a 15-query benchmark: 100% block recall, 100% clean pass. Rails are scaffolding; detectors are the content."
 signature: RetrievalGuardrails
+series: Foundations
 ---
 
 Article #8 closed with a finding and a queue: bigger generators over-refuse on perfect retrieval, and the next rung is the *policy* gate — the one that fires between "we have an answer" and "we hand it to the user or the agent." That's the rung where a Second Brain has to scrub personal identifiers out of a draft before it goes back to the user; where an LLM Wiki has to enforce house style on every page it writes; where an Autoresearch agent has to refuse to run `rm -rf` even when its planner confidently suggested it.

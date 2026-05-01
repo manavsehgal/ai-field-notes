@@ -10,6 +10,7 @@ hardware: "NVIDIA DGX Spark"
 tags: [rag, retrieval, rerank, bm25, rrf, hybrid, nemotron, pgvector, fusion, dgx-spark]
 summary: "Four retrieval modes on one corpus — naive dense, BM25, Reciprocal Rank Fusion, Nemotron rerank. Dense is already 92% recall@5; rerank adds a point at K=10 and reorders the top. The 8B generator still refuses where retrieval is perfect — grounding, not retrieval, is the new bottleneck."
 signature: RerankFusion
+series: Foundations
 ---
 
 Article #6 left a bruise. The Llama 3.1 8B NIM, handed five perfectly-retrieved chunks about the 2004 Google IPO, replied *"The provided context does not contain the answer."* The retrieval was right. The grounding was wrong. The closing paragraph queued two upgrades to the chain — a reranker to sharpen the top-K, and a BM25 lexical path to rescue exact-term queries — and asked whether either would close the gap.

@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import StageFilter from '../components/StageFilter.astro';
+import SeriesFilter from '../components/SeriesFilter.astro';
 import ArticleCard from '../components/ArticleCard.astro';
 import ProjectStats from '../components/ProjectStats.astro';
 import Logo from '../components/Logo.astro';
@@ -65,6 +66,7 @@ const rigImage = `${import.meta.env.BASE_URL}dgx-rig.jpg`.replace(/\/+/g, '/');
   </header>
 
   <nav class="filter-row" aria-label="Filter articles">
+    <SeriesFilter current={null} />
     <StageFilter current={null} />
     {upcomingAsc.length > 0 && (
       <button

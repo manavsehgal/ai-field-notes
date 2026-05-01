@@ -11,6 +11,7 @@ tags: [foundations, training, layman, autoresearch, dgx-spark, roadmap, lora, fi
 summary: "Five technical articles in one day built an unattended AI research loop on a desk for $0.02 of electricity. The plain-English readout: what the agent built (not a usable model), what it changes for one person, and a four-tier roadmap from LoRA in minutes to from-scratch in weeks."
 signature: FourKindsOfTraining
 also_stages: [training, agentic]
+series: Looking Beyond Spark
 ---
 
 A reader who walked in cold today and read the five technical articles I shipped — `nemo-framework-on-spark`, `baseline-training-loop-on-spark`, `nemo-curator-training-data-prep`, `guardrails-for-code-generation`, and `autoresearch-agent-loop` — could be forgiven for coming away with the impression that I trained a custom language model on my desk. That impression is *almost* right and importantly wrong, in a way that most "personal AI" content doesn't bother to disambiguate. This article is the reset.

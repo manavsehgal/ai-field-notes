@@ -10,6 +10,7 @@ hardware: "NVIDIA DGX Spark"
 tags: [rag, grounding, refusal, nemotron, llama, generator, scale, dgx-spark]
 summary: "Article #7 bet that a bigger generator would heal the 8B Google-IPO refusal. Ran the A/B across three sizes on one retrieval chain. Bet lost: Nemotron-Super-49B over-refuses the 8B baseline; Llama 3.3 70B narrows the gap, not closes it. The refusal was the scaffold working."
 signature: GeneratorUpgrade
+series: Foundations
 ---
 
 Article #7 ended with a bet. Four retrieval configurations had fed perfect chunks to the 8B generator on *"Did Google have an IPO in 2004?"* All four got back *"The provided context does not contain the answer."* The retrieval had the right facts at rank 1. The grounding didn't commit. The closing line queued the obvious fix: swap the 8B for Llama 3.3 70B or Nemotron-Super-49B and measure whether the bigger model's grounding circuit answers where the smaller one refused.

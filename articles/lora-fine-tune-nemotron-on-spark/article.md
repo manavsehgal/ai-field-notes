@@ -10,6 +10,7 @@ hardware: "NVIDIA DGX Spark"
 tags: [fine-tuning, lora, peft, nemotron, nemo-customizer, adapters, llm-wiki, dgx-spark]
 summary: "A planned walk through LoRA fine-tuning on Nemotron Nano 9B with NeMo Customizer: rank and alpha sweeps, a tiny domain corpus, and the memory accounting that keeps a PEFT run from tripping the Spark's 128 GB unified-memory wall."
 status: upcoming
+series: LLM Wiki
 ---
 
 ## What this article will answer

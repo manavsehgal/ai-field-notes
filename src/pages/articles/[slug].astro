@@ -2,6 +2,7 @@
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { publishOrdinals } from '../../lib/article-order.mjs';
+import { SERIES_SLUGS } from '../../content.config.ts';
 
 export async function getStaticPaths() {
   const all = await getCollection('articles');
@@ -15,13 +16,15 @@ export async function getStaticPaths() {
 
 const { article, ordinal } = Astro.props;
 const { Content } = await render(article);
-const { title, date, author, product, stage, difficulty, time_required, hardware, summary, status } = article.data;
+const { title, date, author, product, stage, difficulty, time_required, hardware, summary, status, series } = article.data;
 
 const isUpcoming = status === 'upcoming';
 const ordinalLabel = isUpcoming ? 'Upcoming' : `№${String(ordinal).padStart(2, '0')}`;
 const dateFmt = new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).format(date);
 
 const homeHref = import.meta.env.BASE_URL.replace(/\/+$/, '/') || '/';
+const base = import.meta.env.BASE_URL.replace(/\/+$/, '/') || '/';
+const seriesHref = series ? `${base}series/${SERIES_SLUGS[series]}/`.replace(/\/+/g, '/') : null;
 ---
 <BaseLayout title={`${title} — ai-field-notes`} description={summary}>
   <div class="progress-bar" id="progress-bar"></div>
@@ -34,6 +37,12 @@ const homeHref = import.meta.env.BASE_URL.replace(/\/+$/, '/') || '/';
       )}
       <h1 class="article__title">{title}</h1>
       <p class="article__summary">{summary}</p>
+      {series && (
+        <a class="article__series-badge" href={seriesHref} data-series={SERIES_SLUGS[series]}>
+          <span class="article__series-badge-label">Series</span>
+          <span class="article__series-badge-name">{series}</span>
+        </a>
+      )}
       <div class="article__meta">
         <span>{ordinalLabel}</span>
         <span>{stage}</span>

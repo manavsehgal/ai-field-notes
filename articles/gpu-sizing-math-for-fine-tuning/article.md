@@ -11,6 +11,7 @@ hardware: "NVIDIA DGX Spark"
 tags: [fine-tuning, memory, sizing, lora, qlora, fsdp, nemotron, h100, h200, dgx-spark]
 summary: "A working answer to: how many GPUs to fine-tune a 100B Nemotron? Three methods, three memory footprints — full FT ≈ 1.6 TB needs 24× H100; LoRA ≈ 250 GB fits 8× H100; QLoRA ≈ 65 GB fits 1× H200. The Spark's 3B LoRA teaches the math."
 signature: FineTuneMemoryMath
+series: Looking Beyond Spark
 ---
 
 You cannot fine-tune a 100B-parameter Nemotron on a DGX Spark. The Spark's 128 GB of unified memory runs out twenty times over before the optimizer has even allocated its state buffers. That is the first sentence of this article, and I am going to spend the rest of it *not* making it the point.

@@ -10,6 +10,7 @@ hardware: "NVIDIA DGX Spark"
 tags: [training, nemo, megatron, continued-pretraining, llama, bf16, activation-checkpoint, autoresearch, dgx-spark]
 summary: "When does it make sense to continue pre-training on a single GB10 box, and when is it a category error? A planned run that pushes NeMo Framework, Megatron-LM parallelism, and BF16 mixed precision against the 128 GB unified-memory wall with a small domain corpus."
 status: upcoming
+series: Autoresearch
 ---
 
 ## What this article will answer

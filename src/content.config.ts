@@ -17,6 +17,34 @@ export const STAGES = [
   'dev-tools',
 ] as const;
 
+// Editorial series — the running narrative threads. An article belongs to
+// at most one series. Preamble pieces outside the arc system leave it
+// unset. Foundations covers F1–F7 and the bridge (B). The three application
+// arcs follow the bridge; Looking Beyond Spark is the fourth, opportunistic
+// thread for arithmetic that extrapolates beyond the 128 GB Spark envelope.
+export const SERIES = [
+  'Foundations',
+  'Second Brain',
+  'LLM Wiki',
+  'Autoresearch',
+  'Looking Beyond Spark',
+] as const;
+
+// Slug-safe form for series, used in /series/<slug>/ URLs and the filter
+// component. Mirror order with SERIES so chip rendering matches.
+export const SERIES_SLUGS: Record<(typeof SERIES)[number], string> = {
+  'Foundations': 'foundations',
+  'Second Brain': 'second-brain',
+  'LLM Wiki': 'llm-wiki',
+  'Autoresearch': 'autoresearch',
+  'Looking Beyond Spark': 'looking-beyond-spark',
+};
+
+export const SERIES_BY_SLUG: Record<string, (typeof SERIES)[number]> =
+  Object.fromEntries(
+    Object.entries(SERIES_SLUGS).map(([name, slug]) => [slug, name as (typeof SERIES)[number]]),
+  );
+
 const articles = defineCollection({
   loader: glob({
     pattern: '*/article.md',
@@ -48,6 +76,9 @@ const articles = defineCollection({
     // bucket; `also_stages` lists secondary buckets so the article shows
     // up on those stage pages too.
     also_stages: z.array(z.enum(STAGES)).default([]),
+    // Editorial series — the running narrative thread the article belongs
+    // to. Optional: preamble pieces outside the arc system leave it unset.
+    series: z.enum(SERIES).optional(),
   }),
 });
 

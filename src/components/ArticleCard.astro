@@ -1,5 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content';
+import { SERIES_SLUGS } from '../content.config.ts';
 
 // Signature-figure components live under src/components/svg/ and are bundled
 // in via glob so the name can be looked up dynamically from frontmatter.
@@ -16,13 +17,16 @@ interface Props {
 }
 
 const { article, ordinal } = Astro.props;
-const { title, date, stage, product, time_required, summary, signature, status } = article.data;
+const { title, date, stage, product, time_required, summary, signature, status, series } = article.data;
 
 const ordinalDigits = String(ordinal).padStart(2, '0');
 const ordinalLabel = `№${ordinalDigits}`;
 const dateFmt = new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).format(date);
 
 const href = `${import.meta.env.BASE_URL}articles/${article.id}/`.replace(/\/+/g, '/');
+const seriesHref = series
+  ? `${import.meta.env.BASE_URL}series/${SERIES_SLUGS[series]}/`.replace(/\/+/g, '/')
+  : null;
 
 const Signature = signature ? signatureRegistry[signature] : null;
 const isUpcoming = status === 'upcoming';
@@ -41,6 +45,9 @@ const metaSlot = isUpcoming ? 'Upcoming' : `Article №${ordinalDigits}`;
       )}
       <span>{time_required}</span>
     </div>
+    {series && (
+      <span class="card__series-badge" data-series={SERIES_SLUGS[series]}>{series}</span>
+    )}
     <h2 class="card__title">{title}</h2>
     <p class="card__summary">{summary}</p>
   </div>

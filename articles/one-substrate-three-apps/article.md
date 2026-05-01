@@ -10,6 +10,7 @@ hardware: "NVIDIA DGX Spark"
 tags: [foundation, second-brain, llm-wiki, autoresearch, arc, bridge, dgx-spark]
 summary: "Seven articles installed one stack on the Spark — NIM, Embed, pgvector, RAG glue, reranker, generator A/B, Guardrails. This bridge retells that install as three different answers to one question — corpus plus 128 GB — and walks readers to the top of three tracks."
 signature: OneSubstrateThreeApps
+series: Foundations
 ---
 
 Nine articles ago the Spark was a blinking power light. Now it is an answering machine, a search index, a policy gate, and a retrieval chain fast enough to lose its own latency inside the generator's. The install is done. What it runs is the question the next twenty articles answer — in three different voices.

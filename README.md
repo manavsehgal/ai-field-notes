@@ -26,7 +26,7 @@
 
 | Articles | Words | Lines of code | Models | NVIDIA products |
 |:-:|:-:|:-:|:-:|:-:|
-| **22** *(+4 upcoming)* | **56,342** | **11,712** | **7** | **11** |
+| **22** *(+4 upcoming)* | **56,363** | **11,969** | **7** | **11** |
 
 ### Stages
 

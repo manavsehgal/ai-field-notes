@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-01T00:43:33Z",
+  "generated_at": "2026-05-01T01:00:30Z",
   "articles": {
     "total": 22,
     "published": 22,
@@ -7,7 +7,7 @@
     "drafts": 0
   },
   "words": {
-    "total": 56342,
+    "total": 56363,
     "mean_per_article": 2561,
     "longest": {
       "slug": "nim-first-inference-dgx-spark",
@@ -17,19 +17,19 @@
   },
   "code": {
     "evidence_loc": 6209,
-    "src_loc": 5503,
-    "total_loc": 11712,
+    "src_loc": 5760,
+    "total_loc": 11969,
     "by_language": {
       "python": 6181,
-      "astro": 3565,
-      "css": 1776,
+      "astro": 3674,
+      "css": 1896,
       "javascript": 112,
-      "typescript": 50,
+      "typescript": 78,
       "sql": 15,
       "shell": 13
     },
     "data_lines": {
-      "json": 9332,
+      "json": 9285,
       "yaml": 165
     }
   },

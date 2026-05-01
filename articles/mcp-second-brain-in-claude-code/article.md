@@ -11,6 +11,7 @@ tags: [mcp, claude-code, second-brain, rag, agentic, fastmcp, pgvector, nim, dgx
 summary: "Closing the Second Brain arc. Four MCP tools wrap the RAG chain — embed, retrieve, optionally rerank, generate — and any Claude Code session anywhere on the box becomes a grounded research client. 200 lines of Python, one launcher, one .mcp.json entry."
 signature: SecondBrainMcp
 also_stages: [inference, dev-tools]
+series: Second Brain
 ---
 
 The previous article ([Ragas, Reranked](/articles/rag-eval-ragas-and-nemo-evaluator/)) closed with a scoreboard. Four variants, 44 held-out questions, the rerank variant landing at 4.27/5 with zero refusals. The chain works. The harder question is the one no eval table answers: *what do you actually do with a working Second Brain?*

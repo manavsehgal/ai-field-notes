@@ -10,6 +10,7 @@ hardware: "NVIDIA DGX Spark"
 tags: [nemo-retriever, embeddings, nim, matryoshka, retrieval, nemotron, dgx-spark]
 summary: "The embedding endpoint that every downstream RAG, wiki, and agent piece will reuse — a 2048-dim Nemotron Retriever NIM running locally on GB10, ready 52 seconds after docker run and holding 28 docs/s under batched load."
 signature: EmbeddingPipeline
+series: Foundations
 ---
 
 An embedding model doesn't answer questions. It turns text into geometry. Every sentence you hand it becomes a point in a fixed-dimensional space, and every downstream retrieval decision — is this passage relevant, are these two pages duplicates, does this agent trajectory resemble a prior one — collapses into a distance calculation between points. Article #3 put an inference endpoint on the Spark. This article puts the *semantic space* on it. From here on, everything the three arcs need — corpus vectors, wiki dedup, trajectory recall — is a `curl` to `localhost`.

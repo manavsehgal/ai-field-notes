@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import StageFilter from '../../components/StageFilter.astro';
+import SeriesFilter from '../../components/SeriesFilter.astro';
 import ArticleCard from '../../components/ArticleCard.astro';
 import { publishOrdinals } from '../../lib/article-order.mjs';
 
@@ -77,6 +78,7 @@ const copy = STAGE_COPY[stage];
     <p class="stage-header__blurb">{copy.blurb}</p>
   </header>
 
+  <SeriesFilter current={null} />
   <StageFilter current={stage} />
 
   <section class="research-list">
