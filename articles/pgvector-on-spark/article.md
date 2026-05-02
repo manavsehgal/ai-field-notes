@@ -11,6 +11,7 @@ tags: [pgvector, postgres, hnsw, ivfflat, matryoshka, nemotron, retrieval, dgx-s
 summary: "The substrate between the embed call and the retrieve call — pgvector 0.8.2 running as a Postgres 16 container on GB10, with 1000 Nemotron vectors, HNSW and ivfflat both indexed, and a planner that prefers seq scan until you tell it otherwise."
 signature: PgvectorStore
 series: Foundations
+fieldkit_modules: [rag]
 ---
 
 > **Update — `fieldkit.rag`:** This article predates the `fieldkit.rag` module. The same ingest → retrieve → rerank → fuse path now lives behind [`fieldkit.rag.Pipeline`](https://github.com/manavsehgal/ai-field-notes/tree/main/fieldkit) — `pip install` the package and skip the boilerplate. The evidence below is preserved as the original derivation.

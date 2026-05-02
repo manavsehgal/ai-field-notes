@@ -12,6 +12,7 @@ summary: "A Ragas-style harness written in 200 lines of stdlib Python, run local
 signature: RagEvalCorrectness
 also_stages: [inference, fine-tuning]
 series: Second Brain
+fieldkit_modules: [eval]
 ---
 
 > **Update — `fieldkit.eval`:** This article is the canonical source for the `fieldkit.eval` rubrics — the 0-5 correctness, 0-1 faithfulness, and 0-1 relevance system prompts in `evidence/grade.py` were lifted verbatim into [`fieldkit.eval.RUBRIC_CORRECTNESS / RUBRIC_FAITHFULNESS / RUBRIC_RELEVANCE`](https://github.com/manavsehgal/ai-field-notes/tree/main/fieldkit). The full grader loop is now `Judge.builtin(NIMClient(...), "correctness").grade(question=..., reference=..., prediction=...)` per rubric; the per-variant tables below are still the original derivation.

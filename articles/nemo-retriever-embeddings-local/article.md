@@ -11,6 +11,7 @@ tags: [nemo-retriever, embeddings, nim, matryoshka, retrieval, nemotron, dgx-spa
 summary: "The embedding endpoint that every downstream RAG, wiki, and agent piece will reuse — a 2048-dim Nemotron Retriever NIM running locally on GB10, ready 52 seconds after docker run and holding 28 docs/s under batched load."
 signature: EmbeddingPipeline
 series: Foundations
+fieldkit_modules: [rag]
 ---
 
 > **Update — `fieldkit.rag`:** This article predates the `fieldkit.rag` module. The same ingest → retrieve → rerank → fuse path now lives behind [`fieldkit.rag.Pipeline`](https://github.com/manavsehgal/ai-field-notes/tree/main/fieldkit) — `pip install` the package and skip the boilerplate. The evidence below is preserved as the original derivation.

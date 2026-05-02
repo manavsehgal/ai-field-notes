@@ -1,6 +1,11 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
 
+// fieldkit module reference markdown lives outside src/ in the package
+// directory so the Python repo and the docs site stay in sync. Order
+// matters for nav rendering — capabilities first, then nim, rag, eval, cli.
+export const FIELDKIT_MODULES = ['capabilities', 'nim', 'rag', 'eval', 'cli'] as const;
+
 // Articles live at ../articles/<slug>/article.md and are authored via the
 // tech-writer skill. We keep that authoring workflow by loading articles
 // from outside src/ with a glob loader, and collapse the id to the folder
@@ -81,7 +86,26 @@ const articles = defineCollection({
     // Editorial series — the running narrative thread the article belongs
     // to. Optional: preamble pieces outside the arc system leave it unset.
     series: z.enum(SERIES).optional(),
+    // Which `fieldkit` modules this article exercises. Drives the
+    // "uses fieldkit.X" chip on cards and the back-links from module
+    // reference pages. Conservative — only set on articles that actually
+    // import the module, not articles that merely mention it.
+    fieldkit_modules: z.array(z.enum(FIELDKIT_MODULES)).optional(),
   }),
 });
 
-export const collections = { articles };
+const fieldkit_docs = defineCollection({
+  loader: glob({
+    pattern: '*.md',
+    base: './fieldkit/docs/api',
+    generateId: ({ entry }) => entry.replace(/\.md$/, ''),
+  }),
+  schema: z.object({
+    module: z.enum(FIELDKIT_MODULES),
+    title: z.string(),
+    summary: z.string(),
+    order: z.number().int(),
+  }),
+});
+
+export const collections = { articles, fieldkit_docs };

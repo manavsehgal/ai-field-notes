@@ -17,7 +17,7 @@ interface Props {
 }
 
 const { article, ordinal } = Astro.props;
-const { title, date, stage, product, time_required, summary, signature, status, series } = article.data;
+const { title, date, stage, product, time_required, summary, signature, status, series, fieldkit_modules } = article.data;
 
 const ordinalDigits = String(ordinal).padStart(2, '0');
 const ordinalLabel = `№${ordinalDigits}`;
@@ -50,6 +50,14 @@ const metaSlot = isUpcoming ? 'Upcoming' : `Article №${ordinalDigits}`;
     )}
     <h2 class="card__title">{title}</h2>
     <p class="card__summary">{summary}</p>
+    {(fieldkit_modules ?? []).length > 0 && (
+      <p class="card__fk" aria-label="fieldkit modules used">
+        <span class="card__fk-label">uses</span>
+        {(fieldkit_modules ?? []).map((m) => (
+          <span class="card__fk-chip">fieldkit.{m}</span>
+        ))}
+      </p>
+    )}
   </div>
   {Signature && (
     <aside class="card__signature" aria-hidden="true">

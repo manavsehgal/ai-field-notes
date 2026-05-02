@@ -12,6 +12,7 @@ tags: [inference, kv-cache, paged-attention, fp8, gqa, h100, h200, b200, dgx-spa
 summary: "The serving memory bill is not weights. It's KV cache, and KV scales with concurrent users × context length, not parameters. Same four bills as training; different weights. A 70B at 32 users × 16k context wants 168 GB just for KV — and the Spark teaches you the per-token math."
 signature: KvCacheArithmetic
 series: Looking Beyond Spark
+fieldkit_modules: [capabilities]
 ---
 
 You cannot serve a 100B-class model to real traffic on a DGX Spark. Even FP8-quantized, the weights alone consume 100 GB of the Spark's 128 GB unified envelope, and that's before a single user has sent a single token through it. *That* part of the arithmetic is identical to the [fine-tuning sizing piece](/articles/gpu-sizing-math-for-fine-tuning/) — and just as much beside the point.

@@ -11,6 +11,7 @@ tags: [fine-tuning, lora, peft, qwen, second-brain, dgx-spark]
 summary: "231 own-voice Q&A pairs, a rank-16 LoRA, 69 s of training on a GB10 Spark. The adapter won't memorize your exact numbers, but it will take a model that refuses 61% of questions about your work and turn it into one that answers all of them in your voice. For facts you still need RAG."
 signature: LoraVoiceTransfer
 series: Second Brain
+fieldkit_modules: [eval]
 ---
 
 > **Update — `fieldkit.eval`:** The LLM-as-judge grader (`evidence/judge.py`) and refusal-rate detector below predate the `fieldkit.eval` module. The same `Judge` (with the built-in 0-5 correctness rubric) and top-level `is_refusal` helper now live in [`fieldkit.eval`](https://github.com/manavsehgal/ai-field-notes/tree/main/fieldkit) — `pip install fieldkit` and replace the hand-rolled grading loop with `Judge.builtin(NIMClient(...), "correctness").grade(...)`. The evidence below is preserved as the original derivation.

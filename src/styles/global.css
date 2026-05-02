@@ -1106,6 +1106,32 @@ html[data-theme="light"] .masthead__plate-frame img {
   margin: 0;
 }
 
+/* fieldkit chips — appear only when frontmatter sets `fieldkit_modules`. */
+.card__fk {
+  margin: 0.85rem 0 0;
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+.card__fk-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-text-dim);
+}
+.card__fk-chip {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--color-primary);
+  background: color-mix(in oklch, var(--color-primary-dim) 16%, transparent);
+  border: 1px solid color-mix(in oklch, var(--color-primary-dim) 40%, transparent);
+  padding: 0.18em 0.55em;
+  border-radius: 999px;
+  letter-spacing: 0.01em;
+}
+
 /* Signature figure column — right-aligned thumbnail under 18rem wide. */
 .card__signature {
   width: clamp(14rem, 22vw, 18rem);
