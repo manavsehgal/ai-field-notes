@@ -49,3 +49,9 @@ repos:
         language: python
         types: [python]
         files: ^fieldkit/src/.+\.py$
+      - id: spark-capabilities-sync
+        name: spark-capabilities.json mirror is in sync
+        entry: fieldkit/scripts/sync_capabilities.py
+        language: python
+        pass_filenames: false
+        files: ^(scripts/lib/spark-capabilities\.json|fieldkit/src/fieldkit/capabilities/data/spark-capabilities\.json)$
