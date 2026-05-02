@@ -106,7 +106,7 @@ Each article is a deep-dive essay grown from a single session transcript on the 
 - **[Your Own Semantic Space — a Nemotron Embedding NIM on a DGX Spark](https://ainative.business/field-notes/articles/nemo-retriever-embeddings-local/)** — The embedding endpoint that every downstream RAG, wiki, and agent piece will reuse — a 2048-dim Nemotron Retriever NIM running locally on GB10, ready 52 seconds after docker run and holding 28 docs/s under batched load.
 - **[Three Endpoints, One Answer — Naive RAG on a DGX Spark](https://ainative.business/field-notes/articles/naive-rag-on-spark/)** — Three endpoints in one curl chain — a query embeds through Nemotron, pgvector returns top-5 chunks in under 80 ms, and a Llama 3.1 8B NIM stuffs them into a strict-context prompt. The chain works; the 8B generator still refuses on questions its own context answers.
 - **[One Rail, Three Policies — NeMo Guardrails on the Retrieval Path](https://ainative.business/field-notes/articles/guardrails-on-the-retrieval-path/)** — NeMo Guardrails drops a policy gate between retrieval and generation. One install, three per-arc configs — PII for Second Brain, style for LLM Wiki, code-safety for Autoresearch — and a 15-query benchmark: 100% block recall, 100% clean pass. Rails are scaffolding; detectors are the content.
-- **[Bigger Generator, Same Grounding — 8B vs 49B vs 70B on One Retrieval Chain](https://ainative.business/field-notes/articles/bigger-generator-grounding-on-spark/)** — Article #7 bet that a bigger generator would heal the 8B Google-IPO refusal. Ran the A/B across three sizes on one retrieval chain. Bet lost: Nemotron-Super-49B over-refuses the 8B baseline; Llama 3.3 70B narrows the gap, not closes it. The refusal was the scaffold working.
+- **[Bigger Generator, Same Grounding — 8B vs 49B vs 70B on One Retrieval Chain](https://ainative.business/field-notes/articles/bigger-generator-grounding-on-spark/)** — The rerank-and-fusion article bet that a bigger generator would heal the 8B Google-IPO refusal. Ran the A/B across three sizes on one retrieval chain. Bet lost: Nemotron-Super-49B over-refuses the 8B baseline; Llama 3.3 70B narrows the gap, not closes it. The refusal was the scaffold working.
 
 ### Deployment
 
@@ -138,7 +138,7 @@ Each article is a deep-dive essay grown from a single session transcript on the 
 npm install        # one-time
 npm run dev        # dev server: http://localhost:4321/
                    #              http://<spark-lan-ip>:4321/
-npm run build      # static build to dist/ (uses /ai-field-notes/ base)
+npm run build      # static build to dist/ (uses /field-notes/ base)
 npm run preview    # preview the production build
 ```
 
