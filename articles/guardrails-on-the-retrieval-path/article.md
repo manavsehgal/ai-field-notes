@@ -14,6 +14,8 @@ series: Foundations
 ---
 
 > **Update — `fieldkit.rag`:** This article predates the `fieldkit.rag` module. The same ingest → retrieve → rerank → fuse path now lives behind [`fieldkit.rag.Pipeline`](https://github.com/manavsehgal/ai-field-notes/tree/main/fieldkit) — `pip install` the package and skip the boilerplate. The evidence below is preserved as the original derivation.
+>
+> **Update — `fieldkit.eval`:** The 15-query block / pass harness below predates `fieldkit.eval`. The same `Bench` (per-call latency + success / failure tracking) now lives in [`fieldkit.eval`](https://github.com/manavsehgal/ai-field-notes/tree/main/fieldkit) — drive each rail config as a `Bench(name="…")` and the harness counts blocks vs passes for free.
 
 Article #8 closed with a finding and a queue: bigger generators over-refuse on perfect retrieval, and the next rung is the *policy* gate — the one that fires between "we have an answer" and "we hand it to the user or the agent." That's the rung where a Second Brain has to scrub personal identifiers out of a draft before it goes back to the user; where an LLM Wiki has to enforce house style on every page it writes; where an Autoresearch agent has to refuse to run `rm -rf` even when its planner confidently suggested it.
 

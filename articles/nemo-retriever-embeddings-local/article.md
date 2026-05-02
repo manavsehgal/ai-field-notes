@@ -14,6 +14,8 @@ series: Foundations
 ---
 
 > **Update — `fieldkit.rag`:** This article predates the `fieldkit.rag` module. The same ingest → retrieve → rerank → fuse path now lives behind [`fieldkit.rag.Pipeline`](https://github.com/manavsehgal/ai-field-notes/tree/main/fieldkit) — `pip install` the package and skip the boilerplate. The evidence below is preserved as the original derivation.
+>
+> **Update — `fieldkit.eval`:** The throughput / latency sweep below predates `fieldkit.eval`. The same `Bench` aggregation now lives in [`fieldkit.eval`](https://github.com/manavsehgal/ai-field-notes/tree/main/fieldkit) — drive an embed callable with batch sizes 1 / 8 / 32 / 64 and the harness produces the same per-batch / aggregate stats this article reports.
 
 An embedding model doesn't answer questions. It turns text into geometry. Every sentence you hand it becomes a point in a fixed-dimensional space, and every downstream retrieval decision — is this passage relevant, are these two pages duplicates, does this agent trajectory resemble a prior one — collapses into a distance calculation between points. Article #3 put an inference endpoint on the Spark. This article puts the *semantic space* on it. From here on, everything the three arcs need — corpus vectors, wiki dedup, trajectory recall — is a `curl` to `localhost`.
 

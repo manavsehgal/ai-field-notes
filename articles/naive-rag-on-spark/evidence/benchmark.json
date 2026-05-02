@@ -2,34 +2,32 @@
   "summary": {
     "n": 6,
     "embed_ms": {
-      "mean": 42.69,
-      "median": 45.48,
-      "min": 35.46,
-      "max": 46.16
+      "n": 6,
+      "mean": 28.04,
+      "median": 29.54,
+      "min": 25.33,
+      "max": 32.12
     },
     "retrieve_ms": {
-      "mean": 70.44,
-      "median": 73.12,
-      "min": 63.03,
-      "max": 77.98
-    },
-    "generate_first_token_ms": {
-      "mean": 79.41,
-      "median": 82.5,
-      "min": 67.31,
-      "max": 85.36
+      "n": 6,
+      "mean": 15.45,
+      "median": 15.28,
+      "min": 13.31,
+      "max": 17.82
     },
     "generate_total_ms": {
-      "mean": 656.13,
-      "median": 451.63,
-      "min": 424.63,
-      "max": 1700.85
+      "n": 6,
+      "mean": 968.63,
+      "median": 652.72,
+      "min": 646.65,
+      "max": 2554.41
     },
     "end_to_end_ms": {
-      "mean": 769.25,
-      "median": 569.55,
-      "min": 525.54,
-      "max": 1814.29
+      "n": 6,
+      "mean": 1012.11,
+      "median": 702.66,
+      "min": 687.29,
+      "max": 2597.61
     }
   },
   "queries": [
@@ -65,15 +63,14 @@
       ],
       "answer": "The provided context does not contain the answer.",
       "timings_ms": {
-        "embed": 45.48,
-        "retrieve": 73.12,
-        "generate_first_token": 82.5,
-        "generate_total": 450.95,
-        "end_to_end": 569.55
+        "embed": 29.54,
+        "retrieve": 15.28,
+        "generate_total": 661.23,
+        "end_to_end": 706.05
       },
-      "completion_tokens": 9,
+      "completion_tokens": 10,
       "kind": "in_corpus",
-      "wall_seconds": 0.62
+      "wall_seconds": 0.71
     },
     {
       "question": "What happened at the 2004 Athens Olympics in swimming?",
@@ -107,15 +104,14 @@
       ],
       "answer": "Ian Thorpe won the gold medal in the men's 200 meters freestyle, dubbed the \"race of the century.\" Sources: [1038, 1154, 1023]",
       "timings_ms": {
-        "embed": 35.46,
-        "retrieve": 77.98,
-        "generate_first_token": 85.36,
-        "generate_total": 1700.85,
-        "end_to_end": 1814.29
+        "embed": 29.89,
+        "retrieve": 13.31,
+        "generate_total": 2554.41,
+        "end_to_end": 2597.61
       },
-      "completion_tokens": 39,
+      "completion_tokens": 40,
       "kind": "in_corpus",
-      "wall_seconds": 1.86
+      "wall_seconds": 2.6
     },
     {
       "question": "What did Google do in 2004 related to going public?",
@@ -149,15 +145,14 @@
       ],
       "answer": "The provided context does not contain the answer.",
       "timings_ms": {
-        "embed": 46.16,
-        "retrieve": 76.35,
-        "generate_first_token": 83.57,
-        "generate_total": 457.79,
-        "end_to_end": 580.3
+        "embed": 32.12,
+        "retrieve": 17.82,
+        "generate_total": 652.72,
+        "end_to_end": 702.66
       },
-      "completion_tokens": 9,
+      "completion_tokens": 10,
       "kind": "in_corpus",
-      "wall_seconds": 0.61
+      "wall_seconds": 0.7
     },
     {
       "question": "Who won the 2020 US presidential election?",
@@ -191,15 +186,14 @@
       ],
       "answer": "The provided context does not contain the answer.",
       "timings_ms": {
-        "embed": 37.88,
-        "retrieve": 63.03,
-        "generate_first_token": 67.31,
-        "generate_total": 424.63,
-        "end_to_end": 525.54
+        "embed": 25.33,
+        "retrieve": 16.37,
+        "generate_total": 647.71,
+        "end_to_end": 689.41
       },
-      "completion_tokens": 9,
+      "completion_tokens": 10,
       "kind": "out_of_corpus",
-      "wall_seconds": 0.57
+      "wall_seconds": 0.69
     },
     {
       "question": "What is NVIDIA DGX Spark?",
@@ -233,15 +227,14 @@
       ],
       "answer": "The provided context does not contain the answer.",
       "timings_ms": {
-        "embed": 45.27,
-        "retrieve": 65.34,
-        "generate_first_token": 82.07,
-        "generate_total": 450.92,
-        "end_to_end": 561.53
+        "embed": 25.52,
+        "retrieve": 15.1,
+        "generate_total": 649.04,
+        "end_to_end": 689.66
       },
-      "completion_tokens": 9,
+      "completion_tokens": 10,
       "kind": "out_of_corpus",
-      "wall_seconds": 0.61
+      "wall_seconds": 0.69
     },
     {
       "question": "When was Claude 4 Opus released?",
@@ -275,15 +268,14 @@
       ],
       "answer": "The provided context does not contain the answer.",
       "timings_ms": {
-        "embed": 45.86,
-        "retrieve": 66.82,
-        "generate_first_token": 75.67,
-        "generate_total": 451.63,
-        "end_to_end": 564.31
+        "embed": 25.84,
+        "retrieve": 14.8,
+        "generate_total": 646.65,
+        "end_to_end": 687.29
       },
-      "completion_tokens": 9,
+      "completion_tokens": 10,
       "kind": "out_of_corpus",
-      "wall_seconds": 0.6
+      "wall_seconds": 0.69
     }
   ]
 }

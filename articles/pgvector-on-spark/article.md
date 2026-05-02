@@ -14,6 +14,8 @@ series: Foundations
 ---
 
 > **Update — `fieldkit.rag`:** This article predates the `fieldkit.rag` module. The same ingest → retrieve → rerank → fuse path now lives behind [`fieldkit.rag.Pipeline`](https://github.com/manavsehgal/ai-field-notes/tree/main/fieldkit) — `pip install` the package and skip the boilerplate. The evidence below is preserved as the original derivation.
+>
+> **Update — `fieldkit.eval`:** The latency-sweep code below predates `fieldkit.eval`. The same `Bench` (mean / median / min / max aggregator) primitive now lives in [`fieldkit.eval`](https://github.com/manavsehgal/ai-field-notes/tree/main/fieldkit) — drive any callable with per-stage timings and dump a JSON of the same shape used here.
 
 One inference endpoint became a NIM. One embedding endpoint became the Nemotron Retriever. This time the substrate becomes `pgvector` — the column where the vectors *live* between the embed call and the retrieve call. Three arcs share this table; only the query predicates differ. A Second Brain asks "which notes look like what I just wrote?", a personal wiki asks "which pages duplicate this passage?", and an autoresearch agent asks "which prior trajectories resembled this plan?". All three push the same row shape through the same operator, `<=>`, against the same index.
 

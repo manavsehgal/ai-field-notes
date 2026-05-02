@@ -14,6 +14,8 @@ series: Foundations
 ---
 
 > **Update — `fieldkit.rag`:** This article predates the `fieldkit.rag` module. The same ingest → retrieve → rerank → fuse path now lives behind [`fieldkit.rag.Pipeline`](https://github.com/manavsehgal/ai-field-notes/tree/main/fieldkit) — `pip install` the package and skip the boilerplate. The evidence below is preserved as the original derivation.
+>
+> **Update — `fieldkit.eval`:** The benchmark / grader code below also predates `fieldkit.eval`. The same `Bench` (latency aggregation), `Judge` (LLM-as-judge with built-in correctness / faithfulness / relevance rubrics), and `is_refusal` primitives now live in [`fieldkit.eval`](https://github.com/manavsehgal/ai-field-notes/tree/main/fieldkit) — `pip install` and skip the harness boilerplate. `evidence/benchmark.py` was rewritten against `fieldkit.eval.Bench` + `fieldkit.rag.Pipeline.ask` and produces the same JSON shape (`embed_ms` / `retrieve_ms` / `generate_total_ms` / `end_to_end_ms` aggregates with mean / median / min / max), modulo `generate_first_token_ms` which the public `NIMClient.chat` API doesn't yet stream.
 
 Four articles in. The Llama 3.1 8B NIM has been serving `:8000` for two weeks. The Nemotron Retriever NIM joined it at `:8001`. The `pgvector` container on `:5432` holds a thousand 1024-d vectors with both IVFFlat and HNSW indexes built. Each article stood its endpoint up in isolation. None of them *called each other*.
 

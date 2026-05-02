@@ -14,6 +14,8 @@ series: Foundations
 ---
 
 > **Update — `fieldkit.rag`:** This article predates the `fieldkit.rag` module. The same ingest → retrieve → rerank → fuse path now lives behind [`fieldkit.rag.Pipeline`](https://github.com/manavsehgal/ai-field-notes/tree/main/fieldkit) — `pip install` the package and skip the boilerplate. The evidence below is preserved as the original derivation.
+>
+> **Update — `fieldkit.eval`:** The 8B / 49B / 70B A/B harness below predates `fieldkit.eval`. The same `Bench` aggregation + `is_refusal` regex now live in [`fieldkit.eval`](https://github.com/manavsehgal/ai-field-notes/tree/main/fieldkit) — one `Bench(name="…")` per generator + a refusal-rate roll-up reproduces the table in this article.
 
 Article #7 ended with a bet. Four retrieval configurations had fed perfect chunks to the 8B generator on *"Did Google have an IPO in 2004?"* All four got back *"The provided context does not contain the answer."* The retrieval had the right facts at rank 1. The grounding didn't commit. The closing line queued the obvious fix: swap the 8B for Llama 3.3 70B or Nemotron-Super-49B and measure whether the bigger model's grounding circuit answers where the smaller one refused.
 

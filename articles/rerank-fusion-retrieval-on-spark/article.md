@@ -14,6 +14,8 @@ series: Foundations
 ---
 
 > **Update — `fieldkit.rag`:** This article predates the `fieldkit.rag` module. The same ingest → retrieve → rerank → fuse path now lives behind [`fieldkit.rag.Pipeline`](https://github.com/manavsehgal/ai-field-notes/tree/main/fieldkit) — `pip install` the package and skip the boilerplate. The evidence below is preserved as the original derivation.
+>
+> **Update — `fieldkit.eval`:** The retrieval-mode comparison below predates `fieldkit.eval`. The same `Bench` aggregation (latency + recall per variant) now lives in [`fieldkit.eval`](https://github.com/manavsehgal/ai-field-notes/tree/main/fieldkit) — drive each variant as a separate `Bench(name="…")` and merge their summaries.
 
 Article #6 left a bruise. The Llama 3.1 8B NIM, handed five perfectly-retrieved chunks about the 2004 Google IPO, replied *"The provided context does not contain the answer."* The retrieval was right. The grounding was wrong. The closing paragraph queued two upgrades to the chain — a reranker to sharpen the top-K, and a BM25 lexical path to rescue exact-term queries — and asked whether either would close the gap.
 
