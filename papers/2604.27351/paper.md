@@ -8,8 +8,9 @@ suggested_stage: agentic
 suggested_series: Autoresearch
 fast_verdict: spark-feasible
 relevance_score: 0.65
-has_deep_eval: false
-promoted_to: null
+has_deep_eval: true
+deep_verdict: spark-feasible
+promoted_to: scientific-foundation-models-as-tools
 abs_url: https://arxiv.org/abs/2604.27351
 pdf_url: https://arxiv.org/pdf/2604.27351
 hf_paper_url: https://huggingface.co/papers/2604.27351
@@ -44,3 +45,11 @@ _not yet indexed_
 - [arXiv abstract](https://arxiv.org/abs/2604.27351)
 - [PDF](https://arxiv.org/pdf/2604.27351)
 - [HuggingFace daily papers](https://huggingface.co/papers/2604.27351)
+
+## Deep eval
+
+[Full feasibility eval →](./eval.md) (verdict: **spark-feasible**, evaluated 2026-05-02)
+
+## Promoted
+
+This paper has been promoted to `articles/scientific-foundation-models-as-tools/` (status: upcoming).

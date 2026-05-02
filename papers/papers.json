@@ -44,8 +44,15 @@
         "one_line_rationale": "Lightweight LLM-orchestrator over domain foundation models is software glue that fits NemoClaw/NIM; underlying scientific FMs would be hosted as endpoints."
       },
       "popularity_score": 41,
-      "deep_eval": null,
-      "promoted_to": null
+      "deep_eval": {
+        "path": "papers/2604.27351/eval.md",
+        "evaluated_at": "2026-05-02T06:42:58.803Z",
+        "verdict": "spark-feasible"
+      },
+      "promoted_to": {
+        "article_slug": "scientific-foundation-models-as-tools",
+        "status": "upcoming"
+      }
     },
     {
       "arxiv_id": "2604.26752",
@@ -117,8 +124,15 @@
         "one_line_rationale": "Lightweight test-time distiller plus reweighted sampling on existing open-weight reasoning models fits comfortably within Spark's 128 GB inference envelope."
       },
       "popularity_score": 31,
-      "deep_eval": null,
-      "promoted_to": null
+      "deep_eval": {
+        "path": "papers/2604.24927/eval.md",
+        "evaluated_at": "2026-05-02T06:42:58.803Z",
+        "verdict": "spark-feasible"
+      },
+      "promoted_to": {
+        "article_slug": "test-time-distilling-for-exploration",
+        "status": "upcoming"
+      }
     },
     {
       "arxiv_id": "2604.26904",
@@ -157,8 +171,15 @@
         "one_line_rationale": "Claw-style sandboxed agent SFT + lightweight RL on per-task sandboxes maps directly onto NemoClaw + NeMo fine-tuning within the 128 GB envelope."
       },
       "popularity_score": 30,
-      "deep_eval": null,
-      "promoted_to": null
+      "deep_eval": {
+        "path": "papers/2604.26904/eval.md",
+        "evaluated_at": "2026-05-02T06:42:58.803Z",
+        "verdict": "spark-feasible"
+      },
+      "promoted_to": {
+        "article_slug": "clawgym-on-spark",
+        "status": "upcoming"
+      }
     },
     {
       "arxiv_id": "2604.26951",
@@ -268,8 +289,15 @@
         "one_line_rationale": "Agent-driven literature discovery benchmark fits Autoresearch arc; runnable on Spark via NemoClaw + NIM + NeMo Retriever with pgvector, no training needed."
       },
       "popularity_score": 26,
-      "deep_eval": null,
-      "promoted_to": null
+      "deep_eval": {
+        "path": "papers/2604.25256/eval.md",
+        "evaluated_at": "2026-05-02T06:42:58.803Z",
+        "verdict": "spark-feasible"
+      },
+      "promoted_to": {
+        "article_slug": "autoresearchbench-on-spark",
+        "status": "upcoming"
+      }
     },
     {
       "arxiv_id": "2604.27085",
@@ -351,8 +379,15 @@
         "one_line_rationale": "Live agent benchmark with execution traces and graders maps cleanly onto NemoClaw/OpenClaw sandboxed agents on Spark for local workflow eval."
       },
       "popularity_score": 25,
-      "deep_eval": null,
-      "promoted_to": null
+      "deep_eval": {
+        "path": "papers/2604.28139/eval.md",
+        "evaluated_at": "2026-05-02T06:42:58.803Z",
+        "verdict": "spark-feasible"
+      },
+      "promoted_to": {
+        "article_slug": "claw-eval-live-on-spark",
+        "status": "upcoming"
+      }
     },
     {
       "arxiv_id": "2604.27505",
