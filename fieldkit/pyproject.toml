@@ -38,6 +38,8 @@ dev = [
   "ruff>=0.6",
   "mypy>=1.11",
   "pre-commit>=3.7",
+  "build>=1.2",
+  "twine>=5.0",
 ]
 
 [project.scripts]

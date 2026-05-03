@@ -9,10 +9,14 @@ The blog stays the long-form rationale. `fieldkit` is the `pip install`-able sur
 ## Install
 
 ```bash
-pip install "git+https://github.com/manavsehgal/ai-field-notes.git@fieldkit/v0.1.0#subdirectory=fieldkit"
+pip install fieldkit
 ```
 
-PyPI release lands at `v1.0`; until then the git URL is canonical.
+For the bleeding edge between releases, install from the git tag instead:
+
+```bash
+pip install "git+https://github.com/manavsehgal/ai-field-notes.git@fieldkit/v0.1.0#subdirectory=fieldkit"
+```
 
 ## Quickstart
 
@@ -41,11 +45,11 @@ Modules deferred to `v0.2`: `retriever`, `ft`, `guardrails`, `agents`. To `v0.3`
 
 ## License
 
-Apache-2.0. See [`LICENSE`](LICENSE).
+Apache-2.0. See [`LICENSE`](https://github.com/manavsehgal/ai-field-notes/blob/main/fieldkit/LICENSE).
 
 ## Links
 
 - **Blog:** https://ainative.business/field-notes/
 - **Docs:** https://ainative.business/fieldkit/
 - **Source:** https://github.com/manavsehgal/ai-field-notes/tree/main/fieldkit
-- **Changelog:** [`CHANGELOG.md`](CHANGELOG.md)
+- **Changelog:** [`CHANGELOG.md`](https://github.com/manavsehgal/ai-field-notes/blob/main/fieldkit/CHANGELOG.md)
