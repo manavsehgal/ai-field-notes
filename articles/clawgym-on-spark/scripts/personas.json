@@ -1,0 +1,44 @@
+{
+  "personas": [
+    {
+      "role": "indie-game-dev",
+      "context": "Solo developer working on a 2D platformer in Godot. Sprite assets, scripts, and level data are scattered across folders.",
+      "skill_focus": ["file.move", "file.list", "shell.mkdir", "file.write"]
+    },
+    {
+      "role": "data-science-researcher",
+      "context": "Cleaning up a notebook + CSV directory after a paper-submission sprint. Multiple model checkpoints and intermediate datasets need pruning.",
+      "skill_focus": ["file.delete", "file.list", "file.read", "shell.find"]
+    },
+    {
+      "role": "ml-engineer",
+      "context": "Organizing experiment artifacts: training logs, eval JSON files, and config YAMLs across run directories.",
+      "skill_focus": ["file.move", "file.read", "file.write", "shell.find"]
+    },
+    {
+      "role": "technical-writer",
+      "context": "Maintaining a documentation repo of markdown files. Articles need renaming, frontmatter normalization, and image-path fixes.",
+      "skill_focus": ["file.read", "file.write", "shell.sed", "file.list"]
+    },
+    {
+      "role": "backend-developer",
+      "context": "Refactoring a Python service: moving modules into packages, adding __init__.py files, updating imports.",
+      "skill_focus": ["file.move", "file.write", "shell.grep", "file.read"]
+    },
+    {
+      "role": "devops-engineer",
+      "context": "Cleaning up a monorepo's CI configuration: consolidating Dockerfiles, reorganizing GitHub Actions workflows, normalizing names.",
+      "skill_focus": ["file.move", "file.read", "file.write", "shell.find"]
+    },
+    {
+      "role": "academic-author",
+      "context": "Preparing a LaTeX paper directory for submission: figures, bib files, and chapter sources need organization and stripping of build artifacts.",
+      "skill_focus": ["file.delete", "file.move", "file.list", "shell.find"]
+    },
+    {
+      "role": "embedded-firmware-dev",
+      "context": "Setting up a board-bringup repo: device-tree fragments, Kconfig snippets, and bring-up logs need filing into per-board subdirectories.",
+      "skill_focus": ["file.move", "shell.mkdir", "file.write", "file.list"]
+    }
+  ]
+}
