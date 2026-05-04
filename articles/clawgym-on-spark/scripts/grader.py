@@ -86,8 +86,10 @@ def grade(
         rel = a["path"]
         full = post_state_root / rel
         if kind == "file_exists":
-            results.append(AssertionResult(kind, rel, full.is_file(),
-                                           "" if full.is_file() else "file missing"))
+            # Synth tasks use file_exists for both files and directories
+            # ("file_exists: enemies" for the new dir). Match either.
+            results.append(AssertionResult(kind, rel, full.exists(),
+                                           "" if full.exists() else "path missing"))
         elif kind == "file_not_exists":
             results.append(AssertionResult(kind, rel, not full.exists(),
                                            "" if not full.exists() else "file still present"))
