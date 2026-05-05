@@ -27,12 +27,12 @@ const homeHref = import.meta.env.BASE_URL.replace(/\/+$/, '/') || '/';
 const base = import.meta.env.BASE_URL.replace(/\/+$/, '/') || '/';
 const seriesHref = series ? `${base}series/${SERIES_SLUGS[series]}/`.replace(/\/+/g, '/') : null;
 ---
-<BaseLayout title={`${title} — ai-field-notes`} description={summary}>
+<BaseLayout title={`${title} — ainative`} description={summary}>
   <div class="progress-bar" id="progress-bar"></div>
 
   <article class="article">
     <header class="article__header">
-      <a class="article__breadcrumb" href={homeHref}>← ai-field-notes</a>
+      <a class="article__breadcrumb" href={homeHref}>← Field Notes</a>
       {isUpcoming && (
         <p class="article__upcoming-banner">Upcoming — this is a proposed abstract, not a published piece.</p>
       )}

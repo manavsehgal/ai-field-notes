@@ -1,3 +1,4 @@
+@import "tailwindcss";
 @import "./diagrams.css";
 
 /*
@@ -10,7 +11,29 @@
  * Design tokens live on :root (dark default) with light-theme overrides
  * gated behind html[data-theme="light"]. Theme is persisted via the
  * ThemeToggle component and applied before paint by ThemeScript.
+ *
+ * Tailwind v4 utility classes are used by Nav.astro, Footer.astro, and the
+ * fieldkit section components cloned from ainative.business. The @theme
+ * block below declares the tokens those utilities resolve against; values
+ * mirror :root so utility colors match the site palette.
  */
+
+@theme {
+  --color-surface: oklch(0.12 0.01 250);
+  --color-surface-raised: oklch(0.18 0.01 250);
+  --color-surface-overlay: oklch(0.16 0.01 250);
+  --color-text: oklch(0.92 0.01 250);
+  --color-text-muted: oklch(0.78 0.01 250);
+  --color-text-dim: oklch(0.68 0.01 250);
+  --color-primary: oklch(0.70 0.18 250);
+  --color-primary-dim: oklch(0.50 0.10 250);
+  --color-primary-glow: oklch(0.75 0.22 250);
+  --color-border: oklch(0.22 0.01 250);
+
+  --font-display: "Geist Sans", system-ui, sans-serif;
+  --font-body: "Geist Sans", system-ui, sans-serif;
+  --font-mono: "Geist Mono Variable", "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
 
 /* ---------- Design tokens — dark-first defaults ---------- */
 :root {
@@ -1715,3 +1738,94 @@ a.logo:hover .logo__wordmark-text { color: var(--color-text); }
 
 /* Inline-SVG architecture diagrams are imported at the top of this file
    (CSS requires @import to precede all other statements). */
+
+/* ---------- Index masthead (ainative.business field-notes home) ----------
+   Class names match the cloned src/pages/index.astro. The older `.masthead*`
+   rules above are kept for backwards compatibility but are no longer rendered. */
+.fn-masthead {
+  max-width: 72rem;
+  margin-inline: auto;
+  padding: 7rem 1.5rem 3.5rem;
+}
+.fn-masthead__strip {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+.fn-masthead__strip-count { color: var(--color-text); }
+.fn-masthead__rule {
+  flex: 1;
+  height: 1px;
+  background: var(--color-border);
+}
+.fn-masthead__title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(2.5rem, 6vw, 4.75rem);
+  line-height: 0.95;
+  letter-spacing: -0.035em;
+  margin: 2.5rem 0 1.5rem;
+  color: var(--color-text);
+  max-width: 16ch;
+}
+.fn-masthead__title em {
+  font-style: italic;
+  color: var(--color-primary);
+}
+.fn-masthead__tagline {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: clamp(1.05rem, 1.4vw, 1.2rem);
+  line-height: 1.6;
+  color: var(--color-text-muted);
+  max-width: 58ch;
+  margin: 0;
+}
+.fn-masthead__byline {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+/* ---------- Primary glow pulse (ainative chrome polish) ---------- */
+.primary-pulse {
+  position: relative;
+}
+.primary-pulse::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 0 0 24px 4px var(--color-primary-glow);
+  opacity: 0;
+  animation: primary-pulse 3s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+@keyframes primary-pulse {
+  0%, 100% { opacity: 0; }
+  50%      { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .primary-pulse::before { animation: none; }
+}
+
+/* ---------- Stagger delays for [data-animate-stagger] children ---------- */
+[data-animate-stagger] > [data-animate]:nth-child(1) { transition-delay: 0ms; }
+[data-animate-stagger] > [data-animate]:nth-child(2) { transition-delay: 80ms; }
+[data-animate-stagger] > [data-animate]:nth-child(3) { transition-delay: 160ms; }
+[data-animate-stagger] > [data-animate]:nth-child(4) { transition-delay: 240ms; }
+[data-animate-stagger] > [data-animate]:nth-child(5) { transition-delay: 320ms; }
+[data-animate-stagger] > [data-animate]:nth-child(6) { transition-delay: 400ms; }
+[data-animate-stagger] > [data-animate]:nth-child(7) { transition-delay: 480ms; }

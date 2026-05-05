@@ -5,8 +5,8 @@ import StageFilter from '../components/StageFilter.astro';
 import SeriesFilter from '../components/SeriesFilter.astro';
 import ArticleCard from '../components/ArticleCard.astro';
 import ProjectStats from '../components/ProjectStats.astro';
-import Logo from '../components/Logo.astro';
 import { publishOrdinals } from '../lib/article-order.mjs';
+import { SITE } from '../data/seo';
 
 // Ordinal — earliest article = №01, derived from git first-add time so ties
 // on the same publish day stay deterministic. Display highest number first.
@@ -15,55 +15,38 @@ const ordinalById = publishOrdinals(all, process.cwd());
 const published = all.filter((a) => a.data.status !== 'upcoming');
 const upcoming = all.filter((a) => a.data.status === 'upcoming');
 const publishedDesc = [...published].sort((a, b) => ordinalById.get(b.id) - ordinalById.get(a.id));
-// Upcoming sorted by planned date ascending so the nearest-planned pieces
-// surface first when the toggle is flipped on.
 const upcomingAsc = [...upcoming].sort((a, b) => a.data.date.getTime() - b.data.date.getTime());
 
 const countPadded = String(published.length).padStart(2, '0');
 const volLabel = new Intl.DateTimeFormat('en-GB', { month: 'short', year: 'numeric' }).format(new Date());
-const rigImage = `${import.meta.env.BASE_URL}dgx-rig.jpg`.replace(/\/+/g, '/');
+
+const pageTitle = 'Field Notes — ainative';
+const pageDescription = `Field notes on building AI-native businesses — ${published.length} published articles spanning agent orchestration, inference, training, RAG, and the AI Native Platform series of research papers. By Manav Sehgal.`;
 ---
-<BaseLayout title="ai-field-notes — field notes on the DGX Spark">
-  <header class="masthead">
-    <div class="masthead__strip" aria-hidden="true">
+<BaseLayout title={pageTitle} description={pageDescription}>
+  <header class="fn-masthead">
+    <div class="fn-masthead__strip" aria-hidden="true">
       <span>Vol. 01</span>
-      <span class="masthead__rule"></span>
-      <span>ai-field-notes</span>
-      <span class="masthead__rule"></span>
+      <span class="fn-masthead__rule"></span>
+      <span>AI Native Field Notes</span>
+      <span class="fn-masthead__rule"></span>
       <span>{volLabel}</span>
     </div>
-    <div class="masthead__spread">
-      <div class="masthead__plate">
-        <div class="masthead__plate-frame">
-          <div class="masthead__plate-pan">
-            <img
-              src={rigImage}
-              alt="The DGX Spark rig on the author's desk — the subject of these field notes."
-              width="1600"
-              height="1200"
-              loading="eager"
-              decoding="async"
-            />
-          </div>
-        </div>
-      </div>
-      <div class="masthead__text">
-        <Logo size="hero" class="masthead__logo" />
-        <h1 class="masthead__title">Field notes on the <em>DGX&nbsp;Spark</em>.</h1>
-        <p class="masthead__tagline">
-          One builder maximising the DGX Spark as a personal AI power user and edge AI rig.
-          Every article is a session transcript turned into a deep-dive essay.
-        </p>
-        <div class="masthead__byline" aria-hidden="true">
-          <span><span class="masthead__count">{countPadded}</span> articles published</span>
-          <span class="masthead__rule"></span>
-          <span>Apache 2.0 · by Manav Sehgal</span>
-        </div>
-      </div>
+    <h1 class="fn-masthead__title">Field notes on building <em>AI-native</em> businesses.</h1>
+    <p class="fn-masthead__tagline">
+      One builder's running log — articles on agent orchestration, governed
+      inference, RAG patterns, training economics, and the deep-dive papers
+      that anchor the AI Native Platform series. Every post is a session
+      transcript turned into an essay.
+    </p>
+    <div class="fn-masthead__byline" aria-hidden="true">
+      <span><span class="fn-masthead__strip-count">{countPadded}</span> articles published</span>
+      <span class="fn-masthead__rule"></span>
+      <span>Apache 2.0 · by Manav Sehgal</span>
     </div>
-
-    <ProjectStats />
   </header>
+
+  <ProjectStats />
 
   <nav class="filter-row" aria-label="Filter articles">
     <SeriesFilter current={null} />

@@ -15,7 +15,7 @@ interface Props {
 }
 
 const { title, description } = Astro.props;
-const desc = description ?? 'Field notes on maximising the NVIDIA DGX Spark as a personal AI power user and edge AI builder.';
+const desc = description ?? 'Field notes on building AI-native businesses — agent orchestration, governed inference, RAG patterns, training economics, and the deep-dive papers that anchor the AI Native Platform series. By Manav Sehgal.';
 const base = import.meta.env.BASE_URL.replace(/\/+$/, '/') || '/';
 const asset = (path: string) => `${base}${path}`.replace(/\/+/g, '/');
 const ogImageUrl = `https://ainative.business${asset('og-image.png')}`;

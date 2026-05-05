@@ -1,5 +1,6 @@
 import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
+import tailwindcss from '@tailwindcss/vite';
 import rehypeCaption from './src/lib/rehype-caption.mjs';
 import remarkFixLinks from './src/lib/remark-fix-links.mjs';
 
@@ -41,5 +42,9 @@ export default defineConfig({
 
   build: {
     assets: 'assets',
+  },
+
+  vite: {
+    plugins: [tailwindcss()],
   },
 });
