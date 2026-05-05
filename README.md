@@ -18,7 +18,7 @@
 
 > One builder maximising the NVIDIA DGX Spark as a personal AI power user and edge AI rig. Every article is a session transcript turned into a deep-dive essay.
 
-<sub><b>29 articles published</b> &nbsp;·&nbsp; Apache 2.0 &nbsp;·&nbsp; by <a href="https://github.com/manavsehgal">Manav Sehgal</a></sub>
+<sub><b>30 articles published</b> &nbsp;·&nbsp; Apache 2.0 &nbsp;·&nbsp; by <a href="https://github.com/manavsehgal">Manav Sehgal</a></sub>
 
 ---
 
@@ -26,18 +26,18 @@
 
 | Articles | Words | Lines of code | Models | NVIDIA products |
 |:-:|:-:|:-:|:-:|:-:|
-| **29** *(+4 upcoming)* | **75,613** | **41,307** | **8** | **11** |
+| **30** *(+4 upcoming)* | **78,696** | **41,956** | **8** | **11** |
 
 ### Stages
 
 | Stage | Published | Upcoming |
 |---|:-:|:-:|
 | [Foundations](https://ainative.business/field-notes/stage/foundations/) | 11 | — |
-| [Training](https://ainative.business/field-notes/stage/training/) | 7 | 1 |
-| [Fine-tuning](https://ainative.business/field-notes/stage/fine-tuning/) | 4 | 1 |
+| [Training](https://ainative.business/field-notes/stage/training/) | 8 | 1 |
+| [Fine-tuning](https://ainative.business/field-notes/stage/fine-tuning/) | 5 | 1 |
 | [Inference](https://ainative.business/field-notes/stage/inference/) | 14 | — |
 | [Deployment](https://ainative.business/field-notes/stage/deployment/) | 2 | — |
-| [Agentic](https://ainative.business/field-notes/stage/agentic/) | 9 | — |
+| [Agentic](https://ainative.business/field-notes/stage/agentic/) | 10 | — |
 | [Observability](https://ainative.business/field-notes/stage/observability/) | 6 | 1 |
 | [Dev-tools](https://ainative.business/field-notes/stage/dev-tools/) | 2 | 1 |
 
@@ -45,10 +45,10 @@
 
 | Product | Articles |
 |---|:-:|
-| NVIDIA NIM | 27 |
-| DGX Spark | 26 |
-| NeMo Framework | 21 |
-| TensorRT-LLM | 14 |
+| NVIDIA NIM | 28 |
+| DGX Spark | 27 |
+| NeMo Framework | 22 |
+| TensorRT-LLM | 15 |
 | pgvector | 12 |
 | Triton Inference Server | 10 |
 | NeMo Retriever | 10 |
@@ -61,14 +61,14 @@
 
 | Model | Articles |
 |---|:-:|
-| Llama 3.1 8B Instruct | 17 |
+| Llama 3.1 8B Instruct | 18 |
 | Nemotron Reranker 1B | 6 |
 | Nemotron Super 49B | 5 |
+| Qwen2.5 7B Instruct | 5 |
 | Qwen2.5 3B Instruct | 4 |
 | Nemotron Embed 1B v2 | 4 |
-| Qwen2.5 7B Instruct | 4 |
 | Llama 3.3 70B Instruct | 3 |
-| Nemotron Nano 9B v2 | 1 |
+| Nemotron Nano 9B v2 | 2 |
 
 ---
 
@@ -94,6 +94,7 @@ Each article is a deep-dive essay grown from a single session transcript on the 
 
 ### Fine-tuning
 
+- **[ClawGym on Spark — A 7B Base, A LoRA Adapter, and the +15 pp the Adapter Earned](https://ainative.business/field-notes/articles/clawgym-on-spark/)** — ClawGym shipped only a .github profile, so we built the substrate ourselves — persona task synth, sandbox harness, 200-task corpus, LoRA SFT, matched-base eval. The adapter earns +3.8 pp task pass and +15.0 pp per-assertion against its own base. The diagnostic is the lift.
 - **[Distilling the Architect — A 3B LoRA Trained on the Agent's Own Trajectory](https://ainative.business/field-notes/articles/distill-architect-lora-from-trajectories/)** — A4's 50-iter trajectory becomes training data for a Qwen2.5-3B LoRA proposer. Holding out 8 iters, the 3B mode-collapses onto d_model=768 (the trajectory's most-frequent keep) and matches 0 / 8 exact; the 8B at T=0.5 matches 4 / 8 of its own past picks.
 - **[LoRA on Your Own Q&A — What 231 Pairs Actually Teach a 3B Model](https://ainative.business/field-notes/articles/lora-on-your-own-qa-pairs/)** — 231 own-voice Q&A pairs, a rank-16 LoRA, 69 s of training on a GB10 Spark. The adapter won't memorize your exact numbers, but it will take a model that refuses 61% of questions about your work and turn it into one that answers all of them in your voice. For facts you still need RAG.
 - 🔜 **[LoRA on Nemotron Nano — Fine-tuning a 9B Without Blowing Unified Memory](https://ainative.business/field-notes/articles/lora-fine-tune-nemotron-on-spark/)** *(planned 2026-05-14)* — A planned walk through LoRA fine-tuning on Nemotron Nano 9B with NeMo Customizer: rank and alpha sweeps, a tiny domain corpus, and the memory accounting that keeps a PEFT run from tripping the Spark's 128 GB unified-memory wall.

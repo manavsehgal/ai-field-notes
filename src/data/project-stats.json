@@ -1,14 +1,14 @@
 {
-  "generated_at": "2026-05-03T22:53:31Z",
+  "generated_at": "2026-05-05T06:21:32Z",
   "articles": {
-    "total": 29,
-    "published": 29,
+    "total": 30,
+    "published": 30,
     "upcoming": 4,
     "drafts": 0
   },
   "words": {
-    "total": 75613,
-    "mean_per_article": 2607,
+    "total": 78696,
+    "mean_per_article": 2623,
     "longest": {
       "slug": "nim-first-inference-dgx-spark",
       "title": "Your First NIM on a DGX Spark \u2014 What 24.8 Tokens Per Second Doesn't Tell You",
@@ -16,12 +16,12 @@
     }
   },
   "code": {
-    "evidence_loc": 33301,
-    "src_loc": 8006,
-    "total_loc": 41307,
+    "evidence_loc": 33856,
+    "src_loc": 8100,
+    "total_loc": 41956,
     "by_language": {
-      "python": 33171,
-      "astro": 5422,
+      "python": 33726,
+      "astro": 5516,
       "css": 1937,
       "typescript": 535,
       "shell": 115,
@@ -29,17 +29,17 @@
       "sql": 15
     },
     "data_lines": {
-      "json": 14077,
-      "yaml": 165
+      "json": 772314,
+      "yaml": 743
     }
   },
   "stages": {
     "foundations": 11,
-    "training": 7,
-    "fine-tuning": 4,
+    "training": 8,
+    "fine-tuning": 5,
     "inference": 14,
     "deployment": 2,
-    "agentic": 9,
+    "agentic": 10,
     "observability": 6,
     "dev-tools": 2
   },
@@ -57,7 +57,7 @@
     {
       "id": "llama-3.1-8b-instruct",
       "label": "Llama 3.1 8B Instruct",
-      "articles": 17
+      "articles": 18
     },
     {
       "id": "nemotron-reranker-1b",
@@ -67,6 +67,11 @@
     {
       "id": "nemotron-super-49b",
       "label": "Nemotron Super 49B",
+      "articles": 5
+    },
+    {
+      "id": "qwen-2.5-7b-instruct",
+      "label": "Qwen2.5 7B Instruct",
       "articles": 5
     },
     {
@@ -80,11 +85,6 @@
       "articles": 4
     },
     {
-      "id": "qwen-2.5-7b-instruct",
-      "label": "Qwen2.5 7B Instruct",
-      "articles": 4
-    },
-    {
       "id": "llama-3.3-70b-instruct",
       "label": "Llama 3.3 70B Instruct",
       "articles": 3
@@ -92,29 +92,29 @@
     {
       "id": "nemotron-nano-9b",
       "label": "Nemotron Nano 9B v2",
-      "articles": 1
+      "articles": 2
     }
   ],
   "products": [
     {
       "id": "nim",
       "label": "NVIDIA NIM",
-      "articles": 27
+      "articles": 28
     },
     {
       "id": "dgx-spark",
       "label": "DGX Spark",
-      "articles": 26
+      "articles": 27
     },
     {
       "id": "nemo",
       "label": "NeMo Framework",
-      "articles": 21
+      "articles": 22
     },
     {
       "id": "tensorrt-llm",
       "label": "TensorRT-LLM",
-      "articles": 14
+      "articles": 15
     },
     {
       "id": "pgvector",
