@@ -219,6 +219,26 @@ class Trajectory:
 
 _BASH_BLOCK_RE = re.compile(r"```(?:bash|sh|shell)?\s*\n(.*?)```", re.DOTALL)
 
+# Prose stop sentinel: SFT-distilled agents never emit the literal TASK_COMPLETE
+# token (zero clean-stop demonstrations in the Phase 4 corpus). Instead they
+# emit a bare `echo "Task complete."` (or variants) as their stop signal —
+# observed in 62/158 Phase-5 SFT trajectories, ~290 occurrences. Match those
+# but NOT the side-effect forms (`> file`, `>> file`, `| tee …`).
+_PROSE_STOP_RE = re.compile(
+    r"""^\s*
+        echo\s+
+        (?:["']\s*)?
+        task[ _]?complete[d]?
+        \.?
+        \s*
+        (?:["'])?
+        \s*
+        (?:\#.*)?
+        $
+    """,
+    re.IGNORECASE | re.VERBOSE,
+)
+
 
 def parse_action(text: str) -> tuple[dict | None, str | None]:
     """Extract a single shell command from the agent's response.
@@ -248,7 +268,10 @@ def parse_action(text: str) -> tuple[dict | None, str | None]:
     lines = [ln for ln in cmd.split("\n") if ln.strip() and not ln.strip().startswith("#")]
     if not lines:
         return None, "bash block had only comments"
-    return {"kind": "shell", "cmd": lines[0]}, None
+    first_line = lines[0]
+    if _PROSE_STOP_RE.match(first_line):
+        return {"kind": "done"}, None
+    return {"kind": "shell", "cmd": first_line}, None
 
 
 def truncate(s: str, limit: int = 4000) -> str:
