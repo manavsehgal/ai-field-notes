@@ -309,6 +309,8 @@ class RolloutDriver:
         max_turns: int = 12,
         per_command_timeout: float = 10.0,
         debug: bool = False,
+        temperature: float = 0.2,
+        max_tokens: int = 400,
     ) -> None:
         self.agent = agent_client
         self.model_name = model_name
@@ -316,6 +318,8 @@ class RolloutDriver:
         self.max_turns = max_turns
         self.per_command_timeout = per_command_timeout
         self.debug = debug
+        self.temperature = temperature
+        self.max_tokens = max_tokens
 
     def rollout(self, task: dict) -> tuple[Trajectory, Sandbox]:
         sandbox = self.sandbox_factory()
@@ -337,7 +341,7 @@ class RolloutDriver:
         stopped = "max_turns"
         for turn_idx in range(1, self.max_turns + 1):
             try:
-                resp = self.agent.chat(messages=messages, temperature=0.2, max_tokens=400)
+                resp = self.agent.chat(messages=messages, temperature=self.temperature, max_tokens=self.max_tokens)
                 response_text = resp["choices"][0]["message"]["content"]
             except Exception as e:
                 if self.debug:
