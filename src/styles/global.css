@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "./diagrams.css";
+@import "./explainers.css";
 
 /*
  * ai-field-notes — global stylesheet
@@ -1252,6 +1253,27 @@ html[data-theme="light"] .masthead__plate-frame img {
   letter-spacing: 0.02em;
 }
 .article__breadcrumb:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+/* Header row — breadcrumb on the left, reader controls on the right.
+   Stacks on narrow viewports so the pill cluster doesn't overflow. */
+.article__header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+.article__reader-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+@media (max-width: 640px) {
+  .article__header-row { align-items: flex-start; flex-direction: column; }
+  .article__reader-controls { width: 100%; justify-content: flex-start; }
+}
 
 .article__upcoming-banner {
   display: inline-block;

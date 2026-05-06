@@ -1,8 +1,10 @@
 import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
 import tailwindcss from '@tailwindcss/vite';
+import remarkDirective from 'remark-directive';
 import rehypeCaption from './src/lib/rehype-caption.mjs';
 import remarkFixLinks from './src/lib/remark-fix-links.mjs';
+import remarkExplainers from './src/lib/remark-explainers.mjs';
 
 // ai-field-notes — Astro config
 // Content sourced from ../articles/<slug>/article.md via content collection
@@ -32,7 +34,11 @@ export default defineConfig({
   },
 
   markdown: {
-    remarkPlugins: [[remarkFixLinks, { base, repoBase: REPO_BASE }]],
+    remarkPlugins: [
+      [remarkFixLinks, { base, repoBase: REPO_BASE }],
+      remarkDirective,
+      remarkExplainers,
+    ],
     rehypePlugins: [rehypeCaption],
     shikiConfig: {
       theme: 'github-dark-dimmed',

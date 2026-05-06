@@ -2,6 +2,11 @@
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import FieldkitCTA from '../../components/FieldkitCTA.astro';
+import TermsInThisPiece from '../../components/TermsInThisPiece.astro';
+import ReaderSettings from '../../components/ReaderSettings.astro';
+import BookmarkStar from '../../components/BookmarkStar.astro';
+import TocDrawer from '../../components/TocDrawer.astro';
+import ArticleArcNav from '../../components/ArticleArcNav.astro';
 import { publishOrdinals } from '../../lib/article-order.mjs';
 import { SERIES_SLUGS } from '../../content.config.ts';
 
@@ -32,7 +37,14 @@ const seriesHref = series ? `${base}series/${SERIES_SLUGS[series]}/`.replace(/\/
 
   <article class="article">
     <header class="article__header">
-      <a class="article__breadcrumb" href={homeHref}>← Field Notes</a>
+      <div class="article__header-row">
+        <a class="article__breadcrumb" href={homeHref}>← Field Notes</a>
+        <div class="article__reader-controls">
+          <BookmarkStar slug={article.id} />
+          <TocDrawer />
+          <ReaderSettings />
+        </div>
+      </div>
       {isUpcoming && (
         <p class="article__upcoming-banner">Upcoming — this is a proposed abstract, not a published piece.</p>
       )}
@@ -56,11 +68,22 @@ const seriesHref = series ? `${base}series/${SERIES_SLUGS[series]}/`.replace(/\/
       </div>
     </header>
 
+    <div class="article__resume-banner" data-resume-slug={article.id} hidden>
+      <span>Pick up where you left off?</span>
+      <span class="article__resume-actions">
+        <button type="button" class="js-resume" data-action="resume">Resume</button>
+        <button type="button" class="js-dismiss is-dismiss" data-action="dismiss">Dismiss</button>
+      </span>
+    </div>
+
+    <TermsInThisPiece body={article.body ?? ''} />
+
     <div class="prose">
       <Content />
     </div>
 
     <FieldkitCTA slug={article.id} />
+    <ArticleArcNav slug={article.id} />
   </article>
 
   <script>

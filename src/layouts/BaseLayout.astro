@@ -6,6 +6,7 @@ import '@fontsource-variable/geist-mono';
 import '../styles/global.css';
 
 import ThemeScript from '../components/ThemeScript.astro';
+import ReaderScript from '../components/ReaderScript.astro';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 
@@ -43,6 +44,7 @@ const ogImageUrl = `https://ainative.business${asset('og-image.png')}`;
     <meta name="twitter:image" content={ogImageUrl} />
     <title>{title}</title>
     <ThemeScript />
+    <ReaderScript />
   </head>
   <body>
     <Nav />
