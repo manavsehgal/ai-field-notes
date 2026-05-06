@@ -18,7 +18,7 @@
 
 > One builder maximising the NVIDIA DGX Spark as a personal AI power user and edge AI rig. Every article is a session transcript turned into a deep-dive essay.
 
-<sub><b>30 articles published</b> &nbsp;·&nbsp; Apache 2.0 &nbsp;·&nbsp; by <a href="https://github.com/manavsehgal">Manav Sehgal</a></sub>
+<sub><b>31 articles published</b> &nbsp;·&nbsp; Apache 2.0 &nbsp;·&nbsp; by <a href="https://github.com/manavsehgal">Manav Sehgal</a></sub>
 
 ---
 
@@ -26,18 +26,18 @@
 
 | Articles | Words | Lines of code | Models | NVIDIA products |
 |:-:|:-:|:-:|:-:|:-:|
-| **30** *(+4 upcoming)* | **78,696** | **41,956** | **8** | **11** |
+| **31** *(+4 upcoming)* | **82,591** | **44,083** | **8** | **11** |
 
 ### Stages
 
 | Stage | Published | Upcoming |
 |---|:-:|:-:|
 | [Foundations](https://ainative.business/field-notes/stage/foundations/) | 11 | — |
-| [Training](https://ainative.business/field-notes/stage/training/) | 8 | 1 |
-| [Fine-tuning](https://ainative.business/field-notes/stage/fine-tuning/) | 5 | 1 |
+| [Training](https://ainative.business/field-notes/stage/training/) | 9 | 1 |
+| [Fine-tuning](https://ainative.business/field-notes/stage/fine-tuning/) | 6 | 1 |
 | [Inference](https://ainative.business/field-notes/stage/inference/) | 14 | — |
 | [Deployment](https://ainative.business/field-notes/stage/deployment/) | 2 | — |
-| [Agentic](https://ainative.business/field-notes/stage/agentic/) | 10 | — |
+| [Agentic](https://ainative.business/field-notes/stage/agentic/) | 11 | — |
 | [Observability](https://ainative.business/field-notes/stage/observability/) | 6 | 1 |
 | [Dev-tools](https://ainative.business/field-notes/stage/dev-tools/) | 2 | 1 |
 
@@ -45,9 +45,9 @@
 
 | Product | Articles |
 |---|:-:|
-| NVIDIA NIM | 28 |
+| NVIDIA NIM | 29 |
 | DGX Spark | 27 |
-| NeMo Framework | 22 |
+| NeMo Framework | 23 |
 | TensorRT-LLM | 15 |
 | pgvector | 12 |
 | Triton Inference Server | 10 |
@@ -63,8 +63,8 @@
 |---|:-:|
 | Llama 3.1 8B Instruct | 18 |
 | Nemotron Reranker 1B | 6 |
+| Qwen2.5 7B Instruct | 6 |
 | Nemotron Super 49B | 5 |
-| Qwen2.5 7B Instruct | 5 |
 | Qwen2.5 3B Instruct | 4 |
 | Nemotron Embed 1B v2 | 4 |
 | Llama 3.3 70B Instruct | 3 |
@@ -94,6 +94,7 @@ Each article is a deep-dive essay grown from a single session transcript on the 
 
 ### Fine-tuning
 
+- **[ClawGym GRPO on Spark — Closing the Loop the SFT Adapter Couldn't](https://ainative.business/field-notes/articles/clawgym-on-spark-grpo/)** — Phase 5 SFT taught the agent to keep working but never to stop. 34 GRPO steps with a shaped reward unlearn the failure mode — same model, same base, same LoRA-init, but task_complete climbs 0/158 → 154/158, mean turns drop 12 → 5, and per-assertion still inches up +3.1 pp.
 - **[ClawGym on Spark — A 7B Base, A LoRA Adapter, and the +15 pp the Adapter Earned](https://ainative.business/field-notes/articles/clawgym-on-spark/)** — ClawGym shipped only a .github profile, so we built the substrate ourselves — persona task synth, sandbox harness, 200-task corpus, LoRA SFT, matched-base eval. The adapter earns +3.8 pp task pass and +15.0 pp per-assertion against its own base. The diagnostic is the lift.
 - **[Distilling the Architect — A 3B LoRA Trained on the Agent's Own Trajectory](https://ainative.business/field-notes/articles/distill-architect-lora-from-trajectories/)** — A4's 50-iter trajectory becomes training data for a Qwen2.5-3B LoRA proposer. Holding out 8 iters, the 3B mode-collapses onto d_model=768 (the trajectory's most-frequent keep) and matches 0 / 8 exact; the 8B at T=0.5 matches 4 / 8 of its own past picks.
 - **[LoRA on Your Own Q&A — What 231 Pairs Actually Teach a 3B Model](https://ainative.business/field-notes/articles/lora-on-your-own-qa-pairs/)** — 231 own-voice Q&A pairs, a rank-16 LoRA, 69 s of training on a GB10 Spark. The adapter won't memorize your exact numbers, but it will take a model that refuses 61% of questions about your work and turn it into one that answers all of them in your voice. For facts you still need RAG.
