@@ -3,8 +3,9 @@ import { glob } from 'astro/loaders';
 
 // fieldkit module reference markdown lives outside src/ in the package
 // directory so the Python repo and the docs site stay in sync. Order
-// matters for nav rendering — capabilities first, then nim, rag, eval, cli.
-export const FIELDKIT_MODULES = ['capabilities', 'nim', 'rag', 'eval', 'cli'] as const;
+// matters for nav rendering — capabilities first, then nim, rag, eval,
+// training, cli.
+export const FIELDKIT_MODULES = ['capabilities', 'nim', 'rag', 'eval', 'training', 'cli'] as const;
 
 // Articles live at ../articles/<slug>/article.md and are authored via the
 // tech-writer skill. We keep that authoring workflow by loading articles
