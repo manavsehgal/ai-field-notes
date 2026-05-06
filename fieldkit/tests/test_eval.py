@@ -30,9 +30,12 @@ from fieldkit.eval import (
     Judge,
     JudgeError,
     JudgeResult,
+    PassAtK,
+    PassAtKResult,
     Trajectory,
     TrajectoryIter,
     is_refusal,
+    pass_at_k_estimator,
     summarize_metric,
 )
 from fieldkit.nim import NIMClient
@@ -879,3 +882,183 @@ class TestGradeResultSerialization:
         )
         with pytest.raises(AttributeError):
             result.task_id = "y"  # type: ignore[misc]
+
+
+# --- pass_at_k_estimator + PassAtK --------------------------------------
+
+
+class TestPassAtKEstimator:
+    def test_all_pass_returns_one(self) -> None:
+        assert pass_at_k_estimator(n=8, c=8, k=1) == 1.0
+        assert pass_at_k_estimator(n=8, c=8, k=8) == 1.0
+
+    def test_no_pass_returns_zero(self) -> None:
+        assert pass_at_k_estimator(n=8, c=0, k=1) == 0.0
+        assert pass_at_k_estimator(n=8, c=0, k=8) == 0.0
+
+    def test_pass_at_1_equals_c_over_n(self) -> None:
+        # pass@1 unbiased estimator collapses to c/n
+        assert pass_at_k_estimator(n=10, c=3, k=1) == pytest.approx(0.3)
+        assert pass_at_k_estimator(n=8, c=5, k=1) == pytest.approx(5 / 8)
+
+    def test_pass_at_k_when_k_equals_n(self) -> None:
+        # k == n: probability that any of the n samples pass = 1 if c >= 1
+        assert pass_at_k_estimator(n=8, c=1, k=8) == 1.0
+        assert pass_at_k_estimator(n=8, c=4, k=8) == 1.0
+
+    def test_canonical_value(self) -> None:
+        # n=10, c=2, k=4: 1 - C(8,4)/C(10,4) = 1 - 70/210 = 2/3.
+        # Unbiased estimator math byte-identical to Chen et al. 2021.
+        assert pass_at_k_estimator(n=10, c=2, k=4) == pytest.approx(2 / 3)
+
+    def test_validates_inputs(self) -> None:
+        with pytest.raises(ValueError, match="k and n must be"):
+            pass_at_k_estimator(n=0, c=0, k=1)
+        with pytest.raises(ValueError, match="k and n must be"):
+            pass_at_k_estimator(n=8, c=0, k=0)
+        with pytest.raises(ValueError, match="0 <= c <= n"):
+            pass_at_k_estimator(n=8, c=-1, k=1)
+        with pytest.raises(ValueError, match="0 <= c <= n"):
+            pass_at_k_estimator(n=8, c=9, k=1)
+
+
+def _trivial_grader(text: str, problem: dict[str, Any]) -> bool:
+    """Grader returns True iff sample contains the problem's expected token."""
+    return problem["expect"] in text
+
+
+class TestPassAtKScore:
+    def test_basic_two_problems_two_samples(self) -> None:
+        problems = [
+            {"task_id": "T0", "expect": "yes"},
+            {"task_id": "T1", "expect": "ok"},
+        ]
+        # T0: 1/2 pass, T1: 2/2 pass
+        samples = [
+            ["yes I think so", "no I disagree"],
+            ["ok", "ok again"],
+        ]
+        result = PassAtK(ks=(1, 2)).score(problems, samples, _trivial_grader)
+        assert result.n_problems == 2
+        assert result.samples_per_problem == 2
+        # pass@1: T0 = 1/2, T1 = 2/2 → mean = 0.75
+        assert result.pass_at[1] == pytest.approx(0.75)
+        # pass@2: T0 = 1.0 (one of two passed at k=2), T1 = 1.0 → mean = 1.0
+        assert result.pass_at[2] == pytest.approx(1.0)
+
+    def test_per_task_rows_carry_task_id_and_passed(self) -> None:
+        problems = [{"task_id": "T0", "expect": "yes"}]
+        samples = [["yes", "no", "yes"]]
+        result = PassAtK(ks=(1,)).score(problems, samples, _trivial_grader)
+        assert len(result.per_task) == 1
+        assert result.per_task[0]["task_id"] == "T0"
+        assert result.per_task[0]["n"] == 3
+        assert result.per_task[0]["passed"] == 2
+
+    def test_extras_fn_attaches_metadata(self) -> None:
+        problems = [{"task_id": "T0", "expect": "yes"}]
+        samples = [["yes longish prediction"]]
+
+        def extras(problem: dict[str, Any], samples: Sequence[str]) -> dict[str, Any]:
+            return {"first_pred_tail": samples[0][-10:]}
+
+        result = PassAtK(ks=(1,)).score(
+            problems, samples, _trivial_grader, extras_fn=extras
+        )
+        assert result.per_task[0]["first_pred_tail"] == "prediction"
+
+    def test_empty_problems_returns_zero(self) -> None:
+        result = PassAtK(ks=(1, 8)).score([], [], _trivial_grader)
+        assert result.n_problems == 0
+        assert result.pass_at[1] == 0.0
+        assert result.pass_at[8] == 0.0
+
+    def test_validates_length_mismatch(self) -> None:
+        with pytest.raises(ValueError, match="length mismatch"):
+            PassAtK(ks=(1,)).score(
+                [{"task_id": "T0", "expect": "x"}],
+                [["x"], ["y"]],  # 2 rows, 1 problem
+                _trivial_grader,
+            )
+
+    def test_validates_uneven_sample_counts(self) -> None:
+        with pytest.raises(ValueError, match="same number of samples"):
+            PassAtK(ks=(1,)).score(
+                [
+                    {"task_id": "T0", "expect": "x"},
+                    {"task_id": "T1", "expect": "x"},
+                ],
+                [["x", "x"], ["x"]],
+                _trivial_grader,
+            )
+
+    def test_validates_k_exceeds_samples(self) -> None:
+        with pytest.raises(ValueError, match="exceeds samples"):
+            PassAtK(ks=(8,)).score(
+                [{"task_id": "T0", "expect": "x"}],
+                [["x", "x"]],
+                _trivial_grader,
+            )
+
+    def test_validates_empty_ks(self) -> None:
+        with pytest.raises(ValueError, match="ks cannot be empty"):
+            PassAtK(ks=()).score(
+                [{"task_id": "T0", "expect": "x"}],
+                [["x"]],
+                _trivial_grader,
+            )
+
+
+class TestPassAtKFromRows:
+    def test_basic(self) -> None:
+        rows = [
+            {"task_id": "T0", "n": 8, "passed": 5},
+            {"task_id": "T1", "n": 8, "passed": 0},
+            {"task_id": "T2", "n": 8, "passed": 8},
+        ]
+        result = PassAtK(ks=(1, 8)).from_rows(rows)
+        assert result.n_problems == 3
+        assert result.samples_per_problem == 8
+        # pass@1: 5/8 + 0/8 + 8/8 = 1.625 → mean = 0.5417
+        assert result.pass_at[1] == pytest.approx((5 / 8 + 0 + 1.0) / 3, abs=1e-3)
+        # pass@8: 1 + 0 + 1 = 2 → mean = 2/3
+        assert result.pass_at[8] == pytest.approx(2 / 3)
+
+    def test_validates_inconsistent_n(self) -> None:
+        with pytest.raises(ValueError, match="inconsistent sample counts"):
+            PassAtK(ks=(1,)).from_rows(
+                [
+                    {"task_id": "T0", "n": 8, "passed": 1},
+                    {"task_id": "T1", "n": 4, "passed": 1},
+                ]
+            )
+
+    def test_empty_rows(self) -> None:
+        result = PassAtK(ks=(1,)).from_rows([])
+        assert result.n_problems == 0
+        assert result.pass_at[1] == 0.0
+
+
+class TestPassAtKResult:
+    def test_to_dict_round_trip(self) -> None:
+        result = PassAtKResult(
+            n_problems=2,
+            samples_per_problem=8,
+            per_task=[{"task_id": "T0", "n": 8, "passed": 4}],
+            pass_at={1: 0.5, 8: 0.84156789},
+        )
+        d = result.to_dict()
+        assert d["n_problems"] == 2
+        assert d["samples_per_problem"] == 8
+        assert d["pass_at"] == {"pass@1": 0.5, "pass@8": 0.8416}
+        assert d["per_task"][0]["task_id"] == "T0"
+
+    def test_immutable(self) -> None:
+        result = PassAtKResult(
+            n_problems=0,
+            samples_per_problem=0,
+            per_task=[],
+            pass_at={1: 0.0},
+        )
+        with pytest.raises(AttributeError):
+            result.n_problems = 99  # type: ignore[misc]
