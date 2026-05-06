@@ -28,9 +28,12 @@ from fieldkit.eval import (
     Bench,
     BenchCall,
     GradeResult,
+    GroupStats,
     Judge,
     JudgeError,
     JudgeResult,
+    MatchedBaseComparison,
+    MatchedBaseComparisonResult,
     PassAtK,
     PassAtKResult,
     Trajectory,
@@ -1343,3 +1346,292 @@ class TestSummarizeAgentRuns:
         assert s["wall_seconds"]["mean"] == pytest.approx(11.67, abs=0.01)
         assert s["wall_seconds"]["min"] == 5.0
         assert s["wall_seconds"]["max"] == 20.0
+
+
+# --- MatchedBaseComparison ----------------------------------------------
+
+
+def _trajectory_record(
+    *,
+    task_id: str,
+    passed: bool,
+    n_passed: int,
+    n_total: int,
+    assertions: list[dict[str, Any]] | None = None,
+    stopped: str = "task_complete",
+    n_turns: int = 5,
+    wall_seconds: float = 8.0,
+) -> dict[str, Any]:
+    """Build one rollout trajectory record matching clawgym-on-spark's shape."""
+    if assertions is None:
+        # Default: synthesize n_total assertions of which n_passed pass, kind=file_exists.
+        assertions = [
+            {"kind": "file_exists", "passed": True} for _ in range(n_passed)
+        ] + [
+            {"kind": "file_exists", "passed": False}
+            for _ in range(n_total - n_passed)
+        ]
+    return {
+        "task_id": task_id,
+        "final_grade": {
+            "passed": passed,
+            "n_passed": n_passed,
+            "n_total": n_total,
+            "assertions": assertions,
+        },
+        "stopped": stopped,
+        "n_turns": n_turns,
+        "wall_seconds": wall_seconds,
+    }
+
+
+class TestMatchedBaseComparisonStats:
+    def test_basic_aggregation(self) -> None:
+        rows = [
+            _trajectory_record(
+                task_id="synth-ml-engineer-00",
+                passed=True,
+                n_passed=5,
+                n_total=5,
+                n_turns=4,
+                wall_seconds=10.0,
+            ),
+            _trajectory_record(
+                task_id="synth-ml-engineer-01",
+                passed=False,
+                n_passed=2,
+                n_total=4,
+                n_turns=12,
+                wall_seconds=30.0,
+            ),
+            _trajectory_record(
+                task_id="synth-academic-author-00",
+                passed=True,
+                n_passed=3,
+                n_total=3,
+                n_turns=3,
+                wall_seconds=8.0,
+            ),
+        ]
+        s = MatchedBaseComparison().stats(rows)
+        assert s.n == 3
+        assert s.n_passed == 2
+        assert s.n_assertions_passed == 10
+        assert s.n_assertions_total == 12
+        assert s.task_pass_pct() == pytest.approx(2 / 3 * 100)
+        assert s.assertion_pass_pct() == pytest.approx(10 / 12 * 100)
+        assert s.mean_turns == pytest.approx((4 + 12 + 3) / 3)
+        assert s.mean_wall == pytest.approx((10 + 30 + 8) / 3)
+        assert "ml-engineer" in s.by_group
+        assert "academic-author" in s.by_group
+        assert s.by_group["ml-engineer"]["n"] == 2
+        assert s.by_group["ml-engineer"]["passed"] == 1
+        assert s.by_kind["file_exists"]["n"] == 12
+        assert s.by_kind["file_exists"]["passed"] == 10
+        assert s.stops == {"task_complete": 3}
+
+    def test_empty_rows(self) -> None:
+        s = MatchedBaseComparison().stats([])
+        assert s.n == 0
+        assert s.task_pass_pct() == 0.0
+        assert s.assertion_pass_pct() == 0.0
+
+    def test_no_group_extractor(self) -> None:
+        rows = [
+            _trajectory_record(
+                task_id="anything", passed=True, n_passed=1, n_total=1
+            )
+        ]
+        cmp = MatchedBaseComparison(group_extractor=None)
+        s = cmp.stats(rows)
+        assert s.by_group == {}
+
+    def test_jsonl_path_input(self, tmp_path: Path) -> None:
+        path = tmp_path / "traj.jsonl"
+        rows = [
+            _trajectory_record(
+                task_id="synth-ml-engineer-00", passed=True, n_passed=2, n_total=2
+            ),
+            _trajectory_record(
+                task_id="synth-ml-engineer-01", passed=False, n_passed=0, n_total=3
+            ),
+        ]
+        path.write_text("\n".join(json.dumps(r) for r in rows) + "\n")
+        s = MatchedBaseComparison().stats(path)
+        assert s.n == 2
+        assert s.n_passed == 1
+
+    def test_jsonl_skips_blank_and_malformed(self, tmp_path: Path) -> None:
+        path = tmp_path / "messy.jsonl"
+        good = _trajectory_record(
+            task_id="synth-ml-engineer-00", passed=True, n_passed=1, n_total=1
+        )
+        path.write_text(
+            json.dumps(good) + "\n\n{not valid\n" + json.dumps(good) + "\n"
+        )
+        s = MatchedBaseComparison().stats(path)
+        assert s.n == 2
+
+    def test_short_task_id_falls_back_to_full(self) -> None:
+        rows = [
+            _trajectory_record(task_id="x", passed=True, n_passed=1, n_total=1)
+        ]
+        s = MatchedBaseComparison().stats(rows)
+        assert "x" in s.by_group
+
+
+class TestMatchedBaseComparisonCompare:
+    def test_phase5_shape_overall_deltas(self) -> None:
+        # Mirror the article's headline: SFT has more assertions passed
+        # but takes more turns + more wall.
+        baseline = [
+            _trajectory_record(
+                task_id="synth-ml-engineer-00",
+                passed=False,
+                n_passed=1,
+                n_total=5,
+                n_turns=4,
+                wall_seconds=12.0,
+                stopped="task_complete",
+            ),
+            _trajectory_record(
+                task_id="synth-ml-engineer-01",
+                passed=True,
+                n_passed=4,
+                n_total=4,
+                n_turns=3,
+                wall_seconds=8.0,
+                stopped="task_complete",
+            ),
+        ]
+        sft = [
+            _trajectory_record(
+                task_id="synth-ml-engineer-00",
+                passed=True,
+                n_passed=5,
+                n_total=5,
+                n_turns=12,
+                wall_seconds=28.0,
+                stopped="max_turns",
+            ),
+            _trajectory_record(
+                task_id="synth-ml-engineer-01",
+                passed=True,
+                n_passed=4,
+                n_total=4,
+                n_turns=12,
+                wall_seconds=29.0,
+                stopped="max_turns",
+            ),
+        ]
+        result = MatchedBaseComparison().compare(baseline, sft)
+        # Task pass: base 1/2 (50%) → sft 2/2 (100%) → +50pp
+        assert result.overall_delta["delta_task_pp"] == pytest.approx(50.0)
+        # Per-assertion: base 5/9 (55.6%) → sft 9/9 (100%) → +44.4pp
+        assert result.overall_delta["delta_assertion_pp"] == pytest.approx(
+            44.44, abs=0.01
+        )
+        # Mean turns: 3.5 → 12 = +8.5
+        assert result.overall_delta["delta_mean_turns"] == pytest.approx(8.5)
+        # Per-group has one entry (ml-engineer)
+        assert len(result.per_group) == 1
+        assert result.per_group[0]["group"] == "ml-engineer"
+        assert result.per_group[0]["delta_task_pp"] == pytest.approx(50.0)
+        # Per-kind has one entry (file_exists default)
+        assert len(result.per_kind) == 1
+        assert result.per_kind[0]["delta_pp"] == pytest.approx(44.44, abs=0.01)
+
+    def test_per_group_handles_disjoint_groups(self) -> None:
+        # baseline-only persona + candidate-only persona — both should appear.
+        baseline = [
+            _trajectory_record(
+                task_id="synth-only-base-00", passed=True, n_passed=1, n_total=1
+            )
+        ]
+        candidate = [
+            _trajectory_record(
+                task_id="synth-only-cand-00", passed=False, n_passed=0, n_total=1
+            )
+        ]
+        result = MatchedBaseComparison().compare(baseline, candidate)
+        groups = {r["group"] for r in result.per_group}
+        assert groups == {"only-base", "only-cand"}
+
+    def test_per_kind_groups_assertions_correctly(self) -> None:
+        baseline = [
+            _trajectory_record(
+                task_id="synth-x-00",
+                passed=False,
+                n_passed=1,
+                n_total=2,
+                assertions=[
+                    {"kind": "file_exists", "passed": True},
+                    {"kind": "file_not_exists", "passed": False},
+                ],
+            )
+        ]
+        candidate = [
+            _trajectory_record(
+                task_id="synth-x-00",
+                passed=True,
+                n_passed=2,
+                n_total=2,
+                assertions=[
+                    {"kind": "file_exists", "passed": True},
+                    {"kind": "file_not_exists", "passed": True},
+                ],
+            )
+        ]
+        result = MatchedBaseComparison().compare(baseline, candidate)
+        per_kind = {r["kind"]: r for r in result.per_kind}
+        assert per_kind["file_exists"]["delta_pp"] == 0.0
+        assert per_kind["file_not_exists"]["delta_pp"] == pytest.approx(100.0)
+
+    def test_report_renders_markdown(self) -> None:
+        baseline = [
+            _trajectory_record(
+                task_id="synth-x-00", passed=False, n_passed=0, n_total=1
+            )
+        ]
+        candidate = [
+            _trajectory_record(
+                task_id="synth-x-00", passed=True, n_passed=1, n_total=1
+            )
+        ]
+        result = MatchedBaseComparison().compare(baseline, candidate)
+        rep = result.report()
+        assert "Matched-base comparison" in rep
+        assert "task pass" in rep
+        assert "+100.0 pp" in rep
+
+    def test_to_dict_round_trip(self) -> None:
+        baseline = [
+            _trajectory_record(
+                task_id="synth-x-00", passed=True, n_passed=1, n_total=1
+            )
+        ]
+        candidate = baseline
+        result = MatchedBaseComparison().compare(baseline, candidate)
+        d = result.to_dict()
+        assert "baseline" in d
+        assert "candidate" in d
+        assert d["overall_delta"]["delta_task_pp"] == 0.0
+        # Round-trip must be JSON-serializable
+        json.dumps(d)
+
+
+class TestGroupStatsImmutable:
+    def test_immutable(self) -> None:
+        s = GroupStats(
+            n=0,
+            n_passed=0,
+            n_assertions_passed=0,
+            n_assertions_total=0,
+            by_group={},
+            by_kind={},
+            stops={},
+            mean_turns=0.0,
+            mean_wall=0.0,
+        )
+        with pytest.raises(AttributeError):
+            s.n = 1  # type: ignore[misc]

@@ -52,9 +52,12 @@ __all__ = [
     "Bench",
     "BenchCall",
     "GradeResult",
+    "GroupStats",
     "Judge",
     "JudgeError",
     "JudgeResult",
+    "MatchedBaseComparison",
+    "MatchedBaseComparisonResult",
     "PassAtK",
     "PassAtKResult",
     "Trajectory",
@@ -1494,3 +1497,354 @@ def summarize_agent_runs(
             float(r.tool_format_errors()) for r in runs
         ),
     }
+
+
+# --- MatchedBaseComparison -----------------------------------------------
+
+
+@dataclass(frozen=True, slots=True)
+class GroupStats:
+    """Aggregate stats for one rollout pass over a held-out task set.
+
+    `by_group` maps a group key (typically persona) to per-group counts
+    ``{n, passed, n_assertions_passed, n_assertions_total}``.
+    `by_kind` maps assertion kind to ``{n, passed}``.
+    `stops` maps the trajectory stop reason to its count.
+    """
+
+    n: int
+    n_passed: int
+    n_assertions_passed: int
+    n_assertions_total: int
+    by_group: dict[str, dict[str, int]]
+    by_kind: dict[str, dict[str, int]]
+    stops: dict[str, int]
+    mean_turns: float
+    mean_wall: float
+
+    def task_pass_pct(self) -> float:
+        return 100.0 * self.n_passed / self.n if self.n else 0.0
+
+    def assertion_pass_pct(self) -> float:
+        return (
+            100.0 * self.n_assertions_passed / self.n_assertions_total
+            if self.n_assertions_total
+            else 0.0
+        )
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "n": self.n,
+            "n_passed": self.n_passed,
+            "n_assertions_passed": self.n_assertions_passed,
+            "n_assertions_total": self.n_assertions_total,
+            "task_pass_pct": round(self.task_pass_pct(), 2),
+            "assertion_pass_pct": round(self.assertion_pass_pct(), 2),
+            "by_group": {
+                k: dict(v) for k, v in sorted(self.by_group.items())
+            },
+            "by_kind": {k: dict(v) for k, v in sorted(self.by_kind.items())},
+            "stops": dict(sorted(self.stops.items())),
+            "mean_turns": round(self.mean_turns, 2),
+            "mean_wall": round(self.mean_wall, 2),
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class MatchedBaseComparisonResult:
+    """Side-by-side `(baseline, candidate)` rollout comparison.
+
+    `overall_delta` carries the headline four numbers — task and
+    per-assertion deltas in percentage points, plus mean turns and
+    mean wall deltas. `per_group` is one row per group label
+    ``{group, baseline_task_pct, candidate_task_pct, delta_task_pp,
+    baseline_assertion_pct, candidate_assertion_pct, delta_assertion_pp,
+    n}``. `per_kind` is per-assertion-kind pass-rate deltas.
+    """
+
+    baseline: GroupStats
+    candidate: GroupStats
+    overall_delta: dict[str, float]
+    per_group: list[dict[str, Any]]
+    per_kind: list[dict[str, Any]]
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "baseline": self.baseline.to_dict(),
+            "candidate": self.candidate.to_dict(),
+            "overall_delta": {
+                k: round(v, 2) for k, v in self.overall_delta.items()
+            },
+            "per_group": [dict(r) for r in self.per_group],
+            "per_kind": [dict(r) for r in self.per_kind],
+        }
+
+    def report(self) -> str:
+        """Markdown summary table — overall headline + per-group + per-kind."""
+        b, c = self.baseline, self.candidate
+        lines: list[str] = ["### Matched-base comparison", ""]
+        lines.append("| metric | baseline | candidate | Δ |")
+        lines.append("|---|---:|---:|---:|")
+        lines.append(
+            f"| task pass | {b.n_passed}/{b.n} ({b.task_pass_pct():.1f}%)"
+            f" | {c.n_passed}/{c.n} ({c.task_pass_pct():.1f}%)"
+            f" | {self.overall_delta['delta_task_pp']:+.1f} pp |"
+        )
+        lines.append(
+            f"| per-assertion | {b.n_assertions_passed}/{b.n_assertions_total}"
+            f" ({b.assertion_pass_pct():.1f}%)"
+            f" | {c.n_assertions_passed}/{c.n_assertions_total}"
+            f" ({c.assertion_pass_pct():.1f}%)"
+            f" | {self.overall_delta['delta_assertion_pp']:+.1f} pp |"
+        )
+        lines.append(
+            f"| mean turns | {b.mean_turns:.2f} | {c.mean_turns:.2f}"
+            f" | {self.overall_delta['delta_mean_turns']:+.2f} |"
+        )
+        lines.append(
+            f"| mean wall (s) | {b.mean_wall:.2f} | {c.mean_wall:.2f}"
+            f" | {self.overall_delta['delta_mean_wall']:+.2f} |"
+        )
+        lines.append("")
+        if self.per_group:
+            lines.append("**Per group**")
+            lines.append("")
+            lines.append(
+                "| group | base task% | cand task% | Δ pp | base asrt% | cand asrt% | Δ pp |"
+            )
+            lines.append("|---|---:|---:|---:|---:|---:|---:|")
+            for r in self.per_group:
+                lines.append(
+                    f"| {r['group']} | {r['baseline_task_pct']:.1f}%"
+                    f" | {r['candidate_task_pct']:.1f}%"
+                    f" | {r['delta_task_pp']:+.1f}"
+                    f" | {r['baseline_assertion_pct']:.1f}%"
+                    f" | {r['candidate_assertion_pct']:.1f}%"
+                    f" | {r['delta_assertion_pp']:+.1f} |"
+                )
+            lines.append("")
+        if self.per_kind:
+            lines.append("**Per assertion kind**")
+            lines.append("")
+            lines.append("| kind | base | candidate | Δ pp |")
+            lines.append("|---|---:|---:|---:|")
+            for r in self.per_kind:
+                lines.append(
+                    f"| {r['kind']} | {r['baseline_pct']:.1f}%"
+                    f" | {r['candidate_pct']:.1f}% | {r['delta_pp']:+.1f} |"
+                )
+        return "\n".join(lines)
+
+
+def _synth_persona_extractor(task_id: str) -> str:
+    """Default group extractor: ``synth-<persona>-NN`` → ``<persona>``.
+
+    For task_id ``"synth-data-science-researcher-03"`` returns
+    ``"data-science-researcher"`` (persona may itself contain hyphens).
+    Lifted from `articles/clawgym-on-spark/scripts/compare_phase5.py`.
+    """
+    parts = task_id.split("-")
+    if len(parts) < 3:
+        return task_id
+    return "-".join(parts[1:-1])
+
+
+@dataclass
+class MatchedBaseComparison:
+    """Two-rollout B-minus-A comparison over a held-out task set.
+
+    The "filter held-out by training-set membership → run rollout twice
+    with different `--model` → emit B - A comparison" pattern is
+    reusable for any LoRA / adapter ablation. Lifted from the
+    `clawgym-on-spark` Phase 5 SFT-vs-base eval; the same shape covers
+    GRPO-vs-SFT and any model-comparison-on-fixed-tasks workflow.
+
+    Trajectory record schema (one dict per task)::
+
+        {
+            "task_id": "synth-<persona>-NN",
+            "final_grade": {
+                "passed": bool,
+                "n_passed": int,
+                "n_total": int,
+                "assertions": [{"kind": str, "passed": bool}, ...],
+            },
+            "stopped": "task_complete" | "max_turns" | ...,
+            "n_turns": int,
+            "wall_seconds": float,
+        }
+
+    Usage::
+
+        from fieldkit.eval import MatchedBaseComparison
+
+        cmp = MatchedBaseComparison()
+        result = cmp.compare(
+            baseline=base_trajectories,    # list of dicts OR path/jsonl
+            candidate=sft_trajectories,
+        )
+        print(result.report())
+        json.dump(result.to_dict(), open("comparison.json", "w"), indent=2)
+
+    `group_extractor` defaults to the synth-persona splitter; pass any
+    ``Callable[[str], str]`` for other task-id schemes (e.g. arxiv-id
+    prefixes, Bench question categories, etc.). Set to ``None`` to
+    disable per-group breakdown.
+    """
+
+    group_extractor: Callable[[str], str] | None = field(
+        default=_synth_persona_extractor
+    )
+
+    def stats(
+        self, rows: Iterable[dict[str, Any]] | str | Path
+    ) -> GroupStats:
+        """Aggregate one rollout's trajectories into `GroupStats`.
+
+        `rows` may be a list of dicts (in-memory) or a path to a
+        JSONL file (one trajectory per line; blank / malformed lines
+        are skipped silently).
+        """
+        loaded = list(self._load(rows))
+        n = len(loaded)
+        n_passed = 0
+        ap = 0
+        at = 0
+        by_group: dict[str, dict[str, int]] = {}
+        by_kind: dict[str, dict[str, int]] = {}
+        stops: dict[str, int] = {}
+        turns_sum = 0.0
+        wall_sum = 0.0
+        for r in loaded:
+            grade = r.get("final_grade") or {}
+            passed = bool(grade.get("passed"))
+            n_passed_a = int(grade.get("n_passed") or 0)
+            n_total_a = int(grade.get("n_total") or 0)
+            n_passed += int(passed)
+            ap += n_passed_a
+            at += n_total_a
+
+            if self.group_extractor is not None:
+                g = self.group_extractor(str(r.get("task_id") or ""))
+                bucket = by_group.setdefault(
+                    g,
+                    {"n": 0, "passed": 0, "n_assertions_passed": 0, "n_assertions_total": 0},
+                )
+                bucket["n"] += 1
+                bucket["passed"] += int(passed)
+                bucket["n_assertions_passed"] += n_passed_a
+                bucket["n_assertions_total"] += n_total_a
+
+            for a in grade.get("assertions") or []:
+                k = str(a.get("kind") or "")
+                kbucket = by_kind.setdefault(k, {"n": 0, "passed": 0})
+                kbucket["n"] += 1
+                kbucket["passed"] += int(bool(a.get("passed")))
+
+            stops[str(r.get("stopped") or "?")] = (
+                stops.get(str(r.get("stopped") or "?"), 0) + 1
+            )
+            turns_sum += float(r.get("n_turns") or 0)
+            wall_sum += float(r.get("wall_seconds") or 0)
+
+        return GroupStats(
+            n=n,
+            n_passed=n_passed,
+            n_assertions_passed=ap,
+            n_assertions_total=at,
+            by_group=by_group,
+            by_kind=by_kind,
+            stops=stops,
+            mean_turns=(turns_sum / n) if n else 0.0,
+            mean_wall=(wall_sum / n) if n else 0.0,
+        )
+
+    def compare(
+        self,
+        baseline: Iterable[dict[str, Any]] | str | Path,
+        candidate: Iterable[dict[str, Any]] | str | Path,
+    ) -> MatchedBaseComparisonResult:
+        """Compute side-by-side stats and per-group / per-kind deltas."""
+        a = self.stats(baseline)
+        b = self.stats(candidate)
+        overall = {
+            "delta_task_pp": b.task_pass_pct() - a.task_pass_pct(),
+            "delta_assertion_pp": b.assertion_pass_pct() - a.assertion_pass_pct(),
+            "delta_mean_turns": b.mean_turns - a.mean_turns,
+            "delta_mean_wall": b.mean_wall - a.mean_wall,
+        }
+        per_group: list[dict[str, Any]] = []
+        for g in sorted(set(a.by_group) | set(b.by_group)):
+            ag = a.by_group.get(
+                g, {"n": 0, "passed": 0, "n_assertions_passed": 0, "n_assertions_total": 0}
+            )
+            bg = b.by_group.get(
+                g, {"n": 0, "passed": 0, "n_assertions_passed": 0, "n_assertions_total": 0}
+            )
+            a_task = 100 * ag["passed"] / ag["n"] if ag["n"] else 0.0
+            b_task = 100 * bg["passed"] / bg["n"] if bg["n"] else 0.0
+            a_asrt = (
+                100 * ag["n_assertions_passed"] / ag["n_assertions_total"]
+                if ag["n_assertions_total"]
+                else 0.0
+            )
+            b_asrt = (
+                100 * bg["n_assertions_passed"] / bg["n_assertions_total"]
+                if bg["n_assertions_total"]
+                else 0.0
+            )
+            per_group.append(
+                {
+                    "group": g,
+                    "n": max(ag["n"], bg["n"]),
+                    "baseline_task_pct": round(a_task, 2),
+                    "candidate_task_pct": round(b_task, 2),
+                    "delta_task_pp": round(b_task - a_task, 2),
+                    "baseline_assertion_pct": round(a_asrt, 2),
+                    "candidate_assertion_pct": round(b_asrt, 2),
+                    "delta_assertion_pp": round(b_asrt - a_asrt, 2),
+                }
+            )
+        per_kind: list[dict[str, Any]] = []
+        for k in sorted(set(a.by_kind) | set(b.by_kind)):
+            ak = a.by_kind.get(k, {"n": 0, "passed": 0})
+            bk = b.by_kind.get(k, {"n": 0, "passed": 0})
+            a_pct = 100 * ak["passed"] / ak["n"] if ak["n"] else 0.0
+            b_pct = 100 * bk["passed"] / bk["n"] if bk["n"] else 0.0
+            per_kind.append(
+                {
+                    "kind": k,
+                    "baseline_pct": round(a_pct, 2),
+                    "candidate_pct": round(b_pct, 2),
+                    "delta_pp": round(b_pct - a_pct, 2),
+                    "n": max(ak["n"], bk["n"]),
+                }
+            )
+        return MatchedBaseComparisonResult(
+            baseline=a,
+            candidate=b,
+            overall_delta=overall,
+            per_group=per_group,
+            per_kind=per_kind,
+        )
+
+    def _load(
+        self, src: Iterable[dict[str, Any]] | str | Path
+    ) -> Iterable[dict[str, Any]]:
+        """Accept a list/iterable of dicts OR a JSONL path."""
+        if isinstance(src, (str, Path)):
+            with open(src) as f:
+                for line in f:
+                    s = line.strip()
+                    if not s:
+                        continue
+                    try:
+                        rec = json.loads(s)
+                    except json.JSONDecodeError:
+                        continue
+                    if isinstance(rec, dict):
+                        yield rec
+        else:
+            for rec in src:
+                if isinstance(rec, dict):
+                    yield rec
