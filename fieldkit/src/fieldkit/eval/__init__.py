@@ -40,6 +40,13 @@ from typing import Any
 from fieldkit.nim import NIMClient, NIMError
 
 __all__ = [
+    "ASSERTION_KINDS",
+    "BUILTIN_RUBRICS",
+    "REFUSAL_PATTERNS",
+    "RUBRIC_CORRECTNESS",
+    "RUBRIC_FAITHFULNESS",
+    "RUBRIC_RELEVANCE",
+    "AgentRun",
     "AssertionGrader",
     "AssertionResult",
     "Bench",
@@ -52,14 +59,10 @@ __all__ = [
     "PassAtKResult",
     "Trajectory",
     "TrajectoryIter",
-    "RUBRIC_CORRECTNESS",
-    "RUBRIC_FAITHFULNESS",
-    "RUBRIC_RELEVANCE",
-    "BUILTIN_RUBRICS",
-    "REFUSAL_PATTERNS",
-    "ASSERTION_KINDS",
+    "TurnDetail",
     "is_refusal",
     "pass_at_k_estimator",
+    "summarize_agent_runs",
     "summarize_metric",
 ]
 
@@ -1067,7 +1070,7 @@ def pass_at_k_estimator(n: int, c: int, k: int) -> float:
 
 @dataclass(frozen=True, slots=True)
 class PassAtKResult:
-    """Aggregated pass@k for one model × task pair.
+    """Aggregated pass@k for one model and task pair.
 
     `per_task` is a list of one dict per problem: ``{"task_id": str,
     "n": int, "passed": int}`` plus any ``extras`` the caller attached
@@ -1175,7 +1178,7 @@ class PassAtK:
 
         per_task: list[dict[str, Any]] = []
         pass_sums: dict[int, float] = {k: 0.0 for k in self.ks}
-        for problem, problem_samples in zip(problems, samples):
+        for problem, problem_samples in zip(problems, samples, strict=True):
             passed = sum(
                 1 for s in problem_samples if grader(s, problem)
             )
@@ -1237,3 +1240,257 @@ class PassAtK:
             per_task=list(rows),
             pass_at={k: pass_sums[k] / n_problems for k in self.ks},
         )
+
+
+# --- AgentRun ------------------------------------------------------------
+
+
+@dataclass(frozen=True, slots=True)
+class TurnDetail:
+    """One turn within an agent loop.
+
+    Five canonical fields cover every agent-bench schema we've absorbed
+    so far (AutoResearchBench, autoresearch-agent-loop, clawgym-on-spark
+    rollouts): ``turn`` (1-indexed), ``action`` (free-form label —
+    typically "tool", "synthesis", "error", or a vendor-specific kind),
+    ``duration_s`` (wall clock for this turn), and the two token counts.
+
+    `extras` carries everything else from the source record so the
+    canonical accessors stay stable while bench-specific fields
+    (``papers_retrieved``, ``parse_errors``, ``candidate_cfg``) survive
+    round-tripping.
+    """
+
+    turn: int
+    action: str
+    duration_s: float
+    input_tokens: int | None = None
+    output_tokens: int | None = None
+    extras: dict[str, Any] = field(default_factory=dict)
+
+    def to_dict(self) -> dict[str, Any]:
+        out: dict[str, Any] = {
+            "turn": self.turn,
+            "action": self.action,
+            "duration_s": round(self.duration_s, 2),
+            "input_tokens": self.input_tokens,
+            "output_tokens": self.output_tokens,
+        }
+        if self.extras:
+            out["extras"] = dict(self.extras)
+        return out
+
+
+@dataclass
+class AgentRun:
+    """One agent-loop benchmark question's run, post-eval.
+
+    Canonical schema for any third-party agent bench that emits a
+    per-question record with a status, total wall time, and a list of
+    turn dicts. The default constructor handles the AutoResearchBench
+    JSONL shape; for other benches use ``from_record(...)`` with the
+    field-name overrides.
+
+    Usage::
+
+        from fieldkit.eval import AgentRun, summarize_agent_runs
+
+        runs = AgentRun.from_jsonl(
+            "evidence/runs/llama-3.1-8b/inference_output.jsonl"
+        )
+        print(summarize_agent_runs(runs, label="llama-3.1-8b"))
+
+    `raw` is the full original record so callers can read niche fields
+    without re-parsing the JSONL. The convenience accessors
+    (``tool_calls``, ``tool_format_errors``, ``total_input_tokens``,
+    ``total_output_tokens``) are pure derivations of `turns`.
+    """
+
+    question_id: str
+    status: str
+    wall_seconds: float
+    n_turns: int
+    n_candidates: int
+    turns: list[TurnDetail]
+    raw: dict[str, Any] = field(default_factory=dict)
+
+    @classmethod
+    def from_record(
+        cls,
+        raw: dict[str, Any],
+        *,
+        question_id_field: str = "arxiv_id",
+        question_id_path: tuple[str, ...] = ("input_data",),
+        inference_path: tuple[str, ...] = ("inference_results", 0),
+        status_field: str = "status",
+        wall_field: str = "total_time",
+        turns_field: str = "turn_details",
+        candidates_field: str = "final_candidates",
+    ) -> AgentRun:
+        """Parse one bench record into an `AgentRun`.
+
+        Defaults match the AutoResearchBench shape — top-level
+        ``input_data.arxiv_id`` plus ``inference_results[0]`` carrying
+        `status`, `total_time`, `turn_details`, and `final_candidates`.
+
+        Override the path tuples for benches with different layouts.
+        Each path component is either a string (dict key) or an int
+        (list index). Missing fields fall back to safe defaults.
+        """
+        question_id = _walk_path(raw, [*question_id_path, question_id_field], "")
+        ir = _walk_path(raw, list(inference_path), {})
+        if not isinstance(ir, dict):
+            ir = {}
+        status = str(ir.get(status_field, ""))
+        wall = float(ir.get(wall_field) or 0.0)
+        turn_dicts = ir.get(turns_field) or []
+        candidates = ir.get(candidates_field) or []
+        turns = [_parse_turn(td, i) for i, td in enumerate(turn_dicts, start=1)]
+        return cls(
+            question_id=str(question_id),
+            status=status,
+            wall_seconds=round(wall, 2),
+            n_turns=len(turns),
+            n_candidates=len(candidates) if isinstance(candidates, list) else 0,
+            turns=turns,
+            raw=raw,
+        )
+
+    @classmethod
+    def from_jsonl(
+        cls,
+        path: str | Path,
+        *,
+        parser: Callable[[dict[str, Any]], AgentRun] | None = None,
+    ) -> list[AgentRun]:
+        """Parse a JSONL of agent runs (one record per line).
+
+        Default parser is `cls.from_record` with AutoResearchBench
+        defaults. Pass a custom `parser(raw) -> AgentRun` for other
+        bench shapes; bind defaults via `functools.partial`.
+        """
+        parse: Callable[[dict[str, Any]], AgentRun] = parser or cls.from_record
+        out: list[AgentRun] = []
+        with open(path) as f:
+            for line in f:
+                stripped = line.strip()
+                if not stripped:
+                    continue
+                try:
+                    raw = json.loads(stripped)
+                except json.JSONDecodeError:
+                    continue
+                if not isinstance(raw, dict):
+                    continue
+                out.append(parse(raw))
+        return out
+
+    def tool_calls(self) -> int:
+        """Count of turns whose action is ``"tool"``."""
+        return sum(1 for t in self.turns if t.action == "tool")
+
+    def tool_format_errors(self) -> int:
+        """Count of turns whose action is ``"error"`` (parse / format failures)."""
+        return sum(1 for t in self.turns if t.action == "error")
+
+    def total_input_tokens(self) -> int:
+        """Sum of `input_tokens` across all turns; missing values count as 0."""
+        return sum(int(t.input_tokens or 0) for t in self.turns)
+
+    def total_output_tokens(self) -> int:
+        """Sum of `output_tokens` across all turns; missing values count as 0."""
+        return sum(int(t.output_tokens or 0) for t in self.turns)
+
+    def succeeded(self) -> bool:
+        """True iff status is ``"finished"`` and at least one candidate was emitted.
+
+        Matches the AutoResearchBench convention; override with a custom
+        success predicate if your bench uses different semantics.
+        """
+        return self.status == "finished" and self.n_candidates > 0
+
+    def to_dict(self, *, include_raw: bool = False) -> dict[str, Any]:
+        """Compact summary dict; opt in to ``raw`` for full provenance."""
+        out: dict[str, Any] = {
+            "question_id": self.question_id,
+            "status": self.status,
+            "wall_seconds": self.wall_seconds,
+            "n_turns": self.n_turns,
+            "n_candidates": self.n_candidates,
+            "tool_calls": self.tool_calls(),
+            "tool_format_errors": self.tool_format_errors(),
+            "input_tokens": self.total_input_tokens(),
+            "output_tokens": self.total_output_tokens(),
+            "turns": [t.to_dict() for t in self.turns],
+        }
+        if include_raw:
+            out["raw"] = self.raw
+        return out
+
+
+def _walk_path(obj: Any, path: Sequence[Any], default: Any) -> Any:
+    """Walk a nested dict/list path; return `default` on any miss."""
+    cur = obj
+    for k in path:
+        if isinstance(k, int):
+            if not isinstance(cur, list) or k >= len(cur) or k < -len(cur):
+                return default
+            cur = cur[k]
+        else:
+            if not isinstance(cur, dict) or k not in cur:
+                return default
+            cur = cur[k]
+    return cur
+
+
+def _parse_turn(td: Any, fallback_turn: int) -> TurnDetail:
+    """Parse one turn dict into TurnDetail; permissive on missing fields."""
+    if not isinstance(td, dict):
+        return TurnDetail(turn=fallback_turn, action="", duration_s=0.0)
+    canonical = {"turn", "action", "duration", "duration_s", "input_tokens", "output_tokens"}
+    extras = {k: v for k, v in td.items() if k not in canonical}
+    return TurnDetail(
+        turn=int(td.get("turn") or fallback_turn),
+        action=str(td.get("action") or ""),
+        duration_s=round(float(td.get("duration") or td.get("duration_s") or 0.0), 2),
+        input_tokens=_int_or_none(td.get("input_tokens")),
+        output_tokens=_int_or_none(td.get("output_tokens")),
+        extras=extras,
+    )
+
+
+def _int_or_none(v: Any) -> int | None:
+    if v is None:
+        return None
+    try:
+        return int(v)
+    except (TypeError, ValueError):
+        return None
+
+
+def summarize_agent_runs(
+    runs: Sequence[AgentRun], *, label: str = ""
+) -> dict[str, Any]:
+    """Aggregate per-status counts + wall/turns/candidates summaries.
+
+    Mirrors the JSON shape `articles/autoresearchbench-on-spark/scripts/
+    analyze_run.py` writes — `status_counts`, plus `summarize_metric`
+    rollups for `wall_seconds`, `turns`, `candidates`. Returns a JSON-
+    serializable dict; pass to `json.dumps` directly.
+    """
+    if not runs:
+        return {"label": label, "n_questions": 0, "status_counts": {}}
+    statuses = [r.status for r in runs]
+    return {
+        "label": label,
+        "n_questions": len(runs),
+        "n_succeeded": sum(1 for r in runs if r.succeeded()),
+        "status_counts": {s: statuses.count(s) for s in sorted(set(statuses))},
+        "wall_seconds": summarize_metric(r.wall_seconds for r in runs),
+        "turns": summarize_metric(float(r.n_turns) for r in runs),
+        "candidates": summarize_metric(float(r.n_candidates) for r in runs),
+        "tool_calls": summarize_metric(float(r.tool_calls()) for r in runs),
+        "tool_format_errors": summarize_metric(
+            float(r.tool_format_errors()) for r in runs
+        ),
+    }

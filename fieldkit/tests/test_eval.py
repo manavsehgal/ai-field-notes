@@ -22,6 +22,7 @@ from fieldkit.eval import (
     RUBRIC_CORRECTNESS,
     RUBRIC_FAITHFULNESS,
     RUBRIC_RELEVANCE,
+    AgentRun,
     AssertionGrader,
     AssertionResult,
     Bench,
@@ -34,8 +35,10 @@ from fieldkit.eval import (
     PassAtKResult,
     Trajectory,
     TrajectoryIter,
+    TurnDetail,
     is_refusal,
     pass_at_k_estimator,
+    summarize_agent_runs,
     summarize_metric,
 )
 from fieldkit.nim import NIMClient
@@ -1062,3 +1065,281 @@ class TestPassAtKResult:
         )
         with pytest.raises(AttributeError):
             result.n_problems = 99  # type: ignore[misc]
+
+
+# --- AgentRun + TurnDetail + summarize_agent_runs ------------------------
+
+
+_DEFAULT_TURNS: list[dict[str, Any]] = [
+    {
+        "turn": 1,
+        "action": "tool",
+        "duration": 4.21,
+        "input_tokens": 1024,
+        "output_tokens": 256,
+        "papers_retrieved_this_turn": 5,
+    },
+    {
+        "turn": 2,
+        "action": "synthesis",
+        "duration": 3.10,
+        "input_tokens": 2048,
+        "output_tokens": 512,
+    },
+]
+_DEFAULT_CANDIDATES: list[dict[str, Any]] = [{"title": "Cand1"}, {"title": "Cand2"}]
+
+
+def _autoresearch_record(
+    *,
+    arxiv_id: str = "2602.01234",
+    status: str = "finished",
+    total_time: float = 12.5,
+    turn_details: list[dict[str, Any]] | None = None,
+    final_candidates: list[dict[str, Any]] | None = None,
+) -> dict[str, Any]:
+    """Build an AutoResearchBench-shaped JSON record for tests.
+
+    Use ``turn_details=[]`` / ``final_candidates=[]`` to override with empty
+    lists; pass ``None`` (the default) to get the canonical fixture.
+    """
+    return {
+        "input_data": {
+            "arxiv_id": arxiv_id,
+            "answer": ["Some Reference Title"],
+        },
+        "inference_results": [
+            {
+                "status": status,
+                "total_time": total_time,
+                "turn_details": _DEFAULT_TURNS if turn_details is None else turn_details,
+                "final_candidates": (
+                    _DEFAULT_CANDIDATES if final_candidates is None else final_candidates
+                ),
+            }
+        ],
+    }
+
+
+class TestTurnDetail:
+    def test_basic_dict(self) -> None:
+        t = TurnDetail(
+            turn=1,
+            action="tool",
+            duration_s=4.21,
+            input_tokens=1024,
+            output_tokens=256,
+            extras={"papers": 5},
+        )
+        d = t.to_dict()
+        assert d["turn"] == 1
+        assert d["action"] == "tool"
+        assert d["duration_s"] == 4.21
+        assert d["input_tokens"] == 1024
+        assert d["output_tokens"] == 256
+        assert d["extras"] == {"papers": 5}
+
+    def test_empty_extras_omitted(self) -> None:
+        t = TurnDetail(turn=1, action="x", duration_s=0.5)
+        assert "extras" not in t.to_dict()
+
+
+class TestAgentRunFromRecord:
+    def test_autoresearch_default_shape(self) -> None:
+        raw = _autoresearch_record()
+        run = AgentRun.from_record(raw)
+        assert run.question_id == "2602.01234"
+        assert run.status == "finished"
+        assert run.wall_seconds == 12.5
+        assert run.n_turns == 2
+        assert run.n_candidates == 2
+        assert run.turns[0].action == "tool"
+        assert run.turns[0].duration_s == 4.21
+        assert run.turns[0].extras == {"papers_retrieved_this_turn": 5}
+        assert run.turns[1].action == "synthesis"
+
+    def test_missing_inference_results_recovers(self) -> None:
+        # Some pre-run / failed records have no inference_results at all.
+        raw = {"input_data": {"arxiv_id": "2602.99999"}}
+        run = AgentRun.from_record(raw)
+        assert run.question_id == "2602.99999"
+        assert run.status == ""
+        assert run.wall_seconds == 0.0
+        assert run.n_turns == 0
+        assert run.n_candidates == 0
+
+    def test_custom_field_overrides(self) -> None:
+        # Synthetic shape: top-level question_id, no inference_results wrapper.
+        raw = {
+            "task_id": "TASK-007",
+            "result_status": "ok",
+            "elapsed": 9.0,
+            "steps": [
+                {"turn": 1, "action": "search", "duration": 1.0, "output_tokens": 50},
+            ],
+            "outputs": [{"x": 1}],
+        }
+        run = AgentRun.from_record(
+            raw,
+            question_id_field="task_id",
+            question_id_path=(),
+            inference_path=(),
+            status_field="result_status",
+            wall_field="elapsed",
+            turns_field="steps",
+            candidates_field="outputs",
+        )
+        assert run.question_id == "TASK-007"
+        assert run.status == "ok"
+        assert run.n_turns == 1
+        assert run.n_candidates == 1
+        assert run.turns[0].action == "search"
+        assert run.turns[0].output_tokens == 50
+
+    def test_supports_duration_s_alias(self) -> None:
+        # Some agent loops emit duration_s instead of duration.
+        raw = _autoresearch_record(
+            turn_details=[
+                {"turn": 1, "action": "tool", "duration_s": 0.75, "input_tokens": 100}
+            ]
+        )
+        run = AgentRun.from_record(raw)
+        assert run.turns[0].duration_s == 0.75
+
+
+class TestAgentRunDerivations:
+    def test_tool_calls_and_errors(self) -> None:
+        raw = _autoresearch_record(
+            turn_details=[
+                {"turn": 1, "action": "tool", "duration": 1.0},
+                {"turn": 2, "action": "error", "duration": 0.5},
+                {"turn": 3, "action": "tool", "duration": 1.5},
+                {"turn": 4, "action": "synthesis", "duration": 2.0},
+            ]
+        )
+        run = AgentRun.from_record(raw)
+        assert run.tool_calls() == 2
+        assert run.tool_format_errors() == 1
+
+    def test_total_tokens(self) -> None:
+        raw = _autoresearch_record(
+            turn_details=[
+                {"turn": 1, "action": "tool", "duration": 0.1, "input_tokens": 1000, "output_tokens": 100},
+                {"turn": 2, "action": "tool", "duration": 0.1, "input_tokens": 2000, "output_tokens": 200},
+                {"turn": 3, "action": "tool", "duration": 0.1, "input_tokens": None, "output_tokens": None},
+            ]
+        )
+        run = AgentRun.from_record(raw)
+        assert run.total_input_tokens() == 3000
+        assert run.total_output_tokens() == 300
+
+    def test_succeeded(self) -> None:
+        ok = AgentRun.from_record(_autoresearch_record(status="finished"))
+        assert ok.succeeded()
+        no_cands = AgentRun.from_record(
+            _autoresearch_record(status="finished", final_candidates=[])
+        )
+        assert not no_cands.succeeded()
+        not_finished = AgentRun.from_record(
+            _autoresearch_record(status="context_overflow")
+        )
+        assert not not_finished.succeeded()
+
+
+class TestAgentRunFromJsonl:
+    def test_basic_jsonl_parse(self, tmp_path: Path) -> None:
+        path = tmp_path / "runs.jsonl"
+        path.write_text(
+            "\n".join(
+                json.dumps(_autoresearch_record(arxiv_id=f"2602.{i:05d}"))
+                for i in range(3)
+            )
+            + "\n"
+        )
+        runs = AgentRun.from_jsonl(path)
+        assert len(runs) == 3
+        assert runs[0].question_id == "2602.00000"
+        assert runs[2].question_id == "2602.00002"
+
+    def test_skips_blank_and_malformed_lines(self, tmp_path: Path) -> None:
+        path = tmp_path / "messy.jsonl"
+        path.write_text(
+            json.dumps(_autoresearch_record(arxiv_id="2602.A"))
+            + "\n\n"
+            + "{not valid json\n"
+            + json.dumps(_autoresearch_record(arxiv_id="2602.B"))
+            + "\n"
+        )
+        runs = AgentRun.from_jsonl(path)
+        assert len(runs) == 2
+        assert {r.question_id for r in runs} == {"2602.A", "2602.B"}
+
+    def test_custom_parser(self, tmp_path: Path) -> None:
+        from functools import partial
+        path = tmp_path / "alt.jsonl"
+        path.write_text(
+            json.dumps(
+                {
+                    "task_id": "T1",
+                    "result_status": "ok",
+                    "elapsed": 3.0,
+                    "steps": [],
+                    "outputs": [{}],
+                }
+            )
+            + "\n"
+        )
+        parser = partial(
+            AgentRun.from_record,
+            question_id_field="task_id",
+            question_id_path=(),
+            inference_path=(),
+            status_field="result_status",
+            wall_field="elapsed",
+            turns_field="steps",
+            candidates_field="outputs",
+        )
+        runs = AgentRun.from_jsonl(path, parser=parser)
+        assert runs[0].question_id == "T1"
+
+
+class TestAgentRunSerialization:
+    def test_to_dict_compact(self) -> None:
+        raw = _autoresearch_record()
+        run = AgentRun.from_record(raw)
+        d = run.to_dict()
+        assert d["question_id"] == "2602.01234"
+        assert d["n_turns"] == 2
+        assert d["tool_calls"] == 1
+        assert d["input_tokens"] == 1024 + 2048
+        assert "raw" not in d
+
+    def test_to_dict_with_raw(self) -> None:
+        raw = _autoresearch_record()
+        run = AgentRun.from_record(raw)
+        d = run.to_dict(include_raw=True)
+        assert d["raw"] == raw
+
+
+class TestSummarizeAgentRuns:
+    def test_empty_runs(self) -> None:
+        s = summarize_agent_runs([])
+        assert s["n_questions"] == 0
+        assert s["status_counts"] == {}
+
+    def test_basic_aggregate(self) -> None:
+        runs = [
+            AgentRun.from_record(_autoresearch_record(status="finished", total_time=10.0)),
+            AgentRun.from_record(
+                _autoresearch_record(status="finished", total_time=20.0, final_candidates=[])
+            ),
+            AgentRun.from_record(_autoresearch_record(status="context_overflow", total_time=5.0)),
+        ]
+        s = summarize_agent_runs(runs, label="llama-3.1-8b")
+        assert s["label"] == "llama-3.1-8b"
+        assert s["n_questions"] == 3
+        assert s["n_succeeded"] == 1  # status=finished AND candidates>0
+        assert s["status_counts"] == {"context_overflow": 1, "finished": 2}
+        assert s["wall_seconds"]["mean"] == pytest.approx(11.67, abs=0.01)
+        assert s["wall_seconds"]["min"] == 5.0
+        assert s["wall_seconds"]["max"] == 20.0
