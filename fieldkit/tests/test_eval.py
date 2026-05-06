@@ -16,13 +16,17 @@ import pytest
 import respx
 
 from fieldkit.eval import (
+    ASSERTION_KINDS,
     BUILTIN_RUBRICS,
     REFUSAL_PATTERNS,
     RUBRIC_CORRECTNESS,
     RUBRIC_FAITHFULNESS,
     RUBRIC_RELEVANCE,
+    AssertionGrader,
+    AssertionResult,
     Bench,
     BenchCall,
+    GradeResult,
     Judge,
     JudgeError,
     JudgeResult,
@@ -648,3 +652,230 @@ class TestTrajectoryAnalysis:
         modes = t.mode_dominance()
         # Two distinct (knob, value) tuples after hashing
         assert len(modes) == 2
+
+
+# --- AssertionGrader -----------------------------------------------------
+
+
+def _make_task(
+    *,
+    task_id: str = "synth-test-00",
+    assertions: list[dict[str, Any]] | None = None,
+    seed_files: list[dict[str, Any]] | None = None,
+) -> dict[str, Any]:
+    return {
+        "task_id": task_id,
+        "verifiable_assertions": assertions or [],
+        "workspace_seed": {"files": seed_files or []},
+    }
+
+
+class TestAssertionGraderKinds:
+    def test_supported_kinds_match_constant(self) -> None:
+        assert AssertionGrader.supported_kinds() == ASSERTION_KINDS
+        assert "file_exists" in ASSERTION_KINDS
+        assert "file_unchanged" in ASSERTION_KINDS
+
+    def test_file_exists_pass_and_fail(self, tmp_path: Path) -> None:
+        (tmp_path / "present.txt").write_text("hi")
+        task = _make_task(
+            assertions=[
+                {"kind": "file_exists", "path": "present.txt"},
+                {"kind": "file_exists", "path": "missing.txt"},
+            ]
+        )
+        result = AssertionGrader().grade(task, tmp_path)
+        assert result.task_id == "synth-test-00"
+        assert result.n_total == 2
+        assert result.n_passed == 1
+        assert not result.passed
+        assert result.assertions[0].passed
+        assert "missing" in result.assertions[1].detail
+
+    def test_file_exists_matches_directory(self, tmp_path: Path) -> None:
+        (tmp_path / "subdir").mkdir()
+        task = _make_task(
+            assertions=[{"kind": "file_exists", "path": "subdir"}]
+        )
+        result = AssertionGrader().grade(task, tmp_path)
+        assert result.passed
+
+    def test_file_not_exists(self, tmp_path: Path) -> None:
+        (tmp_path / "stale.txt").write_text("old")
+        task = _make_task(
+            assertions=[
+                {"kind": "file_not_exists", "path": "stale.txt"},
+                {"kind": "file_not_exists", "path": "absent.txt"},
+            ]
+        )
+        result = AssertionGrader().grade(task, tmp_path)
+        assert not result.assertions[0].passed
+        assert result.assertions[1].passed
+
+    def test_file_contents_contain(self, tmp_path: Path) -> None:
+        (tmp_path / "log.txt").write_text("hello world\nfoo bar\n")
+        task = _make_task(
+            assertions=[
+                {
+                    "kind": "file_contents_contain",
+                    "path": "log.txt",
+                    "must_contain": ["hello", "bar"],
+                },
+                {
+                    "kind": "file_contents_contain",
+                    "path": "log.txt",
+                    "must_contain": ["nope"],
+                },
+                {
+                    "kind": "file_contents_contain",
+                    "path": "nofile.txt",
+                    "must_contain": ["x"],
+                },
+            ]
+        )
+        result = AssertionGrader().grade(task, tmp_path)
+        assert result.assertions[0].passed
+        assert not result.assertions[1].passed
+        assert "missing substrings" in result.assertions[1].detail
+        assert not result.assertions[2].passed
+        assert "file missing" in result.assertions[2].detail
+
+    def test_file_contents_match_regex(self, tmp_path: Path) -> None:
+        (tmp_path / "code.py").write_text("def foo():\n    return 42\n")
+        task = _make_task(
+            assertions=[
+                {
+                    "kind": "file_contents_match_regex",
+                    "path": "code.py",
+                    "regex": r"def\s+foo\(\):",
+                },
+                {
+                    "kind": "file_contents_match_regex",
+                    "path": "code.py",
+                    "regex": r"class\s+",
+                },
+            ]
+        )
+        result = AssertionGrader().grade(task, tmp_path)
+        assert result.assertions[0].passed
+        assert not result.assertions[1].passed
+        assert "regex not matched" in result.assertions[1].detail
+
+    def test_file_unchanged_with_seeds_pass_and_fail(self, tmp_path: Path) -> None:
+        (tmp_path / "config.yml").write_text("a: 1\n")
+        (tmp_path / "drifted.yml").write_text("a: 1\nb: 2\n")
+        task = _make_task(
+            seed_files=[
+                {"kind": "text", "path": "config.yml", "content": "a: 1\n"},
+                {"kind": "text", "path": "drifted.yml", "content": "a: 1\n"},
+            ],
+            assertions=[
+                {"kind": "file_unchanged", "path": "config.yml"},
+                {"kind": "file_unchanged", "path": "drifted.yml"},
+            ],
+        )
+        result = AssertionGrader().grade(task, tmp_path)
+        assert result.assertions[0].passed
+        assert not result.assertions[1].passed
+        assert "diverged" in result.assertions[1].detail
+
+    def test_file_unchanged_without_seed_skipped(self, tmp_path: Path) -> None:
+        (tmp_path / "untouched.txt").write_text("content")
+        task = _make_task(
+            assertions=[{"kind": "file_unchanged", "path": "untouched.txt"}]
+        )
+        # No seed_files given, no workspace_seed entry — assertion is skipped (passes).
+        result = AssertionGrader().grade(task, tmp_path)
+        assert result.assertions[0].passed
+        assert "skipped" in result.assertions[0].detail
+
+    def test_file_unchanged_missing_post_rollout_fails(self, tmp_path: Path) -> None:
+        task = _make_task(
+            seed_files=[{"kind": "text", "path": "x.txt", "content": "v"}],
+            assertions=[{"kind": "file_unchanged", "path": "x.txt"}],
+        )
+        result = AssertionGrader().grade(task, tmp_path)
+        assert not result.assertions[0].passed
+        assert "missing post-rollout" in result.assertions[0].detail
+
+
+class TestAssertionGraderInputShapes:
+    def test_bare_assertions_list(self, tmp_path: Path) -> None:
+        (tmp_path / "a.txt").write_text("hi")
+        result = AssertionGrader().grade(
+            [{"kind": "file_exists", "path": "a.txt"}],
+            tmp_path,
+            task_id="bare-input",
+        )
+        assert result.task_id == "bare-input"
+        assert result.passed
+
+    def test_explicit_seed_overrides_workspace(self, tmp_path: Path) -> None:
+        (tmp_path / "x.txt").write_text("the real contents")
+        task = _make_task(
+            seed_files=[{"kind": "text", "path": "x.txt", "content": "WRONG"}],
+            assertions=[{"kind": "file_unchanged", "path": "x.txt"}],
+        )
+        # workspace_seed says "WRONG" (would fail), explicit seed says "the real contents"
+        result = AssertionGrader().grade(
+            task, tmp_path, seed_files={"x.txt": "the real contents"}
+        )
+        assert result.assertions[0].passed
+
+    def test_unknown_kind_fails_with_detail_not_crashes(
+        self, tmp_path: Path
+    ) -> None:
+        task = _make_task(
+            assertions=[{"kind": "file_is_chmod_777", "path": "anywhere"}]
+        )
+        result = AssertionGrader().grade(task, tmp_path)
+        assert not result.assertions[0].passed
+        assert "unknown kind" in result.assertions[0].detail
+
+    def test_empty_task_grades_as_pass(self, tmp_path: Path) -> None:
+        # Vacuous truth: no assertions = passed (binary AND over empty set).
+        result = AssertionGrader().grade([], tmp_path)
+        assert result.passed
+        assert result.n_total == 0
+
+
+class TestGradeResultSerialization:
+    def test_to_dict_round_trip_shape(self, tmp_path: Path) -> None:
+        (tmp_path / "f.txt").write_text("ok")
+        result = AssertionGrader().grade(
+            _make_task(
+                task_id="t1",
+                assertions=[
+                    {"kind": "file_exists", "path": "f.txt"},
+                    {"kind": "file_not_exists", "path": "f.txt"},  # fail
+                ],
+            ),
+            tmp_path,
+        )
+        d = result.to_dict()
+        assert d["task_id"] == "t1"
+        assert d["passed"] is False
+        assert d["n_passed"] == 1
+        assert d["n_total"] == 2
+        assert isinstance(d["assertions"], list)
+        assert all("kind" in a and "passed" in a for a in d["assertions"])
+
+    def test_assertion_result_to_dict(self) -> None:
+        a = AssertionResult("file_exists", "x.txt", True, "")
+        assert a.to_dict() == {
+            "kind": "file_exists",
+            "path": "x.txt",
+            "passed": True,
+            "detail": "",
+        }
+
+    def test_grade_result_is_immutable(self) -> None:
+        result = GradeResult(
+            task_id="x",
+            passed=True,
+            n_passed=0,
+            n_total=0,
+            assertions=[],
+        )
+        with pytest.raises(AttributeError):
+            result.task_id = "y"  # type: ignore[misc]

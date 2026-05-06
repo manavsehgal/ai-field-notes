@@ -39,8 +39,11 @@ from typing import Any
 from fieldkit.nim import NIMClient, NIMError
 
 __all__ = [
+    "AssertionGrader",
+    "AssertionResult",
     "Bench",
     "BenchCall",
+    "GradeResult",
     "Judge",
     "JudgeError",
     "JudgeResult",
@@ -51,6 +54,7 @@ __all__ = [
     "RUBRIC_RELEVANCE",
     "BUILTIN_RUBRICS",
     "REFUSAL_PATTERNS",
+    "ASSERTION_KINDS",
     "is_refusal",
     "summarize_metric",
 ]
@@ -802,3 +806,227 @@ def _hashable(v: Any) -> Any:
         return v
     except TypeError:
         return str(v)
+
+
+# --- AssertionGrader -----------------------------------------------------
+
+
+ASSERTION_KINDS: tuple[str, ...] = (
+    "file_exists",
+    "file_not_exists",
+    "file_contents_contain",
+    "file_contents_match_regex",
+    "file_unchanged",
+)
+"""The five programmatic assertion primitives the grader supports.
+
+Lifted verbatim from `articles/clawgym-on-spark/scripts/grader.py` —
+the `clawgym-on-spark` synth corpus uses exactly this set, with each
+assertion verifying a post-rollout file-system state. LLM-as-judge
+flavored grading lives separately in `fieldkit.eval.Judge`.
+"""
+
+
+@dataclass(frozen=True, slots=True)
+class AssertionResult:
+    """One assertion's outcome: kind, path, pass/fail, and optional detail.
+
+    `detail` is empty on pass; on failure it records the proximate cause
+    (missing path, regex did not match, divergent contents, etc.) so a
+    grade dump is debuggable without re-running the rollout.
+    """
+
+    kind: str
+    path: str
+    passed: bool
+    detail: str = ""
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "kind": self.kind,
+            "path": self.path,
+            "passed": self.passed,
+            "detail": self.detail,
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class GradeResult:
+    """A task's overall grade: per-assertion outcomes plus binary AND.
+
+    `passed` is True iff every assertion passed. `n_passed` / `n_total`
+    enable per-assertion-rate metrics across a task batch — the
+    `articles/clawgym-on-spark` lift used these for the per-persona +
+    per-assertion-kind breakdowns the article reports.
+    """
+
+    task_id: str
+    passed: bool
+    n_passed: int
+    n_total: int
+    assertions: list[AssertionResult]
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "task_id": self.task_id,
+            "passed": self.passed,
+            "n_passed": self.n_passed,
+            "n_total": self.n_total,
+            "assertions": [a.to_dict() for a in self.assertions],
+        }
+
+
+@dataclass
+class AssertionGrader:
+    """Pure-function grader over five file-system assertion primitives.
+
+    Usage::
+
+        from pathlib import Path
+        from fieldkit.eval import AssertionGrader
+
+        grader = AssertionGrader()
+        result = grader.grade(
+            task,                                 # SynthTask-shaped dict OR bare list
+            post_state_root=Path("/tmp/sandbox-N"),
+        )
+        print(result.passed, result.n_passed, result.n_total)
+
+    The grader is intentionally a pure function over the file system —
+    no LLM, no fuzzy matching, no scoring. The five supported kinds are
+    listed in `ASSERTION_KINDS`; an unknown kind fails the assertion with
+    a `"unknown kind: <k>"` detail rather than crashing the grade.
+
+    `task` accepts either:
+
+    - **a SynthTask-shaped dict** — must have ``verifiable_assertions``,
+      and may have ``task_id`` and ``workspace_seed.files`` (the latter
+      auto-populates ``seed_files`` for ``file_unchanged`` checks);
+    - **a bare list of assertion dicts** — each entry has
+      ``kind``, ``path``, plus kind-specific keys (``must_contain``,
+      ``regex``).
+
+    `seed_files` is the pre-rollout text-content map for ``file_unchanged``
+    assertions; without it those assertions report "skipped (no seed
+    content)" and count as pass. Pass it explicitly to enforce.
+    """
+
+    @staticmethod
+    def supported_kinds() -> tuple[str, ...]:
+        """The exact tuple from `ASSERTION_KINDS`. Useful for menus / docs."""
+        return ASSERTION_KINDS
+
+    def grade(
+        self,
+        task: dict[str, Any] | Sequence[dict[str, Any]],
+        post_state_root: str | Path,
+        *,
+        seed_files: dict[str, str] | None = None,
+        task_id: str = "",
+    ) -> GradeResult:
+        """Evaluate one task's assertions against a post-rollout directory.
+
+        The grader walks each assertion in declaration order. A binary AND
+        of pass/fail across all assertions becomes `GradeResult.passed`.
+        Per-assertion failures are surfaced in `GradeResult.assertions`
+        with a `detail` string explaining the proximate cause.
+        """
+        root = Path(post_state_root)
+        assertions, derived_seeds, derived_id = self._unpack_task(task)
+        if seed_files is None:
+            seed_files = derived_seeds
+        if not task_id:
+            task_id = derived_id
+
+        results: list[AssertionResult] = []
+        for a in assertions:
+            kind = a.get("kind", "")
+            rel = a.get("path", "")
+            full = root / rel
+            results.append(self._grade_one(kind, rel, full, a, seed_files))
+
+        n_passed = sum(1 for r in results if r.passed)
+        return GradeResult(
+            task_id=task_id,
+            passed=all(r.passed for r in results),
+            n_passed=n_passed,
+            n_total=len(results),
+            assertions=results,
+        )
+
+    def _grade_one(
+        self,
+        kind: str,
+        rel: str,
+        full: Path,
+        a: dict[str, Any],
+        seed_files: dict[str, str],
+    ) -> AssertionResult:
+        if kind == "file_exists":
+            ok = full.exists()
+            return AssertionResult(kind, rel, ok, "" if ok else "path missing")
+        if kind == "file_not_exists":
+            ok = not full.exists()
+            return AssertionResult(kind, rel, ok, "" if ok else "file still present")
+        if kind == "file_contents_contain":
+            if not full.is_file():
+                return AssertionResult(kind, rel, False, "file missing")
+            try:
+                body = full.read_text(errors="replace")
+            except OSError as exc:
+                return AssertionResult(kind, rel, False, f"read error: {exc}")
+            missing = [s for s in a.get("must_contain", []) if s not in body]
+            ok = not missing
+            return AssertionResult(
+                kind, rel, ok, "" if ok else f"missing substrings: {missing}"
+            )
+        if kind == "file_contents_match_regex":
+            if not full.is_file():
+                return AssertionResult(kind, rel, False, "file missing")
+            try:
+                body = full.read_text(errors="replace")
+                regex = a.get("regex", "")
+                ok = re.search(regex, body) is not None
+            except (OSError, re.error) as exc:
+                return AssertionResult(kind, rel, False, f"error: {exc}")
+            return AssertionResult(kind, rel, ok, "" if ok else "regex not matched")
+        if kind == "file_unchanged":
+            seed = seed_files.get(rel)
+            if seed is None:
+                return AssertionResult(
+                    kind, rel, True, "skipped (no seed content)"
+                )
+            if not full.is_file():
+                return AssertionResult(
+                    kind, rel, False, "file missing post-rollout"
+                )
+            try:
+                body = full.read_text(errors="replace")
+            except OSError as exc:
+                return AssertionResult(kind, rel, False, f"read error: {exc}")
+            ok = body == seed
+            return AssertionResult(
+                kind, rel, ok, "" if ok else "contents diverged from seed"
+            )
+        return AssertionResult(kind, rel, False, f"unknown kind: {kind}")
+
+    @staticmethod
+    def _unpack_task(
+        task: dict[str, Any] | Sequence[dict[str, Any]],
+    ) -> tuple[Sequence[dict[str, Any]], dict[str, str], str]:
+        """Return ``(assertions, seed_files, task_id)`` from either input shape.
+
+        Dict input: pulls `verifiable_assertions`, derives seeds from
+        `workspace_seed.files` text entries, takes `task_id`. List input:
+        used as-is, no seeds derivable, no task_id.
+        """
+        if isinstance(task, dict):
+            assertions: Sequence[dict[str, Any]] = task.get(
+                "verifiable_assertions", []
+            )
+            seeds: dict[str, str] = {}
+            for f in (task.get("workspace_seed") or {}).get("files", []):
+                if f.get("kind") == "text":
+                    seeds[f.get("path", "")] = f.get("content", "")
+            return assertions, seeds, str(task.get("task_id", ""))
+        return task, {}, ""
