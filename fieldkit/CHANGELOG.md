@@ -6,7 +6,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
-Second public release in progress. One new module (`fieldkit.training`) plus four extensions to the v0.1 `fieldkit.eval` surface, all lifted from articles in [ai-field-notes](https://ainative.business/field-notes/) — primarily the `clawgym-on-spark` and Frontier Scout arcs. The `fieldkit.agents` and `fieldkit.inference` modules originally targeted for v0.2 are deferred to v0.3+ because their public APIs need a second article's use case to lock in (see "Deferred to v0.3+" below).
+## [0.2.0] — 2026-05-05
+
+Second public release. One new module (`fieldkit.training`) plus four extensions to the v0.1 `fieldkit.eval` surface, all lifted from articles in [ai-field-notes](https://ainative.business/field-notes/) — primarily the `clawgym-on-spark` and Frontier Scout arcs. The `fieldkit.agents` and `fieldkit.inference` modules originally targeted for v0.2 are deferred to v0.3+ because their public APIs need a second article's use case to lock in (see "Deferred to v0.3+" below).
 
 ### Added — `fieldkit.training` (new module)
 
@@ -24,9 +26,20 @@ Four new primitives that extend the v0.1 eval surface (`Bench`, `Judge`, `Trajec
 - **`fieldkit.eval.AgentRun`** + **`TurnDetail`** + **`summarize_agent_runs`** — per-question, per-turn schema for any third-party agent bench. Default constructor handles the AutoResearchBench JSONL shape (`input_data.arxiv_id`, `inference_results[0].turn_details/total_time/...`); `from_record(...)` accepts field-name overrides for other bench layouts. `TurnDetail` carries five canonical fields (turn, action, duration_s, input/output tokens) plus an `extras` dict so bench-specific fields (e.g. `papers_retrieved`, `parse_errors`) survive round-tripping. `summarize_agent_runs()` rolls up status counts + `wall_seconds` / `turns` / `candidates` / `tool_calls` / `tool_format_errors` summaries. Source: `articles/autoresearchbench-on-spark/scripts/analyze_run.py`. ([extract from #autoresearchbench-on-spark])
 - **`fieldkit.eval.MatchedBaseComparison`** + **`GroupStats`** + **`MatchedBaseComparisonResult`** — held-out task split + two-rollout driver + per-group / per-assertion-kind delta. The "filter held-out by training-set membership, run rollout twice with different `--model`, emit B-A comparison" pattern is reusable for any LoRA / adapter ablation. Default `group_extractor` splits `synth-<persona>-NN` task IDs into the persona; pass any `Callable[[str], str]` for other task-id schemes, or `None` to disable per-group breakdown. Accepts trajectories as in-memory dicts or a JSONL path. `.report()` returns a markdown summary table. Source: `articles/clawgym-on-spark/scripts/compare_phase5.py`. ([extract from #clawgym-on-spark])
 
-### Verified on Spark
+### Articles in this release
 
-All 220 unit tests pass offline (`pytest -q`) plus 12 additional `fieldkit.training` tests gate on `pytest.importorskip("torch")` so the suite skips cleanly in pure-inference dev envs and runs end-to-end in any env with torch installed. The torch-dependent tests reproduce the snapshot/swap and L2 / max|Δ| math byte-identical to the GRPO trainer's behavior.
+Articles whose `fieldkit_modules` frontmatter assumes v0.2 (added since v0.1.0):
+
+- [`autoresearchbench-on-spark`](https://ainative.business/field-notes/autoresearchbench-on-spark/) — surfaced `fieldkit.eval.AgentRun`.
+- [`test-time-distilling-for-exploration`](https://ainative.business/field-notes/test-time-distilling-for-exploration/) — surfaced the deferred `fieldkit.inference.VLLMClient`.
+- [`runtime-frontier-six-patches-on-spark`](https://ainative.business/field-notes/runtime-frontier-six-patches-on-spark/) — surfaced `fieldkit.eval.PassAtK` (matured in the seventh-patch follow-up).
+- [`pass-at-k-after-the-seventh-patch`](https://ainative.business/field-notes/pass-at-k-after-the-seventh-patch/) — anchor article for `fieldkit.eval.PassAtK`.
+- [`clawgym-on-spark`](https://ainative.business/field-notes/clawgym-on-spark/) — surfaced `fieldkit.eval.AssertionGrader`, `fieldkit.eval.MatchedBaseComparison`, plus the deferred `fieldkit.agents` substrate.
+- [`clawgym-on-spark-grpo`](https://ainative.business/field-notes/clawgym-on-spark-grpo/) — surfaced the entire `fieldkit.training` module (`LoraReferenceSnapshot`, `WeightDeltaTracker`).
+
+### Test suite
+
+**232 passed, 2 skipped** offline (`pytest -q`) — covers all v0.1 surface plus 16 + 19 + 16 + 12 + 12 = 75 new tests for the v0.2 additions. Reproduce: `pip install fieldkit[dev]` then `pytest`. The `fieldkit.training` tests gate on `pytest.importorskip("torch")` so the suite skips cleanly in pure-inference dev envs and runs end-to-end in any env with torch installed. v0.1's live `--spark` integration tests still pass against warm NIMs + pgvector — none were modified in this release.
 
 ### Deferred to v0.3+
 
