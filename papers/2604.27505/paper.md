@@ -1,15 +1,15 @@
 ---
 arxiv_id: 2604.27505
-title: Leveraging Verifier-Based Reinforcement Learning in Image Editing
+title: "Leveraging Verifier-Based Reinforcement Learning in Image Editing"
 published: 2026-04-29
+primary_category: unknown
 hf_upvotes: 18
-popularity_score: 23
+popularity_score: 22
 suggested_stage: fine-tuning
 suggested_series: Frontier Scout
 fast_verdict: borderline
 relevance_score: 0.5
 has_deep_eval: false
-promoted_to: null
 abs_url: https://arxiv.org/abs/2604.27505
 pdf_url: https://arxiv.org/pdf/2604.27505
 hf_paper_url: https://huggingface.co/papers/2604.27505
@@ -17,7 +17,7 @@ hf_paper_url: https://huggingface.co/papers/2604.27505
 
 # Leveraging Verifier-Based Reinforcement Learning in Image Editing
 
-**Verdict:** borderline · **Series:** Frontier Scout · **Stage:** fine-tuning · **Relevance:** 0.5 · **Popularity:** 23/100
+**Verdict:** borderline · **Series:** Frontier Scout · **Stage:** fine-tuning · **Relevance:** 0.50 · **Popularity:** 22/100
 
 > CoT reasoning verifier RM + RLHF for image editing is multi-stage and image-domain; whether it fits depends on backbone scale.
 
@@ -37,10 +37,11 @@ _No public repo yet._
 
 ## Citations
 
-_not yet indexed_
+`citations: not yet indexed`
 
 ## Links
 
 - [arXiv abstract](https://arxiv.org/abs/2604.27505)
 - [PDF](https://arxiv.org/pdf/2604.27505)
 - [HuggingFace daily papers](https://huggingface.co/papers/2604.27505)
+

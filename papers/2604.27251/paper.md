@@ -2,14 +2,14 @@
 arxiv_id: 2604.27251
 title: "Compliance versus Sensibility: On the Reasoning Controllability in Large Language Models"
 published: 2026-04-28
+primary_category: unknown
 hf_upvotes: 5
-popularity_score: 14
+popularity_score: 13
 suggested_stage: inference
 suggested_series: LLM Wiki
 fast_verdict: spark-feasible
 relevance_score: 0.55
 has_deep_eval: false
-promoted_to: null
 abs_url: https://arxiv.org/abs/2604.27251
 pdf_url: https://arxiv.org/pdf/2604.27251
 hf_paper_url: https://huggingface.co/papers/2604.27251
@@ -17,7 +17,7 @@ hf_paper_url: https://huggingface.co/papers/2604.27251
 
 # Compliance versus Sensibility: On the Reasoning Controllability in Large Language Models
 
-**Verdict:** spark-feasible · **Series:** LLM Wiki · **Stage:** inference · **Relevance:** 0.55 · **Popularity:** 14/100
+**Verdict:** spark-feasible · **Series:** LLM Wiki · **Stage:** inference · **Relevance:** 0.55 · **Popularity:** 13/100
 
 > Behavioral study of induction/deduction/abduction conflicts in LLMs is a pure-inference replication runnable against any NIM-hosted model.
 
@@ -37,10 +37,11 @@ _No public repo yet._
 
 ## Citations
 
-_not yet indexed_
+`citations: not yet indexed`
 
 ## Links
 
 - [arXiv abstract](https://arxiv.org/abs/2604.27251)
 - [PDF](https://arxiv.org/pdf/2604.27251)
 - [HuggingFace daily papers](https://huggingface.co/papers/2604.27251)
+

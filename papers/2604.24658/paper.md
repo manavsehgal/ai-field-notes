@@ -2,14 +2,14 @@
 arxiv_id: 2604.24658
 title: "The Last Human-Written Paper: Agent-Native Research Artifacts"
 published: 2026-04-28
+primary_category: unknown
 hf_upvotes: 7
-popularity_score: 16
+popularity_score: 15
 suggested_stage: agentic
 suggested_series: Autoresearch
 fast_verdict: spark-feasible
 relevance_score: 0.6
 has_deep_eval: false
-promoted_to: null
 abs_url: https://arxiv.org/abs/2604.24658
 pdf_url: https://arxiv.org/pdf/2604.24658
 hf_paper_url: https://huggingface.co/papers/2604.24658
@@ -17,7 +17,7 @@ hf_paper_url: https://huggingface.co/papers/2604.24658
 
 # The Last Human-Written Paper: Agent-Native Research Artifacts
 
-**Verdict:** spark-feasible · **Series:** Autoresearch · **Stage:** agentic · **Relevance:** 0.6 · **Popularity:** 16/100
+**Verdict:** spark-feasible · **Series:** Autoresearch · **Stage:** agentic · **Relevance:** 0.60 · **Popularity:** 15/100
 
 > Agent-native research artifact protocol is process + tooling — implementable as a NemoClaw skill atop NIM-hosted reasoning models on Spark.
 
@@ -37,10 +37,11 @@ _No public repo yet._
 
 ## Citations
 
-_not yet indexed_
+`citations: not yet indexed`
 
 ## Links
 
 - [arXiv abstract](https://arxiv.org/abs/2604.24658)
 - [PDF](https://arxiv.org/pdf/2604.24658)
 - [HuggingFace daily papers](https://huggingface.co/papers/2604.24658)
+

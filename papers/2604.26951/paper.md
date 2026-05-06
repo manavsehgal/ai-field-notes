@@ -2,14 +2,14 @@
 arxiv_id: 2604.26951
 title: "Turning the TIDE: Cross-Architecture Distillation for Diffusion Large Language Models"
 published: 2026-04-28
+primary_category: unknown
 hf_upvotes: 40
-popularity_score: 29
+popularity_score: 27
 suggested_stage: fine-tuning
 suggested_series: Frontier Scout
 fast_verdict: borderline
 relevance_score: 0.62
 has_deep_eval: false
-promoted_to: null
 abs_url: https://arxiv.org/abs/2604.26951
 pdf_url: https://arxiv.org/pdf/2604.26951
 hf_paper_url: https://huggingface.co/papers/2604.26951
@@ -17,7 +17,7 @@ hf_paper_url: https://huggingface.co/papers/2604.26951
 
 # Turning the TIDE: Cross-Architecture Distillation for Diffusion Large Language Models
 
-**Verdict:** borderline · **Series:** Frontier Scout · **Stage:** fine-tuning · **Relevance:** 0.62 · **Popularity:** 29/100
+**Verdict:** borderline · **Series:** Frontier Scout · **Stage:** fine-tuning · **Relevance:** 0.62 · **Popularity:** 27/100
 
 > 8B dense and 16B MoE teachers distilling into 0.6B student fits the 128 GB envelope, but full TIDE training pipeline is heavy and dLLM tooling on NeMo is unproven.
 
@@ -37,10 +37,11 @@ _No public repo yet._
 
 ## Citations
 
-_not yet indexed_
+`citations: not yet indexed`
 
 ## Links
 
 - [arXiv abstract](https://arxiv.org/abs/2604.26951)
 - [PDF](https://arxiv.org/pdf/2604.26951)
 - [HuggingFace daily papers](https://huggingface.co/papers/2604.26951)
+

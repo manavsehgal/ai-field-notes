@@ -1,9 +1,10 @@
 ---
 arxiv_id: 2604.27351
-title: Heterogeneous Scientific Foundation Model Collaboration
+title: "Heterogeneous Scientific Foundation Model Collaboration"
 published: 2026-04-29
+primary_category: unknown
 hf_upvotes: 181
-popularity_score: 41
+popularity_score: 39
 suggested_stage: agentic
 suggested_series: Autoresearch
 fast_verdict: spark-feasible
@@ -18,7 +19,7 @@ hf_paper_url: https://huggingface.co/papers/2604.27351
 
 # Heterogeneous Scientific Foundation Model Collaboration
 
-**Verdict:** spark-feasible · **Series:** Autoresearch · **Stage:** agentic · **Relevance:** 0.65 · **Popularity:** 41/100
+**Verdict:** spark-feasible · **Series:** Autoresearch · **Stage:** agentic · **Relevance:** 0.65 · **Popularity:** 39/100
 
 > Lightweight LLM-orchestrator over domain foundation models is software glue that fits NemoClaw/NIM; underlying scientific FMs would be hosted as endpoints.
 
@@ -38,7 +39,7 @@ _No public repo yet._
 
 ## Citations
 
-_not yet indexed_
+`citations: not yet indexed`
 
 ## Links
 
@@ -53,3 +54,4 @@ _not yet indexed_
 ## Promoted
 
 This paper has been promoted to `articles/scientific-foundation-models-as-tools/` (status: upcoming).
+

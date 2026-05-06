@@ -1,14 +1,14 @@
 {
-  "generated_at": "2026-05-02T06:23:56.817Z",
+  "generated_at": "2026-05-06T17:30:00.000Z",
   "config": {
     "hf_days": 30,
     "arxiv_limit": 60,
     "relevance_threshold": 0.5
   },
   "counts": {
-    "total": 21,
-    "classified_this_run": 25,
-    "dropped_low_relevance": 9
+    "total": 36,
+    "classified_this_run": 15,
+    "dropped_low_relevance": 15
   },
   "papers": [
     {
@@ -43,7 +43,7 @@
         "fast_verdict": "spark-feasible",
         "one_line_rationale": "Lightweight LLM-orchestrator over domain foundation models is software glue that fits NemoClaw/NIM; underlying scientific FMs would be hosted as endpoints."
       },
-      "popularity_score": 41,
+      "popularity_score": 39,
       "deep_eval": {
         "path": "papers/2604.27351/eval.md",
         "evaluated_at": "2026-05-02T06:42:58.803Z",
@@ -58,6 +58,41 @@
         "article_slug": "scientific-foundation-models-as-tools",
         "status": "upcoming"
       }
+    },
+    {
+      "arxiv_id": "2604.27660",
+      "title": "From Context to Skills: Can Language Models Learn from Context Skillfully?",
+      "authors": [],
+      "abstract": "Many real-world tasks require language models (LMs) to reason over complex contexts that exceed their parametric knowledge. This calls for context learning, where LMs directly learn relevant knowledge from the given context. An intuitive solution is inference-time skill augmentation: extracting the rules and procedures from context into natural-language skills. However, constructing such skills for context learning scenarios faces two challenges: the prohibitive cost of manual skill annotation for long, technically dense contexts, and the lack of external feedback for automated skill construction. In this paper, we propose Ctx2Skill, a self-evolving framework that autonomously discovers, refines, and selects context-specific skills without human supervision or external feedback. At its core, a multi-agent self-play loop has a Challenger that generates probing tasks and rubrics, a Reasoner that attempts to solve them guided by an evolving skill set, and a neutral Judge that provides binary feedback. Crucially, both the Challenger and the Reasoner evolve through accumulated skills: dedicated Proposer and Generator agents analyze failure cases and synthesize them into targeted skill updates for both sides, enabling automated skill discovery and refinement. To prevent adversarial collapse caused by increasingly extreme task generation and over-specialized skill accumulation, we further introduce a Cross-time Replay mechanism that identifies the skill set achieving the best balance across representative cases for the Reasoner side, ensuring robust and generalizable skill evolution. The resulting skills can be plugged into any language model to obtain better context learning capability. Evaluated on four context learning tasks from CL-bench, Ctx2Skill consistently improves solving rates across backbone models.",
+      "published": "2026-05-02T20:00:00.000Z",
+      "primary_category": null,
+      "abs_url": "https://arxiv.org/abs/2604.27660",
+      "pdf_url": "https://arxiv.org/pdf/2604.27660",
+      "hf_upvotes": 132,
+      "hf_paper_url": "https://huggingface.co/papers/2604.27660",
+      "citations": null,
+      "repos": [],
+      "has_code": false,
+      "classify": {
+        "suggested_stage": "inference",
+        "suggested_series": "LLM Wiki",
+        "topic_tags": [
+          "context-learning",
+          "skills",
+          "in-context",
+          "evals",
+          "structured-generation"
+        ],
+        "nvidia_stack": [
+          "NIM"
+        ],
+        "relevance_score": 0.75,
+        "fast_verdict": "spark-feasible",
+        "one_line_rationale": "Inference-time skill extraction from long context \u2014 a NIM-hostable LLM workflow, easy to stand up on Spark for an 'LLM Wiki' study."
+      },
+      "popularity_score": 38,
+      "deep_eval": null,
+      "promoted_to": null
     },
     {
       "arxiv_id": "2604.26752",
@@ -90,7 +125,44 @@
         "fast_verdict": "borderline",
         "one_line_rationale": "GLM-5V-Turbo is a frontier multimodal agent model; only borderline for Spark inference depending on released parameter count and quantization."
       },
-      "popularity_score": 35,
+      "popularity_score": 33,
+      "deep_eval": null,
+      "promoted_to": null
+    },
+    {
+      "arxiv_id": "2605.03042",
+      "title": "ARIS: Autonomous Research via Adversarial Multi-Agent Collaboration",
+      "authors": [],
+      "abstract": "This report describes ARIS (Auto-Research-in-sleep), an open-source research harness for autonomous research, including its architecture, assurance mechanisms, and early deployment experience. The performance of agent systems built on LLMs depends on both the model weights and the harness around them, which governs what information to store, retrieve, and present to the model. For long-horizon research workflows, the central failure mode is not a visible breakdown but a plausible unsupported success: a long-running agent can produce claims whose evidential support is incomplete, misreported, or silently inherited from the executor's framing. Therefore, we present ARIS as a research harness that coordinates machine-learning research workflows through cross-model adversarial collaboration as a default configuration: an executor model drives forward progress while a reviewer from a different model family is recommended to critique intermediate artifacts and request revisions. ARIS has three architectural layers. The execution layer provides more than 65 reusable Markdown-defined skills, model integrations via MCP, a persistent research wiki for iterative reuse of prior findings, and deterministic figure generation. The orchestration layer coordinates five end-to-end workflows with adjustable effort settings and configurable routing to reviewer models. The assurance layer includes a three-stage process for checking whether experimental claims are supported by evidence: integrity verification, result-to-claim mapping, and claim auditing that cross-checks manuscript statements against the claim ledger and raw evidence, as well as a five-pass scientific-editing pipeline, mathematical-proof checks, and visual inspection of the rendered PDF. A prototype self-improvement loop records research traces and proposes harness improvements that are adopted only after reviewer approval.",
+      "published": "2026-05-03T20:00:00.000Z",
+      "primary_category": null,
+      "abs_url": "https://arxiv.org/abs/2605.03042",
+      "pdf_url": "https://arxiv.org/pdf/2605.03042",
+      "hf_upvotes": 65,
+      "hf_paper_url": "https://huggingface.co/papers/2605.03042",
+      "citations": null,
+      "repos": [],
+      "has_code": false,
+      "classify": {
+        "suggested_stage": "agentic",
+        "suggested_series": "Autoresearch",
+        "topic_tags": [
+          "agentic",
+          "autoresearch",
+          "multi-agent",
+          "orchestration",
+          "evals"
+        ],
+        "nvidia_stack": [
+          "NIM",
+          "NemoClaw",
+          "Guardrails"
+        ],
+        "relevance_score": 0.85,
+        "fast_verdict": "spark-feasible",
+        "one_line_rationale": "Open-source autonomous-research harness with adversarial review \u2014 direct Autoresearch-arc material; runs over hosted NIM endpoints."
+      },
+      "popularity_score": 33,
       "deep_eval": null,
       "promoted_to": null
     },
@@ -128,7 +200,7 @@
         "fast_verdict": "spark-feasible",
         "one_line_rationale": "Lightweight test-time distiller plus reweighted sampling on existing open-weight reasoning models fits comfortably within Spark's 128 GB inference envelope."
       },
-      "popularity_score": 31,
+      "popularity_score": 29,
       "deep_eval": {
         "path": "papers/2604.24927/eval.md",
         "evaluated_at": "2026-05-02T06:42:58.803Z",
@@ -180,7 +252,7 @@
         "fast_verdict": "spark-feasible",
         "one_line_rationale": "Claw-style sandboxed agent SFT + lightweight RL on per-task sandboxes maps directly onto NemoClaw + NeMo fine-tuning within the 128 GB envelope."
       },
-      "popularity_score": 30,
+      "popularity_score": 28,
       "deep_eval": {
         "path": "papers/2604.26904/eval.md",
         "evaluated_at": "2026-05-02T06:42:58.803Z",
@@ -194,6 +266,52 @@
         "article_slug": "clawgym-on-spark",
         "status": "upcoming"
       }
+    },
+    {
+      "arxiv_id": "2605.04036",
+      "title": "OpenSeeker-v2: Pushing the Limits of Search Agents with Informative and High-Difficulty Trajectories",
+      "authors": [
+        "Yuwen Du",
+        "Rui Ye",
+        "Shuo Tang",
+        "Keduan Huang",
+        "Xinyu Zhu",
+        "Yuzhu Cai",
+        "Siheng Chen"
+      ],
+      "abstract": "Deep search capabilities have become an indispensable competency for frontier Large Language Model (LLM) agents, yet their development remains dominated by industrial giants. The typical industry recipe involves a highly resource-intensive pipeline spanning pre-training, continual pre-training (CPT), supervised fine-tuning (SFT), and reinforcement learning (RL). In this report, we show that when fueled with informative and high-difficulty trajectories, a simple SFT approach could be surprisingly powerful for training frontier search agents. By introducing three simple data synthesis modifications: scaling knowledge graph size for richer exploration, expanding the tool set size for broader functionality, and strict low-step filtering, we establish a stronger baseline. Trained on merely 10.6k data points, our OpenSeeker-v2 achieves state-of-the-art performance across 4 benchmarks (30B-sized agents with ReAct paradigm): 46.0% on BrowseComp, 58.1% on BrowseComp-ZH, 34.6% on Humanity's Last Exam, and 78.0% on xbench, surpassing even Tongyi DeepResearch trained with heavy CPT+SFT+RL pipeline, which achieves 43.4%, 46.7%, 32.9%, and 75.0%, respectively. Notably, OpenSeeker-v2 represents the first state-of-the-art search agent within its model scale and paradigm to be developed by a purely academic team using only SFT. We are excited to open-source the OpenSeeker-v2 model weights and share our simple yet effective findings to make frontier search agent research more accessible to the community.",
+      "published": "2026-05-04T20:00:00.000Z",
+      "primary_category": "cs.AI",
+      "abs_url": "https://arxiv.org/abs/2605.04036",
+      "pdf_url": "https://arxiv.org/pdf/2605.04036",
+      "hf_upvotes": 36,
+      "hf_paper_url": "https://huggingface.co/papers/2605.04036",
+      "citations": null,
+      "repos": [],
+      "has_code": false,
+      "classify": {
+        "suggested_stage": "fine-tuning",
+        "suggested_series": "Autoresearch",
+        "topic_tags": [
+          "agentic",
+          "search-agents",
+          "sft",
+          "lora",
+          "trajectories",
+          "evals"
+        ],
+        "nvidia_stack": [
+          "NIM",
+          "NeMo",
+          "NemoClaw"
+        ],
+        "relevance_score": 0.78,
+        "fast_verdict": "spark-feasible",
+        "one_line_rationale": "SFT-only recipe for deep-search agents at small scale \u2014 high-signal trajectories + LoRA on a 7B base fits the Spark."
+      },
+      "popularity_score": 28,
+      "deep_eval": null,
+      "promoted_to": null
     },
     {
       "arxiv_id": "2604.26951",
@@ -228,7 +346,43 @@
         "fast_verdict": "borderline",
         "one_line_rationale": "8B dense and 16B MoE teachers distilling into 0.6B student fits the 128 GB envelope, but full TIDE training pipeline is heavy and dLLM tooling on NeMo is unproven."
       },
-      "popularity_score": 29,
+      "popularity_score": 27,
+      "deep_eval": null,
+      "promoted_to": null
+    },
+    {
+      "arxiv_id": "2604.28123",
+      "title": "Beyond SFT-to-RL: Pre-alignment via Black-Box On-Policy Distillation for Multimodal RL",
+      "authors": [],
+      "abstract": "The standard post-training recipe for large multimodal models (LMMs) applies supervised fine-tuning (SFT) on curated demonstrations followed by reinforcement learning with verifiable rewards (RLVR). However, SFT introduces distributional drift that neither preserves the model's original capabilities nor faithfully matches the supervision distribution. This problem is further amplified in multimodal reasoning, where perception errors and reasoning failures follow distinct drift patterns that compound during subsequent RL. We introduce PRISM, a three-stage pipeline that mitigates this drift by inserting an explicit distribution-alignment stage between SFT and RLVR. Building on the principle of on-policy distillation (OPD), PRISM casts alignment as a black-box, response-level adversarial game between the policy and a Mixture-of-Experts (MoE) discriminator with dedicated perception and reasoning experts, providing disentangled corrective signals that steer the policy toward the supervision distribution without requiring access to teacher logits. While 1.26M public demonstrations suffice for broad SFT initialization, distribution alignment demands higher-fidelity supervision; we therefore curate 113K additional demonstrations from Gemini 3 Flash, featuring dense visual grounding and step-by-step reasoning on the hardest unsolved problems. Experiments on Qwen3-VL show that PRISM consistently improves downstream RLVR performance across multiple RL algorithms (GRPO, DAPO, GSPO) and diverse multimodal benchmarks, improving average accuracy by +4.4 and +6.0 points over the SFT-to-RLVR baseline on 4B and 8B, respectively. Our code, data, and model checkpoints are publicly available at https://github.com/XIAO4579/PRISM.",
+      "published": "2026-04-30T20:00:00.000Z",
+      "primary_category": null,
+      "abs_url": "https://arxiv.org/abs/2604.28123",
+      "pdf_url": "https://arxiv.org/pdf/2604.28123",
+      "hf_upvotes": 34,
+      "hf_paper_url": "https://huggingface.co/papers/2604.28123",
+      "citations": null,
+      "repos": [],
+      "has_code": false,
+      "classify": {
+        "suggested_stage": "fine-tuning",
+        "suggested_series": "LLM Wiki",
+        "topic_tags": [
+          "distillation",
+          "rl",
+          "multimodal",
+          "post-training",
+          "lora"
+        ],
+        "nvidia_stack": [
+          "NeMo",
+          "NIM"
+        ],
+        "relevance_score": 0.75,
+        "fast_verdict": "spark-feasible",
+        "one_line_rationale": "Black-box on-policy distillation as pre-alignment for multimodal RL \u2014 small-student distillation is in the Spark envelope."
+      },
+      "popularity_score": 27,
       "deep_eval": null,
       "promoted_to": null
     },
@@ -262,7 +416,7 @@
         "fast_verdict": "borderline",
         "one_line_rationale": "Co-evolving multiple experts in parallel during RLVR is memory-heavy; whether it fits the 128 GB unified pool depends on expert sizes."
       },
-      "popularity_score": 28,
+      "popularity_score": 26,
       "deep_eval": null,
       "promoted_to": null
     },
@@ -302,7 +456,7 @@
         "fast_verdict": "spark-feasible",
         "one_line_rationale": "Agent-driven literature discovery benchmark fits Autoresearch arc; runnable on Spark via NemoClaw + NIM + NeMo Retriever with pgvector, no training needed."
       },
-      "popularity_score": 26,
+      "popularity_score": 24,
       "deep_eval": {
         "path": "papers/2604.25256/eval.md",
         "evaluated_at": "2026-05-02T06:42:58.803Z",
@@ -347,7 +501,7 @@
         "fast_verdict": "borderline",
         "one_line_rationale": "Multi-consumer-GPU pipeline-parallel scheduler doesn't run on Spark's single GB10, but the throughput math extrapolates cleanly into Looking Beyond Spark."
       },
-      "popularity_score": 26,
+      "popularity_score": 24,
       "deep_eval": null,
       "promoted_to": null
     },
@@ -397,7 +551,7 @@
         "fast_verdict": "spark-feasible",
         "one_line_rationale": "Live agent benchmark with execution traces and graders maps cleanly onto NemoClaw/OpenClaw sandboxed agents on Spark for local workflow eval."
       },
-      "popularity_score": 25,
+      "popularity_score": 23,
       "deep_eval": {
         "path": "papers/2604.28139/eval.md",
         "evaluated_at": "2026-05-02T06:42:58.803Z",
@@ -443,7 +597,7 @@
         "fast_verdict": "borderline",
         "one_line_rationale": "CoT reasoning verifier RM + RLHF for image editing is multi-stage and image-domain; whether it fits depends on backbone scale."
       },
-      "popularity_score": 23,
+      "popularity_score": 22,
       "deep_eval": null,
       "promoted_to": null
     },
@@ -476,9 +630,46 @@
         ],
         "relevance_score": 0.7,
         "fast_verdict": "spark-feasible",
-        "one_line_rationale": "Token-level length value head over a 7B model is a small auxiliary network atop standard inference — comfortably inside Spark's envelope."
+        "one_line_rationale": "Token-level length value head over a 7B model is a small auxiliary network atop standard inference \u2014 comfortably inside Spark's envelope."
       },
-      "popularity_score": 22,
+      "popularity_score": 21,
+      "deep_eval": null,
+      "promoted_to": null
+    },
+    {
+      "arxiv_id": "2605.00553",
+      "title": "Stable-GFlowNet: Toward Diverse and Robust LLM Red-Teaming via Contrastive Trajectory Balance",
+      "authors": [],
+      "abstract": "Large Language Model (LLM) Red-Teaming, which proactively identifies vulnerabilities of LLMs, is an essential process for ensuring safety. Finding effective and diverse attacks in red-teaming is important, but achieving both is challenging. Generative Flow Networks (GFNs) that perform distribution matching are a promising methods, but they are notorious for training instability and mode collapse. In particular, unstable rewards in red-teaming accelerate mode collapse. We propose Stable-GFN (S-GFN), which eliminates partition function Z estimation in GFN and reduces training instability. S-GFN avoids Z-estimation through pairwise comparisons and employs a robust masking methodology against noisy rewards. Additionally, we propose a fluency stabilizer to prevent the model from getting stuck in local optima that produce gibberish. S-GFN provides more stable training while maintaining the optimal policy of GFN. We demonstrate the overwhelming attack performance and diversity of S-GFN across various settings.",
+      "published": "2026-04-30T20:00:00.000Z",
+      "primary_category": null,
+      "abs_url": "https://arxiv.org/abs/2605.00553",
+      "pdf_url": "https://arxiv.org/pdf/2605.00553",
+      "hf_upvotes": 15,
+      "hf_paper_url": "https://huggingface.co/papers/2605.00553",
+      "citations": null,
+      "repos": [],
+      "has_code": false,
+      "classify": {
+        "suggested_stage": "fine-tuning",
+        "suggested_series": "LLM Wiki",
+        "topic_tags": [
+          "red-teaming",
+          "guardrails",
+          "rl",
+          "gflownet",
+          "safety"
+        ],
+        "nvidia_stack": [
+          "NeMo",
+          "Guardrails",
+          "NIM"
+        ],
+        "relevance_score": 0.65,
+        "fast_verdict": "spark-feasible",
+        "one_line_rationale": "Stable GFlowNet for diverse LLM red-team prompt generation \u2014 small-scale RL on small attacker LM, safety-arc material."
+      },
+      "popularity_score": 21,
       "deep_eval": null,
       "promoted_to": null
     },
@@ -529,7 +720,42 @@
         "fast_verdict": "spark-feasible",
         "one_line_rationale": "Method-evolution graph extraction is an LLM-over-corpus pipeline that maps directly onto NIM + NeMo Retriever + pgvector on Spark, on a subset."
       },
-      "popularity_score": 21,
+      "popularity_score": 20,
+      "deep_eval": null,
+      "promoted_to": null
+    },
+    {
+      "arxiv_id": "2605.01428",
+      "title": "Hallucinations Undermine Trust; Metacognition is a Way Forward",
+      "authors": [],
+      "abstract": "Despite significant strides in factual reliability, errors -- often termed hallucinations -- remain a major concern for generative AI, especially as LLMs are increasingly expected to be helpful in more complex or nuanced setups. Yet even in the simplest setting -- factoid question-answering with clear ground truth-frontier models without external tools continue to hallucinate. We argue that most factuality gains in this domain have come from expanding the model's knowledge boundary (encoding more facts) rather than improving awareness of that boundary (distinguishing known from unknown). We conjecture that the latter is inherently difficult: models may lack the discriminative power to perfectly separate truths from errors, creating an unavoidable tradeoff between eliminating hallucinations and preserving utility.\n  This tradeoff dissolves under a different framing. If we understand hallucinations as confident errors -- incorrect information delivered without appropriate qualification -- a third path emerges beyond the answer-or-abstain dichotomy: expressing uncertainty. We propose faithful uncertainty: aligning linguistic uncertainty with intrinsic uncertainty. This is one facet of metacognition -- the ability to be aware of one's own uncertainty and to act on it. For direct interaction, acting on uncertainty means communicating it honestly; for agentic systems, it becomes the control layer governing when to search and what to trust. Metacognition is thus essential for LLMs to be both trustworthy and capable; we conclude by highlighting open problems for progress towards this objective.",
+      "published": "2026-05-01T20:00:00.000Z",
+      "primary_category": null,
+      "abs_url": "https://arxiv.org/abs/2605.01428",
+      "pdf_url": "https://arxiv.org/pdf/2605.01428",
+      "hf_upvotes": 13,
+      "hf_paper_url": "https://huggingface.co/papers/2605.01428",
+      "citations": null,
+      "repos": [],
+      "has_code": false,
+      "classify": {
+        "suggested_stage": "inference",
+        "suggested_series": "LLM Wiki",
+        "topic_tags": [
+          "hallucination",
+          "metacognition",
+          "evals",
+          "uncertainty"
+        ],
+        "nvidia_stack": [
+          "NIM",
+          "Guardrails"
+        ],
+        "relevance_score": 0.65,
+        "fast_verdict": "spark-feasible",
+        "one_line_rationale": "Metacognitive-uncertainty layer over a hosted LLM \u2014 pure inference-time wrapper, easy NIM-side experiment."
+      },
+      "popularity_score": 20,
       "deep_eval": null,
       "promoted_to": null
     },
@@ -563,7 +789,43 @@
         "fast_verdict": "borderline",
         "one_line_rationale": "Audio reasoning post-training fits NeMo's speech surface but RLVR-on-audio at scale is a non-trivial Spark workload."
       },
-      "popularity_score": 20,
+      "popularity_score": 19,
+      "deep_eval": null,
+      "promoted_to": null
+    },
+    {
+      "arxiv_id": "2605.00347",
+      "title": "Odysseus: Scaling VLMs to 100+ Turn Decision-Making in Games via Reinforcement Learning",
+      "authors": [],
+      "abstract": "Given the rapidly growing capabilities of vision-language models (VLMs), extending them to interactive decision-making tasks such as video games has emerged as a promising frontier. However, existing approaches either rely on large-scale supervised fine-tuning (SFT) on human trajectories or apply reinforcement learning (RL) only in relatively short-horizon settings (typically around 20--30 turns). In this work, we study RL-based training of VLMs for long-horizon decision-making in Super Mario Land, a visually grounded environment requiring 100+ turns of interaction with coordinated perception, reasoning, and action. We begin with a systematic investigation of key algorithmic components and propose an adapted variant of PPO with a lightweight turn-level critic, which substantially improves training stability and sample efficiency over critic-free methods such as GRPO and Reinforce++. We further show that pretrained VLMs provide strong action priors, significantly improving sample efficiency during RL training and reducing the need for manual design choices such as action engineering, compared to classical deep RL trained from scratch. Building on these insights, we introduce Odysseus, an open training framework for VLM agents, achieving substantial gains across multiple levels of the game and at least 3 times average game progresses than frontier models. Moreover, the trained models exhibit consistent improvements under both in-game and cross-game generalization settings, while maintaining general-domain capabilities. Overall, our results identify key ingredients for making RL stable and effective in long-horizon, multi-modal settings, and provide practical guidance for developing VLMs as embodied agents.",
+      "published": "2026-04-30T20:00:00.000Z",
+      "primary_category": null,
+      "abs_url": "https://arxiv.org/abs/2605.00347",
+      "pdf_url": "https://arxiv.org/pdf/2605.00347",
+      "hf_upvotes": 12,
+      "hf_paper_url": "https://huggingface.co/papers/2605.00347",
+      "citations": 0,
+      "repos": [],
+      "has_code": false,
+      "classify": {
+        "suggested_stage": "training",
+        "suggested_series": "Autoresearch",
+        "topic_tags": [
+          "agentic",
+          "vlm",
+          "rl",
+          "long-horizon",
+          "multimodal"
+        ],
+        "nvidia_stack": [
+          "NeMo",
+          "NemoClaw"
+        ],
+        "relevance_score": 0.65,
+        "fast_verdict": "borderline",
+        "one_line_rationale": "100+ turn VLM RL on Mario \u2014 small-VLM fits, but 100+ turn rollouts \u00d7 RL may push the unified-memory budget; verify in eval."
+      },
+      "popularity_score": 19,
       "deep_eval": null,
       "promoted_to": null
     },
@@ -599,9 +861,45 @@
         ],
         "relevance_score": 0.92,
         "fast_verdict": "spark-feasible",
-        "one_line_rationale": "Native NVIDIA Nemotron 3 Nano Omni 30B-A3B MoE shipped with BF16/FP8/FP4 — FP4 weights (~15 GB) leave ample 128 GB headroom for KV + multimodal context."
+        "one_line_rationale": "Native NVIDIA Nemotron 3 Nano Omni 30B-A3B MoE shipped with BF16/FP8/FP4 \u2014 FP4 weights (~15 GB) leave ample 128 GB headroom for KV + multimodal context."
       },
-      "popularity_score": 20,
+      "popularity_score": 18,
+      "deep_eval": null,
+      "promoted_to": null
+    },
+    {
+      "arxiv_id": "2605.02396",
+      "title": "HeavySkill: Heavy Thinking as the Inner Skill in Agentic Harness",
+      "authors": [],
+      "abstract": "Recent advances in agentic harness with orchestration frameworks that coordinate multiple agents with memory, skills, and tool use have achieved remarkable success in complex reasoning tasks. However, the underlying mechanism that truly drives performance remains obscured behind intricate system designs. In this paper, we propose HeavySkill, a perspective that views heavy thinking not only as a minimal execution unit in orchestration harness but also as an inner skill internalized within the model's parameters that drives the orchestrator to solve complex tasks. We identify this skill as a two-stage pipeline, i.e., parallel reasoning then summarization, which can operate beneath any agentic harness. We present a systematic empirical study of HeavySkill across diverse domains. Our results show that this inner skill consistently outperforms traditional Best-of-N (BoN) strategies; notably, stronger LLMs can even approach Pass@N performance. Crucially, we demonstrate that the depth and width of heavy thinking, as a learnable skill, can be further scaled via reinforcement learning, offering a promising path toward self-evolving LLMs that internalize complex reasoning without relying on brittle orchestration layers.",
+      "published": "2026-05-03T20:00:00.000Z",
+      "primary_category": null,
+      "abs_url": "https://arxiv.org/abs/2605.02396",
+      "pdf_url": "https://arxiv.org/pdf/2605.02396",
+      "hf_upvotes": 9,
+      "hf_paper_url": "https://huggingface.co/papers/2605.02396",
+      "citations": null,
+      "repos": [],
+      "has_code": false,
+      "classify": {
+        "suggested_stage": "agentic",
+        "suggested_series": "Autoresearch",
+        "topic_tags": [
+          "agentic",
+          "reasoning",
+          "thinking",
+          "harness",
+          "internalization"
+        ],
+        "nvidia_stack": [
+          "NIM",
+          "NemoClaw"
+        ],
+        "relevance_score": 0.7,
+        "fast_verdict": "spark-feasible",
+        "one_line_rationale": "Internalizing 'heavy thinking' into the model rather than the harness \u2014 directly testable on Spark's NIM-hosted thinking models."
+      },
+      "popularity_score": 18,
       "deep_eval": null,
       "promoted_to": null
     },
@@ -637,7 +935,7 @@
         "fast_verdict": "spark-feasible",
         "one_line_rationale": "Multimodal agent benchmark with persona-driven instructions runs on Spark via NemoClaw + NIM-served MLLMs without training."
       },
-      "popularity_score": 18,
+      "popularity_score": 17,
       "deep_eval": null,
       "promoted_to": null
     },
@@ -677,7 +975,80 @@
         "fast_verdict": "spark-feasible",
         "one_line_rationale": "Synthetic-computer long-horizon agent sims map directly onto OpenShell sandboxes inside NemoClaw, with NIM-hosted Nemotron driving the loop."
       },
-      "popularity_score": 18,
+      "popularity_score": 17,
+      "deep_eval": null,
+      "promoted_to": null
+    },
+    {
+      "arxiv_id": "2604.27776",
+      "title": "WindowsWorld: A Process-Centric Benchmark of Autonomous GUI Agents in Professional Cross-Application Environments",
+      "authors": [],
+      "abstract": "While GUI agents have shown impressive capabilities in common computer-use tasks such as OSWorld, current benchmarks mainly focus on isolated and single-application tasks. This overlooks a critical real-world requirement of coordinating across multiple applications to accomplish complex profession-specific workflows. To bridge this gap, we present a computer-use benchmark in cross-application workflows, named WindowsWorld, designed to systematically assess GUI Agents on complex multi-step tasks that mirror real-world professional activities. Our methodology uses a multi-agent framework steered by 16 occupations to generate four difficulty-level tasks with intermediate inspection, which are then refined by human review and executed in a simulated environment. The resulting benchmark contains 181 tasks with an average of 5.0 sub-goals across 17 common desktop applications, of which 78% are inherently multi-application. Experimental results of leading large models and agents show that: 1) All computer-use agents perform poorly on multi-application tasks (< 21% success rate), far below the performance of simple single-app tasks; 2) They largely fail at tasks requiring conditional judgment and reasoning across geq 3 applications, stalling at early sub-goals; 3) Low execution efficiency, where tasks often fail despite far exceeding human step limits. Code, benchmark data, and evaluation resources are available at github.com/HITsz-TMG/WindowsWorld.",
+      "published": "2026-04-29T20:00:00.000Z",
+      "primary_category": null,
+      "abs_url": "https://arxiv.org/abs/2604.27776",
+      "pdf_url": "https://arxiv.org/pdf/2604.27776",
+      "hf_upvotes": 9,
+      "hf_paper_url": "https://huggingface.co/papers/2604.27776",
+      "citations": null,
+      "repos": [],
+      "has_code": false,
+      "classify": {
+        "suggested_stage": "agentic",
+        "suggested_series": "Autoresearch",
+        "topic_tags": [
+          "agentic",
+          "gui-agents",
+          "benchmarks",
+          "process-centric",
+          "evals"
+        ],
+        "nvidia_stack": [
+          "NemoClaw",
+          "OpenClaw"
+        ],
+        "relevance_score": 0.7,
+        "fast_verdict": "spark-feasible",
+        "one_line_rationale": "Cross-application Windows GUI benchmark \u2014 natural ClawGym/OpenClaw ablation target, runnable as Spark-side harness."
+      },
+      "popularity_score": 17,
+      "deep_eval": null,
+      "promoted_to": null
+    },
+    {
+      "arxiv_id": "2605.02661",
+      "title": "AcademiClaw: When Students Set Challenges for AI Agents",
+      "authors": [],
+      "abstract": "Benchmarks within the OpenClaw ecosystem have thus far evaluated exclusively assistant-level tasks, leaving the academic-level capabilities of OpenClaw largely unexamined. We introduce AcademiClaw, a bilingual benchmark of 80 complex, long-horizon tasks sourced directly from university students' real academic workflows -- homework, research projects, competitions, and personal projects -- that they found current AI agents unable to solve effectively. Curated from 230 student-submitted candidates through rigorous expert review, the final task set spans 25+ professional domains, ranging from olympiad-level mathematics and linguistics problems to GPU-intensive reinforcement learning and full-stack system debugging, with 16 tasks requiring CUDA GPU execution. Each task executes in an isolated Docker sandbox and is scored on task completion by multi-dimensional rubrics combining six complementary techniques, with an independent five-category safety audit providing additional behavioral analysis. Experiments on six frontier models show that even the best achieves only a 55\\% pass rate. Further analysis uncovers sharp capability boundaries across task domains, divergent behavioral strategies among models, and a disconnect between token consumption and output quality, providing fine-grained diagnostic signals beyond what aggregate metrics reveal. We hope that AcademiClaw and its open-sourced data and code can serve as a useful resource for the OpenClaw community, driving progress toward agents that are more capable and versatile across the full breadth of real-world academic demands. All data and code are available at https://github.com/GAIR-NLP/AcademiClaw.",
+      "published": "2026-05-03T20:00:00.000Z",
+      "primary_category": null,
+      "abs_url": "https://arxiv.org/abs/2605.02661",
+      "pdf_url": "https://arxiv.org/pdf/2605.02661",
+      "hf_upvotes": 8,
+      "hf_paper_url": "https://huggingface.co/papers/2605.02661",
+      "citations": null,
+      "repos": [],
+      "has_code": false,
+      "classify": {
+        "suggested_stage": "agentic",
+        "suggested_series": "Frontier Scout",
+        "topic_tags": [
+          "agentic",
+          "openclaw",
+          "benchmarks",
+          "academic",
+          "long-horizon",
+          "evals"
+        ],
+        "nvidia_stack": [
+          "OpenClaw",
+          "NemoClaw"
+        ],
+        "relevance_score": 0.85,
+        "fast_verdict": "spark-feasible",
+        "one_line_rationale": "Direct OpenClaw academic-benchmark \u2014 drop-in for the ClawGym arc, 80 long-horizon student-curated tasks."
+      },
+      "popularity_score": 17,
       "deep_eval": null,
       "promoted_to": null
     },
@@ -712,7 +1083,7 @@
         "fast_verdict": "spark-feasible",
         "one_line_rationale": "Routing routine GUI steps to a small policy and reserving the big MLLM for high-risk steps is exactly the kind of single-Spark optimization the blog studies."
       },
-      "popularity_score": 17,
+      "popularity_score": 16,
       "deep_eval": null,
       "promoted_to": null
     },
@@ -748,7 +1119,7 @@
         "fast_verdict": "spark-feasible",
         "one_line_rationale": "Failure-trajectory analysis + targeted helper agents over open-source LLMs runs cleanly atop NemoClaw with a Spark-hosted Nemotron."
       },
-      "popularity_score": 17,
+      "popularity_score": 16,
       "deep_eval": null,
       "promoted_to": null
     },
@@ -781,9 +1152,46 @@
         ],
         "relevance_score": 0.6,
         "fast_verdict": "spark-feasible",
-        "one_line_rationale": "Agent-native research artifact protocol is process + tooling — implementable as a NemoClaw skill atop NIM-hosted reasoning models on Spark."
+        "one_line_rationale": "Agent-native research artifact protocol is process + tooling \u2014 implementable as a NemoClaw skill atop NIM-hosted reasoning models on Spark."
       },
-      "popularity_score": 16,
+      "popularity_score": 15,
+      "deep_eval": null,
+      "promoted_to": null
+    },
+    {
+      "arxiv_id": "2605.02240",
+      "title": "PhysicianBench: Evaluating LLM Agents in Real-World EHR Environments",
+      "authors": [],
+      "abstract": "We introduce PhysicianBench, a benchmark for evaluating LLM agents on physician tasks grounded in real clinical setting within electronic health record (EHR) environments. Existing medical agent benchmarks primarily focus on static knowledge recall, single-step atomic actions, or action intent without verifiable execution against the environment. As a result, they fail to capture the long-horizon, composite workflows that characterize real clinical systems. PhysicianBench comprises 100 long-horizon tasks adapted from real consultation cases between primary care and subspecialty physicians, with each task independently reviewed by a separate panel of physicians. Tasks are instantiated in an EHR environment with real patient records and accessed through the same standard APIs used by commercial EHR vendors. Tasks span 21 specialties (e.g., cardiology, endocrinology, oncology, psychiatry) and diverse workflow types (e.g., diagnosis interpretation, medication prescribing, treatment planning), requiring an average of 27 tool calls per task. Solving each task requires retrieving data across encounters, reasoning over heterogeneous clinical information, executing consequential clinical actions, and producing clinical documentation. Each task is decomposed into structured checkpoints (670 in total across the benchmark) capturing distinct stages of completion graded by task-specific scripts with execution-grounded verification. Across 13 proprietary and open-source LLM agents, the best-performing model achieves only 46% success rate (pass@1), while open-source models reach at most 19%, revealing a substantial gap between current agent capabilities and the demands of real-world clinical workflows. PhysicianBench provides a realistic and execution-grounded benchmark for measuring progress toward autonomous clinical agents.",
+      "published": "2026-05-03T20:00:00.000Z",
+      "primary_category": null,
+      "abs_url": "https://arxiv.org/abs/2605.02240",
+      "pdf_url": "https://arxiv.org/pdf/2605.02240",
+      "hf_upvotes": 6,
+      "hf_paper_url": "https://huggingface.co/papers/2605.02240",
+      "citations": null,
+      "repos": [],
+      "has_code": false,
+      "classify": {
+        "suggested_stage": "agentic",
+        "suggested_series": "Autoresearch",
+        "topic_tags": [
+          "agentic",
+          "benchmarks",
+          "ehr",
+          "long-horizon",
+          "tool-use",
+          "evals"
+        ],
+        "nvidia_stack": [
+          "NemoClaw",
+          "Guardrails"
+        ],
+        "relevance_score": 0.55,
+        "fast_verdict": "borderline",
+        "one_line_rationale": "Long-horizon EHR agent benchmark \u2014 domain-specific but the harness shape mirrors ClawGym; runnable against a hosted NIM."
+      },
+      "popularity_score": 15,
       "deep_eval": null,
       "promoted_to": null
     },
@@ -817,9 +1225,46 @@
         ],
         "relevance_score": 0.85,
         "fast_verdict": "spark-feasible",
-        "one_line_rationale": "Speculative decoding inside NeMo-RL with vLLM at 8B scale is exactly Spark-class — 8B target + small draft model fit comfortably in 128 GB."
+        "one_line_rationale": "Speculative decoding inside NeMo-RL with vLLM at 8B scale is exactly Spark-class \u2014 8B target + small draft model fit comfortably in 128 GB."
       },
-      "popularity_score": 15,
+      "popularity_score": 14,
+      "deep_eval": null,
+      "promoted_to": null
+    },
+    {
+      "arxiv_id": "2605.02178",
+      "title": "T^2PO: Uncertainty-Guided Exploration Control for Stable Multi-Turn Agentic Reinforcement Learning",
+      "authors": [],
+      "abstract": "Recent progress in multi-turn reinforcement learning (RL) has significantly improved reasoning LLMs' performances on complex interactive tasks. Despite advances in stabilization techniques such as fine-grained credit assignment and trajectory filtering, instability remains pervasive and often leads to training collapse. We argue that this instability stems from inefficient exploration in multi-turn settings, where policies continue to generate low-information actions that neither reduce uncertainty nor advance task progress. To address this issue, we propose Token- and Turn-level Policy Optimization (T^2PO), an uncertainty-aware framework that explicitly controls exploration at fine-grained levels. At the token level, T^2PO monitors uncertainty dynamics and triggers a thinking intervention once the marginal uncertainty change falls below a threshold. At the turn level, T^2PO identifies interactions with negligible exploration progress and dynamically resamples such turns to avoid wasted rollouts. We evaluate T^2PO in diverse environments, including WebShop, ALFWorld, and Search QA, demonstrating substantial gains in training stability and performance improvements with better exploration efficiency. Code is available at: https://github.com/WillDreamer/T2PO.",
+      "published": "2026-05-03T20:00:00.000Z",
+      "primary_category": null,
+      "abs_url": "https://arxiv.org/abs/2605.02178",
+      "pdf_url": "https://arxiv.org/pdf/2605.02178",
+      "hf_upvotes": 5,
+      "hf_paper_url": "https://huggingface.co/papers/2605.02178",
+      "citations": null,
+      "repos": [],
+      "has_code": false,
+      "classify": {
+        "suggested_stage": "training",
+        "suggested_series": "Autoresearch",
+        "topic_tags": [
+          "rl",
+          "grpo",
+          "ppo",
+          "agentic",
+          "exploration",
+          "stability"
+        ],
+        "nvidia_stack": [
+          "NeMo",
+          "NemoClaw"
+        ],
+        "relevance_score": 0.8,
+        "fast_verdict": "spark-feasible",
+        "one_line_rationale": "Uncertainty-guided exploration for multi-turn agentic RL \u2014 direct sequel to the GRPO-on-ClawGym arc."
+      },
+      "popularity_score": 14,
       "deep_eval": null,
       "promoted_to": null
     },
@@ -852,7 +1297,116 @@
         "fast_verdict": "spark-feasible",
         "one_line_rationale": "Behavioral study of induction/deduction/abduction conflicts in LLMs is a pure-inference replication runnable against any NIM-hosted model."
       },
-      "popularity_score": 14,
+      "popularity_score": 13,
+      "deep_eval": null,
+      "promoted_to": null
+    },
+    {
+      "arxiv_id": "2605.00529",
+      "title": "Hierarchical Abstract Tree for Cross-Document Retrieval-Augmented Generation",
+      "authors": [],
+      "abstract": "Retrieval-augmented generation (RAG) enhances large language models with external knowledge, and tree-based RAG organizes documents into hierarchical indexes to support queries at multiple granularities. However, existing Tree-RAG methods designed for single-document retrieval face critical challenges in scaling to cross-document multi-hop questions: (1) poor distribution adaptability, where k-means clustering introduces noise due to rigid distribution assumptions; (2) structural isolation, as tree indexes lack explicit cross-document connections; and (3) coarse abstraction, which obscures fine-grained details. To address these limitations, we propose \u03a8-RAG, a tree-RAG framework with two key components. First, a hierarchical abstract tree index built through an iterative \"merging and collapse\" process that adapts to data distributions without a priori assumption. Second, a multi-granular retrieval agent that intelligently interacts with the knowledge base with reorganized queries and an agent-powered hybrid retriever. \u03a8-RAG supports diverse tasks from token-level question answering to document-level summarization. On cross-document multi-hop QA benchmarks, it outperforms RAPTOR by 25.9% and HippoRAG 2 by 7.4% in average F1 score. Code is available at https://github.com/Newiz430/Psi-RAG.",
+      "published": "2026-04-30T20:00:00.000Z",
+      "primary_category": null,
+      "abs_url": "https://arxiv.org/abs/2605.00529",
+      "pdf_url": "https://arxiv.org/pdf/2605.00529",
+      "hf_upvotes": 3,
+      "hf_paper_url": "https://huggingface.co/papers/2605.00529",
+      "citations": null,
+      "repos": [],
+      "has_code": false,
+      "classify": {
+        "suggested_stage": "inference",
+        "suggested_series": "Second Brain",
+        "topic_tags": [
+          "rag",
+          "retrieval",
+          "tree-rag",
+          "multi-document",
+          "embeddings"
+        ],
+        "nvidia_stack": [
+          "NemoRetriever",
+          "pgvector",
+          "NIM"
+        ],
+        "relevance_score": 0.7,
+        "fast_verdict": "spark-feasible",
+        "one_line_rationale": "Hierarchical cross-document Tree-RAG \u2014 Second Brain F-arc fit; pgvector + NIM-Embed already in place."
+      },
+      "popularity_score": 10,
+      "deep_eval": null,
+      "promoted_to": null
+    },
+    {
+      "arxiv_id": "2605.02801",
+      "title": "Reinforcement Learning for LLM-based Multi-Agent Systems through Orchestration Traces",
+      "authors": [],
+      "abstract": "As large language model (LLM) agents evolve from isolated tool users into coordinated teams, reinforcement learning (RL) must optimize not only individual actions but also how work is spawned, delegated, communicated, aggregated, and stopped. This paper studies RL for LLM-based multi-agent systems through orchestration traces: temporal interaction graphs whose events include sub-agent spawning, delegation, communication, tool use, return, aggregation, and stopping decisions.\n  Using this lens, we identify three technical axes. First, reward design spans eight families, including orchestration rewards for parallelism speedup, split correctness, and aggregation quality. Second, reward and credit signals attach to eight credit- or signal-bearing units from token to team; explicit counterfactual message-level credit remains especially sparse in our curated pool. Third, orchestration learning decomposes into five sub-decisions: when to spawn, whom to delegate to, how to communicate, how to aggregate, and when to stop. In our curated pool as of May 4, 2026, we found no explicit RL training method for the stopping decision.\n  We connect academic methods to public industrial evidence from Kimi Agent Swarm, OpenAI Codex, and Anthropic Claude Code. The resulting scale gap is a gap between publicly reported deployment envelopes and open academic evaluation regimes, not independent verification of industrial training traces. We release the artifact at https://github.com/xxzcc/awesome-llm-mas-rl, including an 84-entry tagged paper pool, a 32-record exclusion log, scripted corpus statistics, and a minimal JSON schema for replayable orchestration traces.",
+      "published": "2026-05-03T20:00:00.000Z",
+      "primary_category": null,
+      "abs_url": "https://arxiv.org/abs/2605.02801",
+      "pdf_url": "https://arxiv.org/pdf/2605.02801",
+      "hf_upvotes": 2,
+      "hf_paper_url": "https://huggingface.co/papers/2605.02801",
+      "citations": null,
+      "repos": [],
+      "has_code": false,
+      "classify": {
+        "suggested_stage": "training",
+        "suggested_series": "Autoresearch",
+        "topic_tags": [
+          "rl",
+          "multi-agent",
+          "orchestration",
+          "agentic",
+          "credit-assignment"
+        ],
+        "nvidia_stack": [
+          "NeMo",
+          "NemoClaw"
+        ],
+        "relevance_score": 0.7,
+        "fast_verdict": "borderline",
+        "one_line_rationale": "RL over multi-agent orchestration traces \u2014 Spark can train one agent at a time, multi-agent rollouts may need careful memory choreography."
+      },
+      "popularity_score": 9,
+      "deep_eval": null,
+      "promoted_to": null
+    },
+    {
+      "arxiv_id": "2605.03596",
+      "title": "Workspace-Bench 1.0: Benchmarking AI Agents on Workspace Tasks with Large-Scale File Dependencies",
+      "authors": [],
+      "abstract": "Workspace learning requires AI agents to identify, reason over, exploit, and update explicit and implicit dependencies among heterogeneous files in a worker's workspace, enabling them to complete both routine and advanced tasks effectively. Despite its importance, existing relevant benchmarks largely evaluate agents on pre-specified or synthesized files with limited real-world dependencies, leaving workspace-level evaluation underexplored. To this end, we introduce Workspace-Bench, a benchmark for evaluating AI agents on Workspace Learning invOlving Large-Scale File Dependencies. We construct realistic workspaces with 5 worker profiles, 74 file types, 20,476 files (up to 20GB) and curate 388 tasks, each with its own file dependency graph, evaluated across 7,399 total rubrics that require cross-file retrieval, contextual reasoning, and adaptive decision-making. We further provide Workspace-Bench-Lite, a 100-task subset that preserves the benchmark distribution while reducing evaluation costs by about 70%. We evaluate 4 popular agent harnesses and 7 foundation models. Experimental results show that current agents remain far from reliable workspace learning, where the best reaches only 68.7%, substantially below the human result of 80.7%, and the average performance across agents is only 47.4%.",
+      "published": "2026-05-04T20:00:00.000Z",
+      "primary_category": null,
+      "abs_url": "https://arxiv.org/abs/2605.03596",
+      "pdf_url": "https://arxiv.org/pdf/2605.03596",
+      "hf_upvotes": 2,
+      "hf_paper_url": "https://huggingface.co/papers/2605.03596",
+      "citations": null,
+      "repos": [],
+      "has_code": false,
+      "classify": {
+        "suggested_stage": "agentic",
+        "suggested_series": "Autoresearch",
+        "topic_tags": [
+          "agentic",
+          "benchmarks",
+          "workspace",
+          "file-dependencies",
+          "evals"
+        ],
+        "nvidia_stack": [
+          "NemoClaw",
+          "OpenClaw"
+        ],
+        "relevance_score": 0.78,
+        "fast_verdict": "spark-feasible",
+        "one_line_rationale": "Workspace-Bench: agents over real file-dependency graphs \u2014 close cousin of ClawGym, ready Spark harness."
+      },
+      "popularity_score": 9,
       "deep_eval": null,
       "promoted_to": null
     }

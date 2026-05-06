@@ -2,14 +2,14 @@
 arxiv_id: 2604.27039
 title: "Length Value Model: Scalable Value Pretraining for Token-Level Length Modeling"
 published: 2026-04-28
+primary_category: unknown
 hf_upvotes: 16
-popularity_score: 22
+popularity_score: 21
 suggested_stage: inference
 suggested_series: LLM Wiki
 fast_verdict: spark-feasible
 relevance_score: 0.7
 has_deep_eval: false
-promoted_to: null
 abs_url: https://arxiv.org/abs/2604.27039
 pdf_url: https://arxiv.org/pdf/2604.27039
 hf_paper_url: https://huggingface.co/papers/2604.27039
@@ -17,7 +17,7 @@ hf_paper_url: https://huggingface.co/papers/2604.27039
 
 # Length Value Model: Scalable Value Pretraining for Token-Level Length Modeling
 
-**Verdict:** spark-feasible · **Series:** LLM Wiki · **Stage:** inference · **Relevance:** 0.7 · **Popularity:** 22/100
+**Verdict:** spark-feasible · **Series:** LLM Wiki · **Stage:** inference · **Relevance:** 0.70 · **Popularity:** 21/100
 
 > Token-level length value head over a 7B model is a small auxiliary network atop standard inference — comfortably inside Spark's envelope.
 
@@ -37,10 +37,11 @@ _No public repo yet._
 
 ## Citations
 
-_not yet indexed_
+`citations: not yet indexed`
 
 ## Links
 
 - [arXiv abstract](https://arxiv.org/abs/2604.27039)
 - [PDF](https://arxiv.org/pdf/2604.27039)
 - [HuggingFace daily papers](https://huggingface.co/papers/2604.27039)
+

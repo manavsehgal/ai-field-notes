@@ -2,14 +2,14 @@
 arxiv_id: 2604.27419
 title: "InteractWeb-Bench: Can Multimodal Agent Escape Blind Execution in Interactive Website Generation?"
 published: 2026-04-29
+primary_category: unknown
 hf_upvotes: 9
-popularity_score: 18
+popularity_score: 17
 suggested_stage: agentic
 suggested_series: Autoresearch
 fast_verdict: spark-feasible
 relevance_score: 0.65
 has_deep_eval: false
-promoted_to: null
 abs_url: https://arxiv.org/abs/2604.27419
 pdf_url: https://arxiv.org/pdf/2604.27419
 hf_paper_url: https://huggingface.co/papers/2604.27419
@@ -17,7 +17,7 @@ hf_paper_url: https://huggingface.co/papers/2604.27419
 
 # InteractWeb-Bench: Can Multimodal Agent Escape Blind Execution in Interactive Website Generation?
 
-**Verdict:** spark-feasible · **Series:** Autoresearch · **Stage:** agentic · **Relevance:** 0.65 · **Popularity:** 18/100
+**Verdict:** spark-feasible · **Series:** Autoresearch · **Stage:** agentic · **Relevance:** 0.65 · **Popularity:** 17/100
 
 > Multimodal agent benchmark with persona-driven instructions runs on Spark via NemoClaw + NIM-served MLLMs without training.
 
@@ -37,10 +37,11 @@ _No public repo yet._
 
 ## Citations
 
-_not yet indexed_
+`citations: not yet indexed`
 
 ## Links
 
 - [arXiv abstract](https://arxiv.org/abs/2604.27419)
 - [PDF](https://arxiv.org/pdf/2604.27419)
 - [HuggingFace daily papers](https://huggingface.co/papers/2604.27419)
+

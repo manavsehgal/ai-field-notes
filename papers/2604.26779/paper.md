@@ -1,15 +1,15 @@
 ---
 arxiv_id: 2604.26779
-title: Accelerating RL Post-Training Rollouts via System-Integrated Speculative Decoding
+title: "Accelerating RL Post-Training Rollouts via System-Integrated Speculative Decoding"
 published: 2026-04-28
+primary_category: unknown
 hf_upvotes: 6
-popularity_score: 15
+popularity_score: 14
 suggested_stage: training
 suggested_series: LLM Wiki
 fast_verdict: spark-feasible
 relevance_score: 0.85
 has_deep_eval: false
-promoted_to: null
 abs_url: https://arxiv.org/abs/2604.26779
 pdf_url: https://arxiv.org/pdf/2604.26779
 hf_paper_url: https://huggingface.co/papers/2604.26779
@@ -17,7 +17,7 @@ hf_paper_url: https://huggingface.co/papers/2604.26779
 
 # Accelerating RL Post-Training Rollouts via System-Integrated Speculative Decoding
 
-**Verdict:** spark-feasible · **Series:** LLM Wiki · **Stage:** training · **Relevance:** 0.85 · **Popularity:** 15/100
+**Verdict:** spark-feasible · **Series:** LLM Wiki · **Stage:** training · **Relevance:** 0.85 · **Popularity:** 14/100
 
 > Speculative decoding inside NeMo-RL with vLLM at 8B scale is exactly Spark-class — 8B target + small draft model fit comfortably in 128 GB.
 
@@ -37,10 +37,11 @@ _No public repo yet._
 
 ## Citations
 
-_not yet indexed_
+`citations: not yet indexed`
 
 ## Links
 
 - [arXiv abstract](https://arxiv.org/abs/2604.26779)
 - [PDF](https://arxiv.org/pdf/2604.26779)
 - [HuggingFace daily papers](https://huggingface.co/papers/2604.26779)
+

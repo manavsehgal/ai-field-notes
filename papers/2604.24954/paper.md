@@ -2,14 +2,14 @@
 arxiv_id: 2604.24954
 title: "Nemotron 3 Nano Omni: Efficient and Open Multimodal Intelligence"
 published: 2026-04-26
+primary_category: unknown
 hf_upvotes: 12
-popularity_score: 20
+popularity_score: 18
 suggested_stage: inference
 suggested_series: Foundations
 fast_verdict: spark-feasible
 relevance_score: 0.92
 has_deep_eval: false
-promoted_to: null
 abs_url: https://arxiv.org/abs/2604.24954
 pdf_url: https://arxiv.org/pdf/2604.24954
 hf_paper_url: https://huggingface.co/papers/2604.24954
@@ -17,7 +17,7 @@ hf_paper_url: https://huggingface.co/papers/2604.24954
 
 # Nemotron 3 Nano Omni: Efficient and Open Multimodal Intelligence
 
-**Verdict:** spark-feasible · **Series:** Foundations · **Stage:** inference · **Relevance:** 0.92 · **Popularity:** 20/100
+**Verdict:** spark-feasible · **Series:** Foundations · **Stage:** inference · **Relevance:** 0.92 · **Popularity:** 18/100
 
 > Native NVIDIA Nemotron 3 Nano Omni 30B-A3B MoE shipped with BF16/FP8/FP4 — FP4 weights (~15 GB) leave ample 128 GB headroom for KV + multimodal context.
 
@@ -37,10 +37,11 @@ _No public repo yet._
 
 ## Citations
 
-_not yet indexed_
+`citations: not yet indexed`
 
 ## Links
 
 - [arXiv abstract](https://arxiv.org/abs/2604.24954)
 - [PDF](https://arxiv.org/pdf/2604.24954)
 - [HuggingFace daily papers](https://huggingface.co/papers/2604.24954)
+

@@ -4,13 +4,12 @@ title: "Intern-Atlas: A Methodological Evolution Graph as Research Infrastructur
 published: 2026-04-29
 primary_category: cs.AI
 hf_upvotes: 13
-popularity_score: 21
+popularity_score: 20
 suggested_stage: agentic
 suggested_series: Autoresearch
 fast_verdict: spark-feasible
 relevance_score: 0.75
 has_deep_eval: false
-promoted_to: null
 abs_url: https://arxiv.org/abs/2604.28158
 pdf_url: https://arxiv.org/pdf/2604.28158
 hf_paper_url: https://huggingface.co/papers/2604.28158
@@ -18,7 +17,7 @@ hf_paper_url: https://huggingface.co/papers/2604.28158
 
 # Intern-Atlas: A Methodological Evolution Graph as Research Infrastructure for AI Scientists
 
-**Verdict:** spark-feasible · **Series:** Autoresearch · **Stage:** agentic · **Relevance:** 0.75 · **Popularity:** 21/100
+**Verdict:** spark-feasible · **Series:** Autoresearch · **Stage:** agentic · **Relevance:** 0.75 · **Popularity:** 20/100
 
 > Method-evolution graph extraction is an LLM-over-corpus pipeline that maps directly onto NIM + NeMo Retriever + pgvector on Spark, on a subset.
 
@@ -45,3 +44,4 @@ _No public repo yet._
 - [arXiv abstract](https://arxiv.org/abs/2604.28158)
 - [PDF](https://arxiv.org/pdf/2604.28158)
 - [HuggingFace daily papers](https://huggingface.co/papers/2604.28158)
+

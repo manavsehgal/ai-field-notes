@@ -1,15 +1,15 @@
 ---
 arxiv_id: 2604.27085
-title: Efficient Training on Multiple Consumer GPUs with RoundPipe
+title: "Efficient Training on Multiple Consumer GPUs with RoundPipe"
 published: 2026-04-28
+primary_category: unknown
 hf_upvotes: 25
-popularity_score: 26
+popularity_score: 24
 suggested_stage: training
 suggested_series: Looking Beyond Spark
 fast_verdict: borderline
 relevance_score: 0.62
 has_deep_eval: false
-promoted_to: null
 abs_url: https://arxiv.org/abs/2604.27085
 pdf_url: https://arxiv.org/pdf/2604.27085
 hf_paper_url: https://huggingface.co/papers/2604.27085
@@ -17,7 +17,7 @@ hf_paper_url: https://huggingface.co/papers/2604.27085
 
 # Efficient Training on Multiple Consumer GPUs with RoundPipe
 
-**Verdict:** borderline · **Series:** Looking Beyond Spark · **Stage:** training · **Relevance:** 0.62 · **Popularity:** 26/100
+**Verdict:** borderline · **Series:** Looking Beyond Spark · **Stage:** training · **Relevance:** 0.62 · **Popularity:** 24/100
 
 > Multi-consumer-GPU pipeline-parallel scheduler doesn't run on Spark's single GB10, but the throughput math extrapolates cleanly into Looking Beyond Spark.
 
@@ -39,10 +39,11 @@ _No public repo yet._
 
 ## Citations
 
-_not yet indexed_
+`citations: not yet indexed`
 
 ## Links
 
 - [arXiv abstract](https://arxiv.org/abs/2604.27085)
 - [PDF](https://arxiv.org/pdf/2604.27085)
 - [HuggingFace daily papers](https://huggingface.co/papers/2604.27085)
+

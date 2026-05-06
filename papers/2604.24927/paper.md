@@ -1,9 +1,10 @@
 ---
 arxiv_id: 2604.24927
-title: Large Language Models Explore by Latent Distilling
+title: "Large Language Models Explore by Latent Distilling"
 published: 2026-04-26
+primary_category: unknown
 hf_upvotes: 59
-popularity_score: 31
+popularity_score: 29
 suggested_stage: inference
 suggested_series: LLM Wiki
 fast_verdict: spark-feasible
@@ -18,7 +19,7 @@ hf_paper_url: https://huggingface.co/papers/2604.24927
 
 # Large Language Models Explore by Latent Distilling
 
-**Verdict:** spark-feasible · **Series:** LLM Wiki · **Stage:** inference · **Relevance:** 0.72 · **Popularity:** 31/100
+**Verdict:** spark-feasible · **Series:** LLM Wiki · **Stage:** inference · **Relevance:** 0.72 · **Popularity:** 29/100
 
 > Lightweight test-time distiller plus reweighted sampling on existing open-weight reasoning models fits comfortably within Spark's 128 GB inference envelope.
 
@@ -38,7 +39,7 @@ _No public repo yet._
 
 ## Citations
 
-_not yet indexed_
+`citations: not yet indexed`
 
 ## Links
 
@@ -53,3 +54,4 @@ _not yet indexed_
 ## Promoted
 
 This paper has been promoted to `articles/test-time-distilling-for-exploration/` (status: upcoming).
+

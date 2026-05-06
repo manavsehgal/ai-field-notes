@@ -1,15 +1,15 @@
 ---
 arxiv_id: 2604.25719
-title: Step-Audio-R1.5 Technical Report
+title: "Step-Audio-R1.5 Technical Report"
 published: 2026-04-27
+primary_category: unknown
 hf_upvotes: 13
-popularity_score: 20
+popularity_score: 19
 suggested_stage: fine-tuning
 suggested_series: Frontier Scout
 fast_verdict: borderline
 relevance_score: 0.55
 has_deep_eval: false
-promoted_to: null
 abs_url: https://arxiv.org/abs/2604.25719
 pdf_url: https://arxiv.org/pdf/2604.25719
 hf_paper_url: https://huggingface.co/papers/2604.25719
@@ -17,7 +17,7 @@ hf_paper_url: https://huggingface.co/papers/2604.25719
 
 # Step-Audio-R1.5 Technical Report
 
-**Verdict:** borderline · **Series:** Frontier Scout · **Stage:** fine-tuning · **Relevance:** 0.55 · **Popularity:** 20/100
+**Verdict:** borderline · **Series:** Frontier Scout · **Stage:** fine-tuning · **Relevance:** 0.55 · **Popularity:** 19/100
 
 > Audio reasoning post-training fits NeMo's speech surface but RLVR-on-audio at scale is a non-trivial Spark workload.
 
@@ -44,3 +44,4 @@ _No public repo yet._
 - [arXiv abstract](https://arxiv.org/abs/2604.25719)
 - [PDF](https://arxiv.org/pdf/2604.25719)
 - [HuggingFace daily papers](https://huggingface.co/papers/2604.25719)
+

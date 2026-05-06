@@ -1,15 +1,15 @@
 ---
 arxiv_id: 2604.27151
-title: Step-level Optimization for Efficient Computer-use Agents
+title: "Step-level Optimization for Efficient Computer-use Agents"
 published: 2026-04-28
+primary_category: unknown
 hf_upvotes: 8
-popularity_score: 17
+popularity_score: 16
 suggested_stage: agentic
 suggested_series: Autoresearch
 fast_verdict: spark-feasible
 relevance_score: 0.78
 has_deep_eval: false
-promoted_to: null
 abs_url: https://arxiv.org/abs/2604.27151
 pdf_url: https://arxiv.org/pdf/2604.27151
 hf_paper_url: https://huggingface.co/papers/2604.27151
@@ -17,7 +17,7 @@ hf_paper_url: https://huggingface.co/papers/2604.27151
 
 # Step-level Optimization for Efficient Computer-use Agents
 
-**Verdict:** spark-feasible · **Series:** Autoresearch · **Stage:** agentic · **Relevance:** 0.78 · **Popularity:** 17/100
+**Verdict:** spark-feasible · **Series:** Autoresearch · **Stage:** agentic · **Relevance:** 0.78 · **Popularity:** 16/100
 
 > Routing routine GUI steps to a small policy and reserving the big MLLM for high-risk steps is exactly the kind of single-Spark optimization the blog studies.
 
@@ -37,10 +37,11 @@ _No public repo yet._
 
 ## Citations
 
-_not yet indexed_
+`citations: not yet indexed`
 
 ## Links
 
 - [arXiv abstract](https://arxiv.org/abs/2604.27151)
 - [PDF](https://arxiv.org/pdf/2604.27151)
 - [HuggingFace daily papers](https://huggingface.co/papers/2604.27151)
+

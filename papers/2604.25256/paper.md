@@ -2,8 +2,9 @@
 arxiv_id: 2604.25256
 title: "AutoResearchBench: Benchmarking AI Agents on Complex Scientific Literature Discovery"
 published: 2026-04-27
+primary_category: unknown
 hf_upvotes: 27
-popularity_score: 26
+popularity_score: 24
 suggested_stage: agentic
 suggested_series: Autoresearch
 fast_verdict: spark-feasible
@@ -18,7 +19,7 @@ hf_paper_url: https://huggingface.co/papers/2604.25256
 
 # AutoResearchBench: Benchmarking AI Agents on Complex Scientific Literature Discovery
 
-**Verdict:** spark-feasible · **Series:** Autoresearch · **Stage:** agentic · **Relevance:** 0.78 · **Popularity:** 26/100
+**Verdict:** spark-feasible · **Series:** Autoresearch · **Stage:** agentic · **Relevance:** 0.78 · **Popularity:** 24/100
 
 > Agent-driven literature discovery benchmark fits Autoresearch arc; runnable on Spark via NemoClaw + NIM + NeMo Retriever with pgvector, no training needed.
 
@@ -38,7 +39,7 @@ _No public repo yet._
 
 ## Citations
 
-_not yet indexed_
+`citations: not yet indexed`
 
 ## Links
 
@@ -53,3 +54,4 @@ _not yet indexed_
 ## Promoted
 
 This paper has been promoted to `articles/autoresearchbench-on-spark/` (status: upcoming).
+

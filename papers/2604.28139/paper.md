@@ -4,7 +4,7 @@ title: "Claw-Eval-Live: A Live Agent Benchmark for Evolving Real-World Workflows
 published: 2026-04-29
 primary_category: cs.SE
 hf_upvotes: 22
-popularity_score: 25
+popularity_score: 23
 suggested_stage: agentic
 suggested_series: Autoresearch
 fast_verdict: spark-feasible
@@ -19,7 +19,7 @@ hf_paper_url: https://huggingface.co/papers/2604.28139
 
 # Claw-Eval-Live: A Live Agent Benchmark for Evolving Real-World Workflows
 
-**Verdict:** spark-feasible · **Series:** Autoresearch · **Stage:** agentic · **Relevance:** 0.78 · **Popularity:** 25/100
+**Verdict:** spark-feasible · **Series:** Autoresearch · **Stage:** agentic · **Relevance:** 0.78 · **Popularity:** 23/100
 
 > Live agent benchmark with execution traces and graders maps cleanly onto NemoClaw/OpenClaw sandboxed agents on Spark for local workflow eval.
 
@@ -39,7 +39,7 @@ _No public repo yet._
 
 ## Citations
 
-_not yet indexed_
+`citations: not yet indexed`
 
 ## Links
 
@@ -54,3 +54,4 @@ _not yet indexed_
 ## Promoted
 
 This paper has been promoted to `articles/claw-eval-live-on-spark/` (status: upcoming).
+

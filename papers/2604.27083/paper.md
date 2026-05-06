@@ -1,15 +1,15 @@
 ---
 arxiv_id: 2604.27083
-title: Co-Evolving Policy Distillation
+title: "Co-Evolving Policy Distillation"
 published: 2026-04-28
+primary_category: unknown
 hf_upvotes: 35
-popularity_score: 28
+popularity_score: 26
 suggested_stage: fine-tuning
 suggested_series: Frontier Scout
 fast_verdict: borderline
 relevance_score: 0.55
 has_deep_eval: false
-promoted_to: null
 abs_url: https://arxiv.org/abs/2604.27083
 pdf_url: https://arxiv.org/pdf/2604.27083
 hf_paper_url: https://huggingface.co/papers/2604.27083
@@ -17,7 +17,7 @@ hf_paper_url: https://huggingface.co/papers/2604.27083
 
 # Co-Evolving Policy Distillation
 
-**Verdict:** borderline · **Series:** Frontier Scout · **Stage:** fine-tuning · **Relevance:** 0.55 · **Popularity:** 28/100
+**Verdict:** borderline · **Series:** Frontier Scout · **Stage:** fine-tuning · **Relevance:** 0.55 · **Popularity:** 26/100
 
 > Co-evolving multiple experts in parallel during RLVR is memory-heavy; whether it fits the 128 GB unified pool depends on expert sizes.
 
@@ -37,10 +37,11 @@ _No public repo yet._
 
 ## Citations
 
-_not yet indexed_
+`citations: not yet indexed`
 
 ## Links
 
 - [arXiv abstract](https://arxiv.org/abs/2604.27083)
 - [PDF](https://arxiv.org/pdf/2604.27083)
 - [HuggingFace daily papers](https://huggingface.co/papers/2604.27083)
+
