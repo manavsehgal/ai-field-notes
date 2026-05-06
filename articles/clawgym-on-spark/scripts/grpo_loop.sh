@@ -207,6 +207,7 @@ run_step() {
     # KL reference is FIXED to the SFT-init ($INIT) for every step — classic
     # GRPO fixed-SFT-init reference. The reference adapter is staged once
     # at /work/clawgym-grpo/_reference_adapter/ before the loop starts.
+    set +e
     docker exec "$CONTAINER" bash -c "
         cd /work/clawgym-grpo && python3 grpo_train.py \
             --bundle dryrun/trajectory_bundle.jsonl \
@@ -217,6 +218,28 @@ run_step() {
             --base-model Qwen/Qwen2.5-7B-Instruct \
             --lr $LR --kl-beta $KL_BETA --check-weight-delta
     " 2>&1 | tee "$step_dir/trainer.log"
+    trainer_exit=${PIPESTATUS[0]}
+    set -e
+
+    # Pool-saturation terminator: trainer returns 1 with "no usable rollouts"
+    # when every sampled group has zero-variance advantages. That's the natural
+    # endpoint of a small training pool — the policy reliably solves every task,
+    # so GRPO has no signal left. Exit cleanly instead of letting `set -e`
+    # propagate as a generic failure (the loop already produced N-1 adapters).
+    if [[ $trainer_exit -ne 0 ]]; then
+        if grep -q "no usable rollouts" "$step_dir/trainer.log"; then
+            echo ""
+            echo "=== POOL CONVERGED, EXITING EARLY (step $step) ==="
+            echo "Trainer reported all-zero advantages — every sampled group is"
+            echo "saturated at SUCCESS. The pool is exhausted as a learning signal."
+            echo "Last successfully-trained adapter: $current_adapter"
+            echo "=== loop complete in $(( $(date +%s) - t_loop ))s ==="
+            exit 0
+        else
+            echo "ERROR: trainer exited $trainer_exit (not pool saturation)" >&2
+            exit "$trainer_exit"
+        fi
+    fi
 
     # 5. Pull adapter back to host
     docker cp "$CONTAINER:/work/clawgym-grpo/adapter-step-$(printf '%03d' "$step")/" \
