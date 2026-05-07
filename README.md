@@ -26,18 +26,18 @@
 
 | Articles | Words | Lines of code | Models | NVIDIA products |
 |:-:|:-:|:-:|:-:|:-:|
-| **31** *(+4 upcoming)* | **82,591** | **44,083** | **8** | **11** |
+| **31** *(+5 upcoming)* | **106,881** | **100,147** | **8** | **11** |
 
 ### Stages
 
 | Stage | Published | Upcoming |
 |---|:-:|:-:|
 | [Foundations](https://ainative.business/field-notes/stage/foundations/) | 11 | — |
-| [Training](https://ainative.business/field-notes/stage/training/) | 9 | 1 |
-| [Fine-tuning](https://ainative.business/field-notes/stage/fine-tuning/) | 6 | 1 |
+| [Training](https://ainative.business/field-notes/stage/training/) | 9 | 2 |
+| [Fine-tuning](https://ainative.business/field-notes/stage/fine-tuning/) | 6 | 2 |
 | [Inference](https://ainative.business/field-notes/stage/inference/) | 14 | — |
 | [Deployment](https://ainative.business/field-notes/stage/deployment/) | 2 | — |
-| [Agentic](https://ainative.business/field-notes/stage/agentic/) | 11 | — |
+| [Agentic](https://ainative.business/field-notes/stage/agentic/) | 11 | 1 |
 | [Observability](https://ainative.business/field-notes/stage/observability/) | 6 | 1 |
 | [Dev-tools](https://ainative.business/field-notes/stage/dev-tools/) | 2 | 1 |
 
@@ -47,13 +47,13 @@
 |---|:-:|
 | NVIDIA NIM | 29 |
 | DGX Spark | 27 |
-| NeMo Framework | 23 |
-| TensorRT-LLM | 15 |
+| NeMo Framework | 24 |
+| TensorRT-LLM | 16 |
+| Triton Inference Server | 12 |
 | pgvector | 12 |
-| Triton Inference Server | 10 |
 | NeMo Retriever | 10 |
 | NemoClaw | 8 |
-| Ollama | 4 |
+| Ollama | 5 |
 | NeMo Guardrails | 4 |
 | OpenClaw | 3 |
 
@@ -99,6 +99,7 @@ Each article is a deep-dive essay grown from a single session transcript on the 
 - **[Distilling the Architect — A 3B LoRA Trained on the Agent's Own Trajectory](https://ainative.business/field-notes/articles/distill-architect-lora-from-trajectories/)** — A4's 50-iter trajectory becomes training data for a Qwen2.5-3B LoRA proposer. Holding out 8 iters, the 3B mode-collapses onto d_model=768 (the trajectory's most-frequent keep) and matches 0 / 8 exact; the 8B at T=0.5 matches 4 / 8 of its own past picks.
 - **[LoRA on Your Own Q&A — What 231 Pairs Actually Teach a 3B Model](https://ainative.business/field-notes/articles/lora-on-your-own-qa-pairs/)** — 231 own-voice Q&A pairs, a rank-16 LoRA, 69 s of training on a GB10 Spark. The adapter won't memorize your exact numbers, but it will take a model that refuses 61% of questions about your work and turn it into one that answers all of them in your voice. For facts you still need RAG.
 - 🔜 **[LoRA on Nemotron Nano — Fine-tuning a 9B Without Blowing Unified Memory](https://ainative.business/field-notes/articles/lora-fine-tune-nemotron-on-spark/)** *(planned 2026-05-14)* — A planned walk through LoRA fine-tuning on Nemotron Nano 9B with NeMo Customizer: rank and alpha sweeps, a tiny domain corpus, and the memory accounting that keeps a PEFT run from tripping the Spark's 128 GB unified-memory wall.
+- 🔜 **[T²PO on Spark — Uncertainty-Guided Exploration on Top of the GRPO Loop](https://ainative.business/field-notes/articles/t2po-uncertainty-guided-rl-on-spark/)** *(planned 2026-05-07)* — ICML 2026 spotlight paper layers two uncertainty-guided controls on top of GRPO for multi-turn agents. Reproducing the algorithmic deltas on a single Spark with Qwen 2.5 7B + LoRA on the Phase 6 ClawGym harness, ALFWorld benchmark.
 
 ### Inference
 
