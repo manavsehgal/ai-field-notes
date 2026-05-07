@@ -1265,8 +1265,15 @@
         "one_line_rationale": "Uncertainty-guided exploration for multi-turn agentic RL \u2014 direct sequel to the GRPO-on-ClawGym arc."
       },
       "popularity_score": 14,
-      "deep_eval": null,
-      "promoted_to": null
+      "deep_eval": {
+        "path": "papers/2605.02178/eval.md",
+        "evaluated_at": "2026-05-07T14:03:57.000Z",
+        "verdict": "spark-feasible"
+      },
+      "promoted_to": {
+        "article_slug": "t2po-uncertainty-guided-rl-on-spark",
+        "status": "upcoming"
+      }
     },
     {
       "arxiv_id": "2604.27251",

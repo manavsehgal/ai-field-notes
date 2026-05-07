@@ -9,7 +9,9 @@ suggested_stage: training
 suggested_series: Autoresearch
 fast_verdict: spark-feasible
 relevance_score: 0.8
-has_deep_eval: false
+has_deep_eval: true
+deep_verdict: spark-feasible
+promoted_to: t2po-uncertainty-guided-rl-on-spark
 abs_url: https://arxiv.org/abs/2605.02178
 pdf_url: https://arxiv.org/pdf/2605.02178
 hf_paper_url: https://huggingface.co/papers/2605.02178
@@ -33,7 +35,9 @@ Recent progress in multi-turn reinforcement learning (RL) has significantly impr
 
 ## Repos
 
-_No public repo yet._
+| Repo | Stars | Language |
+|------|------:|----------|
+| [WillDreamer/T2PO](https://github.com/WillDreamer/T2PO) | 9 | Python |
 
 ## Citations
 
@@ -44,4 +48,12 @@ _No public repo yet._
 - [arXiv abstract](https://arxiv.org/abs/2605.02178)
 - [PDF](https://arxiv.org/pdf/2605.02178)
 - [HuggingFace daily papers](https://huggingface.co/papers/2605.02178)
+
+## Deep eval
+
+[Full feasibility eval →](./eval.md) (verdict: **spark-feasible**, evaluated 2026-05-07)
+
+## Promoted
+
+This paper has been promoted to `articles/t2po-uncertainty-guided-rl-on-spark/` (status: upcoming).
 
