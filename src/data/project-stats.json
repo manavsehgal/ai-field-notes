@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-07T01:48:10Z",
+  "generated_at": "2026-05-07T12:36:44Z",
   "articles": {
     "total": 31,
     "published": 31,
@@ -7,12 +7,12 @@
     "drafts": 0
   },
   "words": {
-    "total": 90746,
-    "mean_per_article": 2927,
+    "total": 106881,
+    "mean_per_article": 3447,
     "longest": {
-      "slug": "nim-first-inference-dgx-spark",
-      "title": "Your First NIM on a DGX Spark \u2014 What 24.8 Tokens Per Second Doesn't Tell You",
-      "words": 4289
+      "slug": "clawgym-on-spark-grpo",
+      "title": "ClawGym GRPO on Spark \u2014 Closing the Loop the SFT Adapter Couldn't",
+      "words": 4704
     }
   },
   "code": {
@@ -109,22 +109,22 @@
     {
       "id": "nemo",
       "label": "NeMo Framework",
-      "articles": 23
+      "articles": 24
     },
     {
       "id": "tensorrt-llm",
       "label": "TensorRT-LLM",
-      "articles": 15
+      "articles": 16
+    },
+    {
+      "id": "triton",
+      "label": "Triton Inference Server",
+      "articles": 12
     },
     {
       "id": "pgvector",
       "label": "pgvector",
       "articles": 12
-    },
-    {
-      "id": "triton",
-      "label": "Triton Inference Server",
-      "articles": 10
     },
     {
       "id": "nemo-retriever",
@@ -139,7 +139,7 @@
     {
       "id": "ollama",
       "label": "Ollama",
-      "articles": 4
+      "articles": 5
     },
     {
       "id": "nemo-guardrails",
@@ -153,7 +153,34 @@
     }
   ],
   "metrics": {
+    "throughput": [
+      {
+        "label": "runs the same 7b at",
+        "value": "600 tok/s",
+        "article_slug": "runtime-frontier-six-patches-on-spark"
+      },
+      {
+        "label": "fp8 engine runs at roughly",
+        "value": "25 tok/s",
+        "article_slug": "naive-rag-on-spark"
+      },
+      {
+        "label": "on h100 is bandwidth-bound at",
+        "value": "120 tok/s",
+        "article_slug": "clawgym-on-spark-grpo"
+      },
+      {
+        "label": "run the same setup at",
+        "value": "600 tok/s",
+        "article_slug": "test-time-distilling-for-exploration"
+      }
+    ],
     "accuracy": [
+      {
+        "label": "use to land the headline",
+        "value": "9% accuracy",
+        "article_slug": "autoresearchbench-on-spark"
+      },
       {
         "label": "the query the bench's headline",
         "value": "9% accuracy",
@@ -168,33 +195,6 @@
         "label": "three refused with partial retrieval",
         "value": "recall@5 = 0.50",
         "article_slug": "bigger-generator-grounding-on-spark"
-      },
-      {
-        "label": "three deep-research questions the same",
-        "value": "0% Accuracy",
-        "article_slug": "autoresearchbench-on-spark"
-      }
-    ],
-    "throughput": [
-      {
-        "label": "fp8 engine runs at roughly",
-        "value": "25 tok/s",
-        "article_slug": "naive-rag-on-spark"
-      },
-      {
-        "label": "the nim number scales from",
-        "value": "22 tok/s",
-        "article_slug": "trtllm-and-triton-on-spark"
-      },
-      {
-        "label": "that names the right number",
-        "value": "24.8 t/s",
-        "article_slug": "mcp-second-brain-in-claude-code"
-      },
-      {
-        "label": "clawnav is pinned to nemotron",
-        "value": "22 tok/s",
-        "article_slug": "nemoclaw-vs-openclaw-dgx-spark"
       }
     ],
     "latency": [
