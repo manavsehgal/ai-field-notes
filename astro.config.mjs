@@ -5,6 +5,7 @@ import remarkDirective from 'remark-directive';
 import rehypeCaption from './src/lib/rehype-caption.mjs';
 import remarkFixLinks from './src/lib/remark-fix-links.mjs';
 import remarkExplainers from './src/lib/remark-explainers.mjs';
+import rehypeExplainerFigure from './src/lib/rehype-explainer-figure.mjs';
 
 // ai-field-notes — Astro config
 // Content sourced from ../articles/<slug>/article.md via content collection
@@ -39,7 +40,7 @@ export default defineConfig({
       remarkDirective,
       remarkExplainers,
     ],
-    rehypePlugins: [rehypeCaption],
+    rehypePlugins: [rehypeCaption, rehypeExplainerFigure],
     shikiConfig: {
       theme: 'github-dark-dimmed',
       wrap: true,

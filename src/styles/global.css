@@ -351,12 +351,14 @@ main { flex: 1; padding-top: 4rem; /* offset for fixed nav */ }
   background: var(--color-surface-overlay);
 }
 
-/* Article image breakout — preserve the 80rem container-width pattern from the old .prose img trick,
-   applied automatically to any bare markdown <p><img></p> inside .prose (matching ainative's .figure--bleed idea).
-   Anchor at the prose-column center, then translate back by half the element's own width so both sides bleed equally. */
+/* Article image breakout — anchor at the prose-column center, translate back by half the element's
+   own width so both sides bleed equally. Cap at 88rem (4rem inset from the 92rem .article frame).
+   Wide figures and gutter-floated explainers compete for the same horizontal space; rather than
+   layering or gap-clearing, the explainer-side rule in explainers.css drops a float to inline
+   when it precedes a figure — so the explainer renders above the figure as a prose-width block. */
 .prose p > img:only-child,
 .prose figure.figure--bleed img {
-  width: min(calc(100vw - 3rem), calc(80rem - 3rem));
+  width: min(calc(100vw - 3rem), calc(88rem - 3rem));
   max-width: none;
   margin-left: 50%;
   transform: translateX(-50%);
@@ -1237,7 +1239,7 @@ html[data-theme="light"] .masthead__plate-frame img {
 
 /* ---------- Article frame ---------- */
 .article {
-  max-width: 80rem;
+  max-width: 92rem;
   margin-inline: auto;
   padding: 4rem 1.5rem 6rem;
 }

@@ -88,7 +88,25 @@ export default function remarkExplainers() {
       return [SKIP, index];
     });
 
-    visit(tree, (node) => {
+    // Detect mdast siblings within `lookahead` that are wide figure-like
+    // blocks: raw-HTML figure/img, or a paragraph that's just an image.
+    const FIGURE_HTML_RE = /^\s*<figure[\s>]/i;
+    const IMG_HTML_RE = /^\s*<img[\s>]/i;
+    function precedesFigure(parent, index, lookahead = 3) {
+      const limit = Math.min(parent.children.length - 1, index + lookahead);
+      for (let i = index + 1; i <= limit; i++) {
+        const s = parent.children[i];
+        if (!s) continue;
+        if (s.type === 'html' && (FIGURE_HTML_RE.test(s.value) || IMG_HTML_RE.test(s.value))) return true;
+        if (s.type === 'paragraph' && Array.isArray(s.children)) {
+          const meaningful = s.children.filter((c) => c.type !== 'text' || (c.value && c.value.trim()));
+          if (meaningful.length === 1 && meaningful[0].type === 'image') return true;
+        }
+      }
+      return false;
+    }
+
+    visit(tree, (node, index, parent) => {
       if (node.type !== 'containerDirective') return;
       if (!KNOWN.has(node.name)) return;
 
@@ -112,13 +130,21 @@ export default function remarkExplainers() {
       }
 
       data.hName = 'aside';
+      const className = ['explain', `explain--${node.name}`];
+      if (parent && index != null && precedesFigure(parent, index)) {
+        className.push('explain--before-figure');
+      }
       const props = {
         id: anchor,
-        className: ['explain', `explain--${node.name}`],
+        className,
         'data-explain': node.name,
       };
       if (labelText) props['data-term'] = labelText;
       data.hProperties = props;
+      // Belt + suspenders: rehype-explainer-figure.mjs also tags
+      // explain--before-figure at the hast stage (catches cases the mdast
+      // sibling walk misses, e.g. raw-HTML figures stitched in differently
+      // by Astro's pipeline).
 
       if (node.name === 'define' && labelText) {
         const bodyChildren = children.filter((c) => !(c.data && c.data.directiveLabel));

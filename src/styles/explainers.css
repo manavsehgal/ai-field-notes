@@ -97,29 +97,96 @@
 .prose .explain--hardware { border-left-color: oklch(0.78 0.12 95); }
 
 /* ── Wide viewport: float into the right gutter ─────────────────────────────
-   .prose lives at max-width 48rem inside .article (max-width 80rem) — that
-   leaves ~14rem on each side. We claim 13rem of the right gutter and a
-   negative margin pulls the aside out of the prose column without disturbing
-   text reflow. shape-outside keeps the prose paragraphs hugging the float
-   edge naturally.                                                            */
+   .prose lives at max-width 48rem inside .article (max-width 92rem) — that
+   leaves up to 22rem of gutter on each side. Width is tokenised via custom
+   properties so the three-band media-query cascade below scales the float
+   with available gutter (13rem at ≥64rem, 15rem at ≥80rem, 17rem at ≥92rem).
+   Negative margin pulls the aside out of the prose column without disturbing
+   text reflow; shape-outside keeps prose hugging the float edge naturally.   */
+.prose {
+  --explainer-width: 13rem;
+  --explainer-claim: 14rem;
+  --explainer-gap: 1.25rem;
+}
+
 @media (min-width: 64rem) {
   html:not([data-explain-mode="inline"]):not([data-explain-mode="hide"]) .prose .explain {
     float: right;
     clear: right;
-    width: 13rem;
-    margin-right: -14rem;
-    margin-left: 1.25rem;
+    width: var(--explainer-width);
+    margin-right: calc(var(--explainer-claim) * -1);
+    margin-left: var(--explainer-gap);
     margin-top: 0.25rem;
     margin-bottom: 1rem;
     shape-outside: margin-box;
+    shape-margin: 0.5rem;
   }
   /* Alternating side: every other explainer drops to the left gutter so a
      long sequence doesn't pile up in a single column. */
   html:not([data-explain-mode="inline"]):not([data-explain-mode="hide"]) .prose .explain:nth-of-type(2n) {
     float: left;
     clear: left;
-    margin-left: -14rem;
-    margin-right: 1.25rem;
+    margin-left: calc(var(--explainer-claim) * -1);
+    margin-right: var(--explainer-gap);
+  }
+  /* Last explainer renders inline (full prose width) so the floated gutter
+     doesn't extend past the article body's natural end. The closing
+     :::hardware block reads as a full-width callout — like a closing quote.
+     MUST come AFTER the :nth-of-type(2n) rule (same specificity, source
+     order wins). shape-outside is reset because the property persists across
+     float removal in some engines. */
+  html:not([data-explain-mode="inline"]):not([data-explain-mode="hide"]) .prose .explain:last-of-type {
+    float: none;
+    clear: both;
+    width: auto;
+    margin: 2.5rem 0 0;
+    shape-outside: none;
+  }
+
+  /* Explainer that precedes (within ~3 siblings) a wide figure-block also
+     drops its float and renders inline. Wide figures (.fn-diagram,
+     .figure--bleed, .figure--wide, breakout images) and gutter-floated
+     explainers compete for the same horizontal space — overlap or
+     clear:both both look bad. Inline-rendering the explainer above the
+     figure avoids both: the explainer reads as a full-prose-width callout,
+     then the figure flows freely below. The .explain--before-figure class
+     is added at the hast stage by rehype-explainer-figure.mjs when a
+     figure or bare image follows the explainer within 3 sibling positions.
+     `.explain.explain--before-figure` matches the `:nth-of-type(2n)` /
+     `:last-of-type` rule specificity above; source order is what wins. */
+  html:not([data-explain-mode="inline"]):not([data-explain-mode="hide"]) .prose .explain.explain--before-figure {
+    float: none;
+    clear: both;
+    width: auto;
+    margin: 1.5rem 0;
+    margin-left: 0;
+    margin-right: 0;
+    shape-outside: none;
+  }
+}
+
+/* Three-band viewport sizing — explainer grows with available gutter */
+@media (min-width: 80rem) {
+  .prose {
+    --explainer-width: 15rem;
+    --explainer-claim: 16.25rem;
+  }
+}
+@media (min-width: 92rem) {
+  .prose {
+    --explainer-width: 17rem;
+    --explainer-claim: 18.25rem;
+  }
+}
+
+/* Print: explainers inline so the gutter doesn't break across pages */
+@media print {
+  .prose .explain {
+    float: none !important;
+    clear: both !important;
+    width: auto !important;
+    margin: 1rem 0 !important;
+    shape-outside: none !important;
   }
 }
 

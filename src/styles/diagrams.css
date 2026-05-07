@@ -17,13 +17,18 @@
   --fn-stagger: 120ms;
 }
 
-/* --- Figure wrapper — break out of the prose column to fill .article (80rem).
+/* --- Figure wrapper — break out of the prose column. Caps at 88rem (4rem
+ * inset from the 92rem .article frame) so the diagram remains visually
+ * proportional in the wider article. When a floated explainer immediately
+ * precedes the diagram, the explainers stylesheet drops that explainer's
+ * float and renders it inline at prose width — so the diagram flows freely
+ * below it without overlap or side-gap.
  * Selector uses .prose to win specificity against `.prose figure { margin: 2rem 0 }`
  * in global.css, which would otherwise zero the left margin and shift the figure. */
 
 .prose .fn-diagram {
   display: block;
-  width: min(calc(100vw - 3rem), calc(80rem - 3rem));
+  width: min(calc(100vw - 3rem), calc(88rem - 3rem));
   margin-left: 50%;
   margin-right: 0;
   margin-top: 3rem;
