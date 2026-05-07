@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-06T18:48:07Z",
+  "generated_at": "2026-05-07T01:48:10Z",
   "articles": {
     "total": 31,
     "published": 31,
@@ -7,12 +7,12 @@
     "drafts": 0
   },
   "words": {
-    "total": 83991,
-    "mean_per_article": 2709,
+    "total": 90746,
+    "mean_per_article": 2927,
     "longest": {
-      "slug": "clawgym-on-spark-grpo",
-      "title": "ClawGym GRPO on Spark \u2014 Closing the Loop the SFT Adapter Couldn't",
-      "words": 3895
+      "slug": "nim-first-inference-dgx-spark",
+      "title": "Your First NIM on a DGX Spark \u2014 What 24.8 Tokens Per Second Doesn't Tell You",
+      "words": 4289
     }
   },
   "code": {
@@ -204,6 +204,11 @@
         "article_slug": "naive-rag-on-spark"
       },
       {
+        "label": "loop over distances finishes in",
+        "value": "2 ms",
+        "article_slug": "pgvector-on-spark"
+      },
+      {
         "label": "the flashinfer autotuner runs in",
         "value": "60 ms",
         "article_slug": "test-time-distilling-for-exploration"
@@ -211,11 +216,6 @@
       {
         "label": "pgvector returns the top-5 in",
         "value": "70 ms",
-        "article_slug": "naive-rag-on-spark"
-      },
-      {
-        "label": "on the task one call",
-        "value": "40 ms",
         "article_slug": "naive-rag-on-spark"
       }
     ]
