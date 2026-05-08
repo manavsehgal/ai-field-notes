@@ -1,3 +1,10 @@
+<!--
+  ⚠️ STATUS: SHIPPED — content below is consumed once the destination syncs through commit f5c29ed (2026-05-08).
+  At the next release prompt, **clear this entire file and start fresh** (do NOT append to existing sections).
+  The file is *one feature/release at a time* — not a running log.
+  Last reset: never (this is the original explainers-feature doc + the 2026-05-08 MTBM-rename append).
+-->
+
 # SYNC-HANDOFF — Explainers feature (Phases 1–3 + layout fix)
 
 This document is the canonical inventory for syncing the **explainers feature** (and its companion Kindle-style reader UX) from the source repo `manavsehgal/ai-field-notes` to the destination repo that publishes `https://ainative.business/field-notes/`. The destination consumer should read this end-to-end and use the file lists, dependency changes, and behavior contracts below to identify every change worth porting.
