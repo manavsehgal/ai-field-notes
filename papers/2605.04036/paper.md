@@ -6,7 +6,7 @@ primary_category: cs.AI
 hf_upvotes: 36
 popularity_score: 28
 suggested_stage: fine-tuning
-suggested_series: Autoresearch
+suggested_series: Machine that Builds Machines
 fast_verdict: spark-feasible
 relevance_score: 0.78
 has_deep_eval: false
@@ -17,7 +17,7 @@ hf_paper_url: https://huggingface.co/papers/2605.04036
 
 # OpenSeeker-v2: Pushing the Limits of Search Agents with Informative and High-Difficulty Trajectories
 
-**Verdict:** spark-feasible · **Series:** Autoresearch · **Stage:** fine-tuning · **Relevance:** 0.78 · **Popularity:** 28/100
+**Verdict:** spark-feasible · **Series:** Machine that Builds Machines · **Stage:** fine-tuning · **Relevance:** 0.78 · **Popularity:** 28/100
 
 > SFT-only recipe for deep-search agents at small scale — high-signal trajectories + LoRA on a 7B base fits the Spark.
 

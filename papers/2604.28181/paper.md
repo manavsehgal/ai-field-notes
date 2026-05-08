@@ -6,7 +6,7 @@ primary_category: cs.AI
 hf_upvotes: 9
 popularity_score: 17
 suggested_stage: agentic
-suggested_series: Autoresearch
+suggested_series: Machine that Builds Machines
 fast_verdict: spark-feasible
 relevance_score: 0.78
 has_deep_eval: false
@@ -17,7 +17,7 @@ hf_paper_url: https://huggingface.co/papers/2604.28181
 
 # Synthetic Computers at Scale for Long-Horizon Productivity Simulation
 
-**Verdict:** spark-feasible · **Series:** Autoresearch · **Stage:** agentic · **Relevance:** 0.78 · **Popularity:** 17/100
+**Verdict:** spark-feasible · **Series:** Machine that Builds Machines · **Stage:** agentic · **Relevance:** 0.78 · **Popularity:** 17/100
 
 > Synthetic-computer long-horizon agent sims map directly onto OpenShell sandboxes inside NemoClaw, with NIM-hosted Nemotron driving the loop.
 

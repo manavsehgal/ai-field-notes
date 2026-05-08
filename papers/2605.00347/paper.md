@@ -6,7 +6,7 @@ primary_category: unknown
 hf_upvotes: 12
 popularity_score: 19
 suggested_stage: training
-suggested_series: Autoresearch
+suggested_series: Machine that Builds Machines
 fast_verdict: borderline
 relevance_score: 0.65
 has_deep_eval: false
@@ -17,7 +17,7 @@ hf_paper_url: https://huggingface.co/papers/2605.00347
 
 # Odysseus: Scaling VLMs to 100+ Turn Decision-Making in Games via Reinforcement Learning
 
-**Verdict:** borderline · **Series:** Autoresearch · **Stage:** training · **Relevance:** 0.65 · **Popularity:** 19/100
+**Verdict:** borderline · **Series:** Machine that Builds Machines · **Stage:** training · **Relevance:** 0.65 · **Popularity:** 19/100
 
 > 100+ turn VLM RL on Mario — small-VLM fits, but 100+ turn rollouts × RL may push the unified-memory budget; verify in eval.
 

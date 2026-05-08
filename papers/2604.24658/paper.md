@@ -6,7 +6,7 @@ primary_category: unknown
 hf_upvotes: 7
 popularity_score: 15
 suggested_stage: agentic
-suggested_series: Autoresearch
+suggested_series: Machine that Builds Machines
 fast_verdict: spark-feasible
 relevance_score: 0.6
 has_deep_eval: false
@@ -17,7 +17,7 @@ hf_paper_url: https://huggingface.co/papers/2604.24658
 
 # The Last Human-Written Paper: Agent-Native Research Artifacts
 
-**Verdict:** spark-feasible · **Series:** Autoresearch · **Stage:** agentic · **Relevance:** 0.60 · **Popularity:** 15/100
+**Verdict:** spark-feasible · **Series:** Machine that Builds Machines · **Stage:** agentic · **Relevance:** 0.60 · **Popularity:** 15/100
 
 > Agent-native research artifact protocol is process + tooling — implementable as a NemoClaw skill atop NIM-hosted reasoning models on Spark.
 

@@ -6,7 +6,7 @@ primary_category: unknown
 hf_upvotes: 181
 popularity_score: 39
 suggested_stage: agentic
-suggested_series: Autoresearch
+suggested_series: Machine that Builds Machines
 fast_verdict: spark-feasible
 relevance_score: 0.65
 has_deep_eval: true
@@ -19,7 +19,7 @@ hf_paper_url: https://huggingface.co/papers/2604.27351
 
 # Heterogeneous Scientific Foundation Model Collaboration
 
-**Verdict:** spark-feasible · **Series:** Autoresearch · **Stage:** agentic · **Relevance:** 0.65 · **Popularity:** 39/100
+**Verdict:** spark-feasible · **Series:** Machine that Builds Machines · **Stage:** agentic · **Relevance:** 0.65 · **Popularity:** 39/100
 
 > Lightweight LLM-orchestrator over domain foundation models is software glue that fits NemoClaw/NIM; underlying scientific FMs would be hosted as endpoints.
 

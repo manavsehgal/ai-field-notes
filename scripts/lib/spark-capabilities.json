@@ -156,7 +156,7 @@
     "Foundations": "shared install / setup substrate; cross-cutting onboarding",
     "Second Brain": "RAG over the user's own corpus; query-time generation",
     "LLM Wiki": "compile-time synthesis; LLM maintains a linted knowledge base",
-    "Autoresearch": "autonomous experimentation; agent runs overnight loops, edits, measures, decides",
+    "Machine that Builds Machines": "AI systems that build/train/improve other AI artifacts; covers self-improvement loops (RL on agent trajectories — GRPO/GiGPO/T²PO/REINFORCE; test-time distillation), synthetic-data pipelines (persona-driven task synthesis, agent-generated training corpora), codegen / SDLC agents (multi-turn agents on SWE-bench / ClawGym / AgentBench / Workspace-Bench shapes), self-fine-tuning (agents fine-tuning their own LoRAs on their own trajectories), multi-agent swarms (debate, voting, role-based meshes for SWE or experimentation), alignment-engineering primitives (provenance graphs, intent traces, knowledge graphs over codebases — 8090.ai-shaped territory), meta-learning (learn-to-learn, learn-to-finetune, agent curricula), and autonomous research loops (the original karpathy-style overnight ML experimentation; spine of A1–A9, one installment of the broader thesis). Tied to /book/ Ch10 'The Machine That Builds Machines' + Ch11 'The Meta-Program'. Renamed from 'Autoresearch' on 2026-05-08; legacy alias resolves at read time.",
     "Looking Beyond Spark": "arithmetic that extrapolates beyond the 128 GB envelope to H100/H200/B200/SuperPOD",
     "Frontier Scout": "the meta-series — papers + the system that found them"
   }

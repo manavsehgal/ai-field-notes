@@ -6,7 +6,7 @@ primary_category: unknown
 hf_upvotes: 86
 popularity_score: 33
 suggested_stage: agentic
-suggested_series: Autoresearch
+suggested_series: Machine that Builds Machines
 fast_verdict: borderline
 relevance_score: 0.6
 has_deep_eval: false
@@ -17,7 +17,7 @@ hf_paper_url: https://huggingface.co/papers/2604.26752
 
 # GLM-5V-Turbo: Toward a Native Foundation Model for Multimodal Agents
 
-**Verdict:** borderline · **Series:** Autoresearch · **Stage:** agentic · **Relevance:** 0.60 · **Popularity:** 33/100
+**Verdict:** borderline · **Series:** Machine that Builds Machines · **Stage:** agentic · **Relevance:** 0.60 · **Popularity:** 33/100
 
 > GLM-5V-Turbo is a frontier multimodal agent model; only borderline for Spark inference depending on released parameter count and quantization.
 

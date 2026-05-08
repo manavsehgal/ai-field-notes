@@ -275,3 +275,99 @@ For deeper reference if needed during sync:
 - Authoring rules + worked examples: source repo `/.claude/skills/tech-writer/references/explainers.md` (this is the playbook future articles follow).
 - Phase summaries in source: commits `a85dd6a` (Phase 1), `90392ad` (Phase 2), `ebe2994` (Phase 3), `5b51787` (layout fix).
 - Live source dev URL: `http://localhost:4321/` on Spark, `http://10.0.0.209:4321/` on LAN.
+
+---
+
+# Update — 2026-05-08: Editorial arc rename `Autoresearch` → `Machine that Builds Machines`
+
+The third running use-case arc has been renamed and broadened. The destination repo must migrate in lockstep — its Astro build will fail Zod validation if any article frontmatter still says `series: Autoresearch` after this sync.
+
+## What changed
+
+**Rationale.** The `Autoresearch` arc was scoped narrowly to karpathy/autoresearch-style overnight ML experimentation. The `/book/` Part-4 *Vision* thesis (Ch10 "The Machine That Builds Machines," Ch11 "The Meta-Program") covers a much wider territory — self-improvement loops on agent trajectories (GRPO/T²PO), synthetic-data pipelines (persona-driven task synth), codegen / SDLC agents (ClawGym / SWE-bench shape), self-fine-tuning, multi-agent swarms, alignment-engineering primitives (provenance graphs, intent traces — what 8090.ai sells as a $1M/yr managed service), meta-learning, and the original autoresearch loop as one installment of the broader thesis. Field-notes had no schema to surface evidence for that book arc; renaming + broadening Autoresearch closes the gap. Karpathy's autoresearch loop remains the spine of A1–A9.
+
+## Schema changes — `src/content.config.ts`
+
+```diff
+ export const SERIES = [
+   'Foundations',
+   'Second Brain',
+   'LLM Wiki',
+-  'Autoresearch',
++  'Machine that Builds Machines',
+   'Looking Beyond Spark',
+   'Frontier Scout',
+ ] as const;
+
+ export const SERIES_SLUGS: Record<(typeof SERIES)[number], string> = {
+   'Foundations': 'foundations',
+   'Second Brain': 'second-brain',
+   'LLM Wiki': 'llm-wiki',
+-  'Autoresearch': 'autoresearch',
++  'Machine that Builds Machines': 'machine-that-builds-machines',
+   'Looking Beyond Spark': 'looking-beyond-spark',
+   'Frontier Scout': 'frontier-scout',
+ };
+```
+
+**New optional frontmatter field — `book_chapters: number[]`:**
+
+```ts
+// Which `/book/` chapter(s) this article grounds with field evidence.
+// Optional and mostly used by "Machine that Builds Machines" articles
+// (default [10]). The destination site can render a "Field evidence"
+// backlink at the foot of /book/<chapter>/ pages by querying articles
+// whose book_chapters includes the chapter number. Source repo doesn't
+// render this — the field is forward-compatible declaration.
+book_chapters: z.array(z.number().int().min(1).max(14)).optional(),
+```
+
+## Article frontmatter migrations (8 articles)
+
+All 8 articles previously tagged `series: Autoresearch` were updated:
+
+| Slug | New `series` | New `book_chapters` |
+|---|---|---|
+| `autoresearch-agent-loop` | Machine that Builds Machines | `[10]` |
+| `baseline-training-loop-on-spark` | Machine that Builds Machines | `[10]` |
+| `distill-architect-lora-from-trajectories` | Machine that Builds Machines | `[10, 11]` *(also Ch11 The Meta-Program)* |
+| `guardrails-for-code-generation` | Machine that Builds Machines | `[10]` |
+| `nemo-curator-training-data-prep` | Machine that Builds Machines | `[10]` |
+| `nemo-framework-continued-pretraining-on-spark` *(upcoming)* | Machine that Builds Machines | `[10]` |
+| `nemo-framework-on-spark` | Machine that Builds Machines | `[10]` |
+| `trajectory-eval-is-the-agent-flailing` | Machine that Builds Machines | `[10]` |
+
+**Slug discipline:** article slugs containing `autoresearch` (e.g. `autoresearch-agent-loop`, `autoresearchbench-on-spark`) are *not* renamed. Slugs are URLs and survive arc renames.
+
+## URL change — `/series/autoresearch/` retired
+
+The series-index page slug changes from `/series/autoresearch/` → `/series/machine-that-builds-machines/`. If the destination wants to keep the old URL working (e.g., for inbound links from external sites), add a redirect rule. The source repo treats the new slug as canonical and does not ship a redirect.
+
+## Forward-compatible feature for the destination — `book_chapters` backlinks
+
+The `book_chapters: [10]` frontmatter field is *declared* in the source schema but the source repo does **not** render the backlink. This is a free win the destination can claim:
+
+- Render a "Field evidence" section at the foot of each `/book/<chapter>/` page.
+- Query: all articles whose `book_chapters` array includes the chapter number.
+- Initial population: 8 MTBM articles point at Ch10 ; 1 article (`distill-architect-lora-from-trajectories`) also points at Ch11.
+
+This closes the source↔destination loop that previously existed only in the book's prose ("see field-notes for proof") — readers reading Ch10 of the book can now see exactly which technical reproductions ground the chapter's claims.
+
+## Verification (after sync)
+
+In addition to the explainers checklist above, the destination should run:
+
+1. `grep -rn "series: Autoresearch" articles/` → empty. Any leftover `Autoresearch` will fail the Zod schema.
+2. `grep -rn "series: Machine that Builds Machines" articles/ | wc -l` → 8.
+3. `grep -rn "book_chapters:" articles/ | wc -l` → 8.
+4. `npm run build` → clean. The Zod enum-mismatch error is the failure mode if anything was missed.
+5. Visit `/series/machine-that-builds-machines/` → 7 published + 1 upcoming articles render.
+
+## Cache caveat (same as the explainers feature)
+
+Astro 5's content-collection cache holds frontmatter across builds. After pulling this change, run **`rm -rf .astro node_modules/.astro`** before the first build. Otherwise you may see a Zod error against stale cached frontmatter that's no longer in the markdown source.
+
+## Out of scope for this sync
+
+- The `chapter_alignment` and `mtbm_station` fields on `papers.json` are *frontier-scout-side* metadata; they don't ship to the destination because `papers/` is not synced (only `articles/` and `fieldkit/docs/api/` are).
+- `papers/<id>/eval.md` files are immutable — they retain the predecessor name "Autoresearch" as historical record. Only `papers.json` (canonical) and `paper.md` mirrors (regenerated on next refresh) are migrated.

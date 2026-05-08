@@ -6,7 +6,7 @@ primary_category: unknown
 hf_upvotes: 9
 popularity_score: 17
 suggested_stage: agentic
-suggested_series: Autoresearch
+suggested_series: Machine that Builds Machines
 fast_verdict: spark-feasible
 relevance_score: 0.7
 has_deep_eval: false
@@ -17,7 +17,7 @@ hf_paper_url: https://huggingface.co/papers/2604.27776
 
 # WindowsWorld: A Process-Centric Benchmark of Autonomous GUI Agents in Professional Cross-Application Environments
 
-**Verdict:** spark-feasible · **Series:** Autoresearch · **Stage:** agentic · **Relevance:** 0.70 · **Popularity:** 17/100
+**Verdict:** spark-feasible · **Series:** Machine that Builds Machines · **Stage:** agentic · **Relevance:** 0.70 · **Popularity:** 17/100
 
 > Cross-application Windows GUI benchmark — natural ClawGym/OpenClaw ablation target, runnable as Spark-side harness.
 

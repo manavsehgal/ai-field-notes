@@ -6,7 +6,7 @@ primary_category: unknown
 hf_upvotes: 9
 popularity_score: 18
 suggested_stage: agentic
-suggested_series: Autoresearch
+suggested_series: Machine that Builds Machines
 fast_verdict: spark-feasible
 relevance_score: 0.7
 has_deep_eval: false
@@ -17,7 +17,7 @@ hf_paper_url: https://huggingface.co/papers/2605.02396
 
 # HeavySkill: Heavy Thinking as the Inner Skill in Agentic Harness
 
-**Verdict:** spark-feasible · **Series:** Autoresearch · **Stage:** agentic · **Relevance:** 0.70 · **Popularity:** 18/100
+**Verdict:** spark-feasible · **Series:** Machine that Builds Machines · **Stage:** agentic · **Relevance:** 0.70 · **Popularity:** 18/100
 
 > Internalizing 'heavy thinking' into the model rather than the harness — directly testable on Spark's NIM-hosted thinking models.
 

@@ -6,7 +6,7 @@ primary_category: unknown
 hf_upvotes: 44
 popularity_score: 28
 suggested_stage: agentic
-suggested_series: Autoresearch
+suggested_series: Machine that Builds Machines
 fast_verdict: spark-feasible
 relevance_score: 0.82
 has_deep_eval: true
@@ -19,7 +19,7 @@ hf_paper_url: https://huggingface.co/papers/2604.26904
 
 # ClawGym: A Scalable Framework for Building Effective Claw Agents
 
-**Verdict:** spark-feasible · **Series:** Autoresearch · **Stage:** agentic · **Relevance:** 0.82 · **Popularity:** 28/100
+**Verdict:** spark-feasible · **Series:** Machine that Builds Machines · **Stage:** agentic · **Relevance:** 0.82 · **Popularity:** 28/100
 
 > Claw-style sandboxed agent SFT + lightweight RL on per-task sandboxes maps directly onto NemoClaw + NeMo fine-tuning within the 128 GB envelope.
 

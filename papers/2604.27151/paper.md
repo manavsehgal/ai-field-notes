@@ -6,7 +6,7 @@ primary_category: unknown
 hf_upvotes: 8
 popularity_score: 16
 suggested_stage: agentic
-suggested_series: Autoresearch
+suggested_series: Machine that Builds Machines
 fast_verdict: spark-feasible
 relevance_score: 0.78
 has_deep_eval: false
@@ -17,7 +17,7 @@ hf_paper_url: https://huggingface.co/papers/2604.27151
 
 # Step-level Optimization for Efficient Computer-use Agents
 
-**Verdict:** spark-feasible · **Series:** Autoresearch · **Stage:** agentic · **Relevance:** 0.78 · **Popularity:** 16/100
+**Verdict:** spark-feasible · **Series:** Machine that Builds Machines · **Stage:** agentic · **Relevance:** 0.78 · **Popularity:** 16/100
 
 > Routing routine GUI steps to a small policy and reserving the big MLLM for high-risk steps is exactly the kind of single-Spark optimization the blog studies.
 

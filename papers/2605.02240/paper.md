@@ -6,7 +6,7 @@ primary_category: unknown
 hf_upvotes: 6
 popularity_score: 15
 suggested_stage: agentic
-suggested_series: Autoresearch
+suggested_series: Machine that Builds Machines
 fast_verdict: borderline
 relevance_score: 0.55
 has_deep_eval: false
@@ -17,7 +17,7 @@ hf_paper_url: https://huggingface.co/papers/2605.02240
 
 # PhysicianBench: Evaluating LLM Agents in Real-World EHR Environments
 
-**Verdict:** borderline · **Series:** Autoresearch · **Stage:** agentic · **Relevance:** 0.55 · **Popularity:** 15/100
+**Verdict:** borderline · **Series:** Machine that Builds Machines · **Stage:** agentic · **Relevance:** 0.55 · **Popularity:** 15/100
 
 > Long-horizon EHR agent benchmark — domain-specific but the harness shape mirrors ClawGym; runnable against a hosted NIM.
 

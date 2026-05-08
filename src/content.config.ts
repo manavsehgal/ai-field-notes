@@ -28,11 +28,16 @@ export const STAGES = [
 // unset. Foundations covers F1–F7 and the bridge (B). The three application
 // arcs follow the bridge; Looking Beyond Spark is the fourth, opportunistic
 // thread for arithmetic that extrapolates beyond the 128 GB Spark envelope.
+// "Machine that Builds Machines" was renamed from "Autoresearch" on
+// 2026-05-08 and broadened to cover the full /book/ Part-4 Vision thesis —
+// AI systems that build, improve, evaluate, or supervise other AI/ML
+// artifacts. The slug stays "autoresearch" so existing inbound links and
+// /series/autoresearch/ bookmarks keep resolving.
 export const SERIES = [
   'Foundations',
   'Second Brain',
   'LLM Wiki',
-  'Autoresearch',
+  'Machine that Builds Machines',
   'Looking Beyond Spark',
   'Frontier Scout',
 ] as const;
@@ -43,7 +48,7 @@ export const SERIES_SLUGS: Record<(typeof SERIES)[number], string> = {
   'Foundations': 'foundations',
   'Second Brain': 'second-brain',
   'LLM Wiki': 'llm-wiki',
-  'Autoresearch': 'autoresearch',
+  'Machine that Builds Machines': 'machine-that-builds-machines',
   'Looking Beyond Spark': 'looking-beyond-spark',
   'Frontier Scout': 'frontier-scout',
 };
@@ -87,6 +92,13 @@ const articles = defineCollection({
     // Editorial series — the running narrative thread the article belongs
     // to. Optional: preamble pieces outside the arc system leave it unset.
     series: z.enum(SERIES).optional(),
+    // Which `/book/` chapter(s) this article grounds with field evidence.
+    // Optional and mostly used by "Machine that Builds Machines" articles
+    // (default [10]). The destination site can render a "Field evidence"
+    // backlink at the foot of /book/<chapter>/ pages by querying articles
+    // whose book_chapters includes the chapter number. Source repo doesn't
+    // render this — the field is forward-compatible declaration.
+    book_chapters: z.array(z.number().int().min(1).max(14)).optional(),
     // Which `fieldkit` modules this article exercises. Drives the
     // "uses fieldkit.X" chip on cards and the back-links from module
     // reference pages. Conservative — only set on articles that actually

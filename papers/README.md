@@ -8,9 +8,9 @@ These are the papers most worth running through `/frontier-scout eval <id>` next
 
 1. **[From Context to Skills: Can Language Models Learn from Context Skillfully?](2604.27660/paper.md)** · 132 upv · spark-feasible · LLM Wiki
    _Inference-time skill extraction from long context — a NIM-hostable LLM workflow, easy to stand up on Spark for an 'LLM Wiki' study._
-2. **[ARIS: Autonomous Research via Adversarial Multi-Agent Collaboration](2605.03042/paper.md)** · 65 upv · spark-feasible · Autoresearch
-   _Open-source autonomous-research harness with adversarial review — direct Autoresearch-arc material; runs over hosted NIM endpoints._
-3. **[OpenSeeker-v2: Pushing the Limits of Search Agents with Informative and High-Difficulty Trajectories](2605.04036/paper.md)** · 36 upv · spark-feasible · Autoresearch
+2. **[ARIS: Autonomous Research via Adversarial Multi-Agent Collaboration](2605.03042/paper.md)** · 65 upv · spark-feasible · Machine that Builds Machines
+   _Open-source autonomous-research harness with adversarial review — direct MTBM-arc material; runs over hosted NIM endpoints._
+3. **[OpenSeeker-v2: Pushing the Limits of Search Agents with Informative and High-Difficulty Trajectories](2605.04036/paper.md)** · 36 upv · spark-feasible · Machine that Builds Machines
    _SFT-only recipe for deep-search agents at small scale — high-signal trajectories + LoRA on a 7B base fits the Spark._
 4. **[Beyond SFT-to-RL: Pre-alignment via Black-Box On-Policy Distillation for Multimodal RL](2604.28123/paper.md)** · 34 upv · spark-feasible · LLM Wiki
    _Black-box on-policy distillation as pre-alignment for multimodal RL — small-student distillation is in the Spark envelope._
@@ -48,14 +48,14 @@ See [runs/2026-05-06/refresh-summary.md](runs/2026-05-06/refresh-summary.md) for
 - [2604.27251 Compliance versus Sensibility: On the Reasoning Controllabil](2604.27251/paper.md) · 13 · _Behavioral study of induction/deduction/abduction conflicts in LLMs is a pure-inference replication runnable against any NIM-hosted model._
 
 
-### Autoresearch (20)
+### Machine that Builds Machines (20)
 
 #### spark-feasible (16)
 - [2604.27351 Heterogeneous Scientific Foundation Model Collaboration](2604.27351/paper.md) · 39 · _Lightweight LLM-orchestrator over domain foundation models is software glue that fits NemoClaw/NIM; underlying scientific FMs would be hosted as endpoints._ · [eval](2604.27351/eval.md) · → `articles/scientific-foundation-models-as-tools/`
-- [2605.03042 ARIS: Autonomous Research via Adversarial Multi-Agent Collab](2605.03042/paper.md) · 33 · _Open-source autonomous-research harness with adversarial review — direct Autoresearch-arc material; runs over hosted NIM endpoints._
+- [2605.03042 ARIS: Autonomous Research via Adversarial Multi-Agent Collab](2605.03042/paper.md) · 33 · _Open-source autonomous-research harness with adversarial review — direct MTBM-arc material; runs over hosted NIM endpoints._
 - [2604.26904 ClawGym: A Scalable Framework for Building Effective Claw Ag](2604.26904/paper.md) · 28 · _Claw-style sandboxed agent SFT + lightweight RL on per-task sandboxes maps directly onto NemoClaw + NeMo fine-tuning within the 128 GB envelope._ · [eval](2604.26904/eval.md) · → `articles/clawgym-on-spark/`
 - [2605.04036 OpenSeeker-v2: Pushing the Limits of Search Agents with Info](2605.04036/paper.md) · 28 · _SFT-only recipe for deep-search agents at small scale — high-signal trajectories + LoRA on a 7B base fits the Spark._
-- [2604.25256 AutoResearchBench: Benchmarking AI Agents on Complex Scienti](2604.25256/paper.md) · 24 · _Agent-driven literature discovery benchmark fits Autoresearch arc; runnable on Spark via NemoClaw + NIM + NeMo Retriever with pgvector, no training needed._ · [eval](2604.25256/eval.md) · → `articles/autoresearchbench-on-spark/`
+- [2604.25256 AutoResearchBench: Benchmarking AI Agents on Complex Scienti](2604.25256/paper.md) · 24 · _Agent-driven literature discovery benchmark fits Machine that Builds Machines arc; runnable on Spark via NemoClaw + NIM + NeMo Retriever with pgvector, no training needed._ · [eval](2604.25256/eval.md) · → `articles/autoresearchbench-on-spark/`
 - [2604.28139 Claw-Eval-Live: A Live Agent Benchmark for Evolving Real-Wor](2604.28139/paper.md) · 23 · _Live agent benchmark with execution traces and graders maps cleanly onto NemoClaw/OpenClaw sandboxed agents on Spark for local workflow eval._ · [eval](2604.28139/eval.md) · → `articles/claw-eval-live-on-spark/`
 - [2604.28158 Intern-Atlas: A Methodological Evolution Graph as Research I](2604.28158/paper.md) · 20 · _Method-evolution graph extraction is an LLM-over-corpus pipeline that maps directly onto NIM + NeMo Retriever + pgvector on Spark, on a subset._
 - [2605.02396 HeavySkill: Heavy Thinking as the Inner Skill in Agentic Har](2605.02396/paper.md) · 18 · _Internalizing 'heavy thinking' into the model rather than the harness — directly testable on Spark's NIM-hosted thinking models._

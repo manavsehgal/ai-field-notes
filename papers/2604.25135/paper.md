@@ -6,7 +6,7 @@ primary_category: unknown
 hf_upvotes: 8
 popularity_score: 16
 suggested_stage: agentic
-suggested_series: Autoresearch
+suggested_series: Machine that Builds Machines
 fast_verdict: spark-feasible
 relevance_score: 0.72
 has_deep_eval: false
@@ -17,7 +17,7 @@ hf_paper_url: https://huggingface.co/papers/2604.25135
 
 # FAMA: Failure-Aware Meta-Agentic Framework for Open-Source LLMs in Interactive Tool Use Environments
 
-**Verdict:** spark-feasible · **Series:** Autoresearch · **Stage:** agentic · **Relevance:** 0.72 · **Popularity:** 16/100
+**Verdict:** spark-feasible · **Series:** Machine that Builds Machines · **Stage:** agentic · **Relevance:** 0.72 · **Popularity:** 16/100
 
 > Failure-trajectory analysis + targeted helper agents over open-source LLMs runs cleanly atop NemoClaw with a Spark-hosted Nemotron.
 

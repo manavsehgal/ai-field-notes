@@ -6,7 +6,7 @@ primary_category: unknown
 hf_upvotes: 2
 popularity_score: 9
 suggested_stage: agentic
-suggested_series: Autoresearch
+suggested_series: Machine that Builds Machines
 fast_verdict: spark-feasible
 relevance_score: 0.78
 has_deep_eval: false
@@ -17,7 +17,7 @@ hf_paper_url: https://huggingface.co/papers/2605.03596
 
 # Workspace-Bench 1.0: Benchmarking AI Agents on Workspace Tasks with Large-Scale File Dependencies
 
-**Verdict:** spark-feasible · **Series:** Autoresearch · **Stage:** agentic · **Relevance:** 0.78 · **Popularity:** 9/100
+**Verdict:** spark-feasible · **Series:** Machine that Builds Machines · **Stage:** agentic · **Relevance:** 0.78 · **Popularity:** 9/100
 
 > Workspace-Bench: agents over real file-dependency graphs — close cousin of ClawGym, ready Spark harness.
 

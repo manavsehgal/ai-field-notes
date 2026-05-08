@@ -27,7 +27,7 @@
       "has_code": false,
       "classify": {
         "suggested_stage": "agentic",
-        "suggested_series": "Autoresearch",
+        "suggested_series": "Machine that Builds Machines",
         "topic_tags": [
           "agentic",
           "tool-use",
@@ -88,7 +88,7 @@
         ],
         "relevance_score": 0.75,
         "fast_verdict": "spark-feasible",
-        "one_line_rationale": "Inference-time skill extraction from long context \u2014 a NIM-hostable LLM workflow, easy to stand up on Spark for an 'LLM Wiki' study."
+        "one_line_rationale": "Inference-time skill extraction from long context — a NIM-hostable LLM workflow, easy to stand up on Spark for an 'LLM Wiki' study."
       },
       "popularity_score": 38,
       "deep_eval": null,
@@ -110,7 +110,7 @@
       "has_code": false,
       "classify": {
         "suggested_stage": "agentic",
-        "suggested_series": "Autoresearch",
+        "suggested_series": "Machine that Builds Machines",
         "topic_tags": [
           "multimodal",
           "agentic",
@@ -145,7 +145,7 @@
       "has_code": false,
       "classify": {
         "suggested_stage": "agentic",
-        "suggested_series": "Autoresearch",
+        "suggested_series": "Machine that Builds Machines",
         "topic_tags": [
           "agentic",
           "autoresearch",
@@ -160,7 +160,7 @@
         ],
         "relevance_score": 0.85,
         "fast_verdict": "spark-feasible",
-        "one_line_rationale": "Open-source autonomous-research harness with adversarial review \u2014 direct Autoresearch-arc material; runs over hosted NIM endpoints."
+        "one_line_rationale": "Open-source autonomous-research harness with adversarial review — direct MTBM-arc material; runs over hosted NIM endpoints."
       },
       "popularity_score": 33,
       "deep_eval": null,
@@ -232,7 +232,7 @@
       "has_code": false,
       "classify": {
         "suggested_stage": "agentic",
-        "suggested_series": "Autoresearch",
+        "suggested_series": "Machine that Builds Machines",
         "topic_tags": [
           "agentic",
           "sandboxing",
@@ -291,7 +291,7 @@
       "has_code": false,
       "classify": {
         "suggested_stage": "fine-tuning",
-        "suggested_series": "Autoresearch",
+        "suggested_series": "Machine that Builds Machines",
         "topic_tags": [
           "agentic",
           "search-agents",
@@ -307,7 +307,7 @@
         ],
         "relevance_score": 0.78,
         "fast_verdict": "spark-feasible",
-        "one_line_rationale": "SFT-only recipe for deep-search agents at small scale \u2014 high-signal trajectories + LoRA on a 7B base fits the Spark."
+        "one_line_rationale": "SFT-only recipe for deep-search agents at small scale — high-signal trajectories + LoRA on a 7B base fits the Spark."
       },
       "popularity_score": 28,
       "deep_eval": null,
@@ -380,7 +380,7 @@
         ],
         "relevance_score": 0.75,
         "fast_verdict": "spark-feasible",
-        "one_line_rationale": "Black-box on-policy distillation as pre-alignment for multimodal RL \u2014 small-student distillation is in the Spark envelope."
+        "one_line_rationale": "Black-box on-policy distillation as pre-alignment for multimodal RL — small-student distillation is in the Spark envelope."
       },
       "popularity_score": 27,
       "deep_eval": null,
@@ -436,7 +436,7 @@
       "has_code": false,
       "classify": {
         "suggested_stage": "agentic",
-        "suggested_series": "Autoresearch",
+        "suggested_series": "Machine that Builds Machines",
         "topic_tags": [
           "agentic",
           "rag",
@@ -454,7 +454,7 @@
         ],
         "relevance_score": 0.78,
         "fast_verdict": "spark-feasible",
-        "one_line_rationale": "Agent-driven literature discovery benchmark fits Autoresearch arc; runnable on Spark via NemoClaw + NIM + NeMo Retriever with pgvector, no training needed."
+        "one_line_rationale": "Agent-driven literature discovery benchmark fits Machine that Builds Machines arc; runnable on Spark via NemoClaw + NIM + NeMo Retriever with pgvector, no training needed."
       },
       "popularity_score": 24,
       "deep_eval": {
@@ -533,7 +533,7 @@
       "has_code": false,
       "classify": {
         "suggested_stage": "agentic",
-        "suggested_series": "Autoresearch",
+        "suggested_series": "Machine that Builds Machines",
         "topic_tags": [
           "agentic",
           "observability",
@@ -630,7 +630,7 @@
         ],
         "relevance_score": 0.7,
         "fast_verdict": "spark-feasible",
-        "one_line_rationale": "Token-level length value head over a 7B model is a small auxiliary network atop standard inference \u2014 comfortably inside Spark's envelope."
+        "one_line_rationale": "Token-level length value head over a 7B model is a small auxiliary network atop standard inference — comfortably inside Spark's envelope."
       },
       "popularity_score": 21,
       "deep_eval": null,
@@ -667,7 +667,7 @@
         ],
         "relevance_score": 0.65,
         "fast_verdict": "spark-feasible",
-        "one_line_rationale": "Stable GFlowNet for diverse LLM red-team prompt generation \u2014 small-scale RL on small attacker LM, safety-arc material."
+        "one_line_rationale": "Stable GFlowNet for diverse LLM red-team prompt generation — small-scale RL on small attacker LM, safety-arc material."
       },
       "popularity_score": 21,
       "deep_eval": null,
@@ -703,7 +703,7 @@
       "has_code": false,
       "classify": {
         "suggested_stage": "agentic",
-        "suggested_series": "Autoresearch",
+        "suggested_series": "Machine that Builds Machines",
         "topic_tags": [
           "agentic",
           "rag",
@@ -753,7 +753,7 @@
         ],
         "relevance_score": 0.65,
         "fast_verdict": "spark-feasible",
-        "one_line_rationale": "Metacognitive-uncertainty layer over a hosted LLM \u2014 pure inference-time wrapper, easy NIM-side experiment."
+        "one_line_rationale": "Metacognitive-uncertainty layer over a hosted LLM — pure inference-time wrapper, easy NIM-side experiment."
       },
       "popularity_score": 20,
       "deep_eval": null,
@@ -809,7 +809,7 @@
       "has_code": false,
       "classify": {
         "suggested_stage": "training",
-        "suggested_series": "Autoresearch",
+        "suggested_series": "Machine that Builds Machines",
         "topic_tags": [
           "agentic",
           "vlm",
@@ -823,7 +823,7 @@
         ],
         "relevance_score": 0.65,
         "fast_verdict": "borderline",
-        "one_line_rationale": "100+ turn VLM RL on Mario \u2014 small-VLM fits, but 100+ turn rollouts \u00d7 RL may push the unified-memory budget; verify in eval."
+        "one_line_rationale": "100+ turn VLM RL on Mario — small-VLM fits, but 100+ turn rollouts × RL may push the unified-memory budget; verify in eval."
       },
       "popularity_score": 19,
       "deep_eval": null,
@@ -861,7 +861,7 @@
         ],
         "relevance_score": 0.92,
         "fast_verdict": "spark-feasible",
-        "one_line_rationale": "Native NVIDIA Nemotron 3 Nano Omni 30B-A3B MoE shipped with BF16/FP8/FP4 \u2014 FP4 weights (~15 GB) leave ample 128 GB headroom for KV + multimodal context."
+        "one_line_rationale": "Native NVIDIA Nemotron 3 Nano Omni 30B-A3B MoE shipped with BF16/FP8/FP4 — FP4 weights (~15 GB) leave ample 128 GB headroom for KV + multimodal context."
       },
       "popularity_score": 18,
       "deep_eval": null,
@@ -883,7 +883,7 @@
       "has_code": false,
       "classify": {
         "suggested_stage": "agentic",
-        "suggested_series": "Autoresearch",
+        "suggested_series": "Machine that Builds Machines",
         "topic_tags": [
           "agentic",
           "reasoning",
@@ -897,7 +897,7 @@
         ],
         "relevance_score": 0.7,
         "fast_verdict": "spark-feasible",
-        "one_line_rationale": "Internalizing 'heavy thinking' into the model rather than the harness \u2014 directly testable on Spark's NIM-hosted thinking models."
+        "one_line_rationale": "Internalizing 'heavy thinking' into the model rather than the harness — directly testable on Spark's NIM-hosted thinking models."
       },
       "popularity_score": 18,
       "deep_eval": null,
@@ -919,7 +919,7 @@
       "has_code": false,
       "classify": {
         "suggested_stage": "agentic",
-        "suggested_series": "Autoresearch",
+        "suggested_series": "Machine that Builds Machines",
         "topic_tags": [
           "agentic",
           "multimodal",
@@ -960,7 +960,7 @@
       "has_code": false,
       "classify": {
         "suggested_stage": "agentic",
-        "suggested_series": "Autoresearch",
+        "suggested_series": "Machine that Builds Machines",
         "topic_tags": [
           "agentic",
           "sandboxing",
@@ -995,7 +995,7 @@
       "has_code": false,
       "classify": {
         "suggested_stage": "agentic",
-        "suggested_series": "Autoresearch",
+        "suggested_series": "Machine that Builds Machines",
         "topic_tags": [
           "agentic",
           "gui-agents",
@@ -1009,7 +1009,7 @@
         ],
         "relevance_score": 0.7,
         "fast_verdict": "spark-feasible",
-        "one_line_rationale": "Cross-application Windows GUI benchmark \u2014 natural ClawGym/OpenClaw ablation target, runnable as Spark-side harness."
+        "one_line_rationale": "Cross-application Windows GUI benchmark — natural ClawGym/OpenClaw ablation target, runnable as Spark-side harness."
       },
       "popularity_score": 17,
       "deep_eval": null,
@@ -1046,7 +1046,7 @@
         ],
         "relevance_score": 0.85,
         "fast_verdict": "spark-feasible",
-        "one_line_rationale": "Direct OpenClaw academic-benchmark \u2014 drop-in for the ClawGym arc, 80 long-horizon student-curated tasks."
+        "one_line_rationale": "Direct OpenClaw academic-benchmark — drop-in for the ClawGym arc, 80 long-horizon student-curated tasks."
       },
       "popularity_score": 17,
       "deep_eval": null,
@@ -1068,7 +1068,7 @@
       "has_code": false,
       "classify": {
         "suggested_stage": "agentic",
-        "suggested_series": "Autoresearch",
+        "suggested_series": "Machine that Builds Machines",
         "topic_tags": [
           "agentic",
           "multimodal",
@@ -1103,7 +1103,7 @@
       "has_code": false,
       "classify": {
         "suggested_stage": "agentic",
-        "suggested_series": "Autoresearch",
+        "suggested_series": "Machine that Builds Machines",
         "topic_tags": [
           "agentic",
           "tool-use",
@@ -1139,7 +1139,7 @@
       "has_code": false,
       "classify": {
         "suggested_stage": "agentic",
-        "suggested_series": "Autoresearch",
+        "suggested_series": "Machine that Builds Machines",
         "topic_tags": [
           "agentic",
           "observability",
@@ -1152,7 +1152,7 @@
         ],
         "relevance_score": 0.6,
         "fast_verdict": "spark-feasible",
-        "one_line_rationale": "Agent-native research artifact protocol is process + tooling \u2014 implementable as a NemoClaw skill atop NIM-hosted reasoning models on Spark."
+        "one_line_rationale": "Agent-native research artifact protocol is process + tooling — implementable as a NemoClaw skill atop NIM-hosted reasoning models on Spark."
       },
       "popularity_score": 15,
       "deep_eval": null,
@@ -1174,7 +1174,7 @@
       "has_code": false,
       "classify": {
         "suggested_stage": "agentic",
-        "suggested_series": "Autoresearch",
+        "suggested_series": "Machine that Builds Machines",
         "topic_tags": [
           "agentic",
           "benchmarks",
@@ -1189,7 +1189,7 @@
         ],
         "relevance_score": 0.55,
         "fast_verdict": "borderline",
-        "one_line_rationale": "Long-horizon EHR agent benchmark \u2014 domain-specific but the harness shape mirrors ClawGym; runnable against a hosted NIM."
+        "one_line_rationale": "Long-horizon EHR agent benchmark — domain-specific but the harness shape mirrors ClawGym; runnable against a hosted NIM."
       },
       "popularity_score": 15,
       "deep_eval": null,
@@ -1225,7 +1225,7 @@
         ],
         "relevance_score": 0.85,
         "fast_verdict": "spark-feasible",
-        "one_line_rationale": "Speculative decoding inside NeMo-RL with vLLM at 8B scale is exactly Spark-class \u2014 8B target + small draft model fit comfortably in 128 GB."
+        "one_line_rationale": "Speculative decoding inside NeMo-RL with vLLM at 8B scale is exactly Spark-class — 8B target + small draft model fit comfortably in 128 GB."
       },
       "popularity_score": 14,
       "deep_eval": null,
@@ -1247,7 +1247,7 @@
       "has_code": false,
       "classify": {
         "suggested_stage": "training",
-        "suggested_series": "Autoresearch",
+        "suggested_series": "Machine that Builds Machines",
         "topic_tags": [
           "rl",
           "grpo",
@@ -1262,7 +1262,7 @@
         ],
         "relevance_score": 0.8,
         "fast_verdict": "spark-feasible",
-        "one_line_rationale": "Uncertainty-guided exploration for multi-turn agentic RL \u2014 direct sequel to the GRPO-on-ClawGym arc."
+        "one_line_rationale": "Uncertainty-guided exploration for multi-turn agentic RL — direct sequel to the GRPO-on-ClawGym arc."
       },
       "popularity_score": 14,
       "deep_eval": {
@@ -1312,7 +1312,7 @@
       "arxiv_id": "2605.00529",
       "title": "Hierarchical Abstract Tree for Cross-Document Retrieval-Augmented Generation",
       "authors": [],
-      "abstract": "Retrieval-augmented generation (RAG) enhances large language models with external knowledge, and tree-based RAG organizes documents into hierarchical indexes to support queries at multiple granularities. However, existing Tree-RAG methods designed for single-document retrieval face critical challenges in scaling to cross-document multi-hop questions: (1) poor distribution adaptability, where k-means clustering introduces noise due to rigid distribution assumptions; (2) structural isolation, as tree indexes lack explicit cross-document connections; and (3) coarse abstraction, which obscures fine-grained details. To address these limitations, we propose \u03a8-RAG, a tree-RAG framework with two key components. First, a hierarchical abstract tree index built through an iterative \"merging and collapse\" process that adapts to data distributions without a priori assumption. Second, a multi-granular retrieval agent that intelligently interacts with the knowledge base with reorganized queries and an agent-powered hybrid retriever. \u03a8-RAG supports diverse tasks from token-level question answering to document-level summarization. On cross-document multi-hop QA benchmarks, it outperforms RAPTOR by 25.9% and HippoRAG 2 by 7.4% in average F1 score. Code is available at https://github.com/Newiz430/Psi-RAG.",
+      "abstract": "Retrieval-augmented generation (RAG) enhances large language models with external knowledge, and tree-based RAG organizes documents into hierarchical indexes to support queries at multiple granularities. However, existing Tree-RAG methods designed for single-document retrieval face critical challenges in scaling to cross-document multi-hop questions: (1) poor distribution adaptability, where k-means clustering introduces noise due to rigid distribution assumptions; (2) structural isolation, as tree indexes lack explicit cross-document connections; and (3) coarse abstraction, which obscures fine-grained details. To address these limitations, we propose Ψ-RAG, a tree-RAG framework with two key components. First, a hierarchical abstract tree index built through an iterative \"merging and collapse\" process that adapts to data distributions without a priori assumption. Second, a multi-granular retrieval agent that intelligently interacts with the knowledge base with reorganized queries and an agent-powered hybrid retriever. Ψ-RAG supports diverse tasks from token-level question answering to document-level summarization. On cross-document multi-hop QA benchmarks, it outperforms RAPTOR by 25.9% and HippoRAG 2 by 7.4% in average F1 score. Code is available at https://github.com/Newiz430/Psi-RAG.",
       "published": "2026-04-30T20:00:00.000Z",
       "primary_category": null,
       "abs_url": "https://arxiv.org/abs/2605.00529",
@@ -1339,7 +1339,7 @@
         ],
         "relevance_score": 0.7,
         "fast_verdict": "spark-feasible",
-        "one_line_rationale": "Hierarchical cross-document Tree-RAG \u2014 Second Brain F-arc fit; pgvector + NIM-Embed already in place."
+        "one_line_rationale": "Hierarchical cross-document Tree-RAG — Second Brain F-arc fit; pgvector + NIM-Embed already in place."
       },
       "popularity_score": 10,
       "deep_eval": null,
@@ -1361,7 +1361,7 @@
       "has_code": false,
       "classify": {
         "suggested_stage": "training",
-        "suggested_series": "Autoresearch",
+        "suggested_series": "Machine that Builds Machines",
         "topic_tags": [
           "rl",
           "multi-agent",
@@ -1375,7 +1375,7 @@
         ],
         "relevance_score": 0.7,
         "fast_verdict": "borderline",
-        "one_line_rationale": "RL over multi-agent orchestration traces \u2014 Spark can train one agent at a time, multi-agent rollouts may need careful memory choreography."
+        "one_line_rationale": "RL over multi-agent orchestration traces — Spark can train one agent at a time, multi-agent rollouts may need careful memory choreography."
       },
       "popularity_score": 9,
       "deep_eval": null,
@@ -1397,7 +1397,7 @@
       "has_code": false,
       "classify": {
         "suggested_stage": "agentic",
-        "suggested_series": "Autoresearch",
+        "suggested_series": "Machine that Builds Machines",
         "topic_tags": [
           "agentic",
           "benchmarks",
@@ -1411,7 +1411,7 @@
         ],
         "relevance_score": 0.78,
         "fast_verdict": "spark-feasible",
-        "one_line_rationale": "Workspace-Bench: agents over real file-dependency graphs \u2014 close cousin of ClawGym, ready Spark harness."
+        "one_line_rationale": "Workspace-Bench: agents over real file-dependency graphs — close cousin of ClawGym, ready Spark harness."
       },
       "popularity_score": 9,
       "deep_eval": null,
