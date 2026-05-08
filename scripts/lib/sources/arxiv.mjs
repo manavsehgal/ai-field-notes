@@ -1,6 +1,13 @@
 // arxiv.org Atom API — public, no auth.
 // Docs: https://info.arxiv.org/help/api/user-manual.html
 
+import { setDefaultResultOrder } from 'node:dns';
+
+// arxiv.org's AAAA records are unstable on the Spark's network path; force
+// IPv4 to avoid `EAI_AGAIN` on the DNS lookup. Module-scoped so callers don't
+// need to set NODE_OPTIONS=--dns-result-order=ipv4first.
+try { setDefaultResultOrder('ipv4first'); } catch { /* node < 18 fallback */ }
+
 const ATOM_NS = 'http://www.w3.org/2005/Atom';
 const ARXIV_NS = 'http://arxiv.org/schemas/atom';
 
@@ -89,7 +96,7 @@ function parseEntries(xml) {
  * Fetch the most recent N papers across the project's relevant arxiv categories.
  * Sorted by submission date desc.
  */
-export async function fetchRecentArxiv({ maxResults = 100, categories = CATEGORIES, retries = 3 } = {}) {
+export async function fetchRecentArxiv({ maxResults = 100, categories = CATEGORIES, retries = 4 } = {}) {
   const search_query = categories.map((c) => `cat:${c}`).join('+OR+');
   const url = `https://export.arxiv.org/api/query?search_query=${search_query}&sortBy=submittedDate&sortOrder=descending&max_results=${maxResults}`;
   let lastErr = null;
@@ -106,7 +113,9 @@ export async function fetchRecentArxiv({ maxResults = 100, categories = CATEGORI
       return parseEntries(xml);
     } catch (e) {
       lastErr = e;
-      await new Promise((r) => setTimeout(r, 2000));
+      // DNS / network errors get a longer backoff than HTTP errors do
+      const isDns = e?.cause?.code === 'EAI_AGAIN' || e?.cause?.code === 'ENOTFOUND';
+      await new Promise((r) => setTimeout(r, isDns ? 4000 * (i + 1) : 2000));
     }
   }
   throw lastErr || new Error('arxiv: exhausted retries');
