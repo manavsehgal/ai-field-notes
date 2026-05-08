@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
-# Phase 6 GRPO outer loop for ClawGym-on-Spark.
+# T²PO outer loop for ClawGym-on-Spark.
+# Forked from clawgym-on-spark/scripts/grpo_loop.sh (Phase 6).
+# Three deltas: t2po_smoke.py (TDS rollouts), t2po_train.py with
+# --gigpo-step-w 1.0 (per-token weighted loss), and isolated paths
+# (/work/t2po-run/) so it doesn't collide with Phase 6 artifacts.
 #
 # Architecture (kill-and-restart):
 #
@@ -69,8 +73,14 @@ LR=1e-5
 KL_BETA=0.04
 RESUME_STEP=1
 SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-HOST_VENV="/tmp/fk-clawgym/bin/python3"
+HOST_VENV="/tmp/fk-t2po/bin/python3"
 VLLM_GPU_UTIL=0.85  # vLLM only — we kill it before trainer runs
+NUM_THINK_TOKENS=450
+TDS_ETA=0.3
+TDS_MAX_TRY=2
+GIGPO_TRAJ_W=1.0
+GIGPO_STEP_W=1.0
+EVAL_BASE_TRAJ=""  # path to qwen-base trajectories.jsonl for compare
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -88,6 +98,12 @@ while [[ $# -gt 0 ]]; do
         --lr) LR="$2"; shift 2 ;;
         --kl-beta) KL_BETA="$2"; shift 2 ;;
         --resume-step) RESUME_STEP="$2"; shift 2 ;;
+        --num-think-tokens) NUM_THINK_TOKENS="$2"; shift 2 ;;
+        --tds-eta) TDS_ETA="$2"; shift 2 ;;
+        --tds-max-try) TDS_MAX_TRY="$2"; shift 2 ;;
+        --gigpo-traj-w) GIGPO_TRAJ_W="$2"; shift 2 ;;
+        --gigpo-step-w) GIGPO_STEP_W="$2"; shift 2 ;;
+        --eval-base-traj) EVAL_BASE_TRAJ="$2"; shift 2 ;;
         *) echo "unknown flag $1" >&2; exit 2 ;;
     esac
 done
@@ -107,6 +123,8 @@ echo "  INIT=$INIT"
 echo "  OUT_DIR=$OUT_DIR"
 echo "  STEPS=$STEPS  TASKS_PER_STEP=$TASKS_PER_STEP  K=$K  EVAL_EVERY=$EVAL_EVERY"
 echo "  TEMPERATURE=$TEMPERATURE  LR=$LR  KL_BETA=$KL_BETA"
+echo "  GIGPO_TRAJ_W=$GIGPO_TRAJ_W  GIGPO_STEP_W=$GIGPO_STEP_W"
+echo "  TDS_ETA=$TDS_ETA  TDS_MAX_TRY=$TDS_MAX_TRY  NUM_THINK_TOKENS=$NUM_THINK_TOKENS"
 echo "  RESUME_STEP=$RESUME_STEP"
 
 # ────────────────────────────────────────────────────────────────
@@ -114,9 +132,9 @@ echo "  RESUME_STEP=$RESUME_STEP"
 # ────────────────────────────────────────────────────────────────
 
 container_path() {
-    # Convert host adapter-vN path to container-side /work/clawgym-grpo/...
-    # Assumes adapter is staged into container under /work/clawgym-grpo/.
-    echo "/work/clawgym-grpo/$(basename "$1")"
+    # Convert host adapter-vN path to container-side /work/t2po-run/...
+    # Assumes adapter is staged into container under /work/t2po-run/.
+    echo "/work/t2po-run/$(basename "$1")"
 }
 
 start_vllm() {
@@ -189,13 +207,16 @@ run_step() {
     local task_ids
     task_ids=$(sample_task_ids "$TASKS_PER_STEP")
     echo "[step $step] sampled tasks: $task_ids"
-    "$HOST_VENV" "$SCRIPTS_DIR/phase6_smoke.py" \
+    "$HOST_VENV" "$SCRIPTS_DIR/t2po_smoke.py" \
         --tasks "$POOL" \
         --task-ids "$task_ids" \
         --k "$K" \
         --temperature "$TEMPERATURE" \
         --vllm-base-url "$VLLM_URL" \
         --model clawgym \
+        --num-think-tokens "$NUM_THINK_TOKENS" \
+        --tds-eta-threshold "$TDS_ETA" \
+        --tds-max-try "$TDS_MAX_TRY" \
         --out-dir "$step_dir/" \
         | tee "$step_dir/rollout.log"
 
@@ -203,20 +224,23 @@ run_step() {
     stop_vllm
 
     # 4. Trainer step → save adapter
-    docker cp "$step_dir/trajectory_bundle.jsonl" "$CONTAINER:/work/clawgym-grpo/dryrun/"
+    docker exec "$CONTAINER" mkdir -p /work/t2po-run/bundles
+    docker cp "$step_dir/trajectory_bundle.jsonl" "$CONTAINER:/work/t2po-run/bundles/step-$(printf '%03d' "$step").jsonl"
     # KL reference is FIXED to the SFT-init ($INIT) for every step — classic
     # GRPO fixed-SFT-init reference. The reference adapter is staged once
-    # at /work/clawgym-grpo/_reference_adapter/ before the loop starts.
+    # at /work/t2po-run/_reference_adapter/ before the loop starts.
     set +e
     docker exec "$CONTAINER" bash -c "
-        cd /work/clawgym-grpo && python3 grpo_train.py \
-            --bundle dryrun/trajectory_bundle.jsonl \
-            --tasks-pool tasks-grpo-pool.jsonl \
+        cd /work/t2po-scripts && python3 t2po_train.py \
+            --bundle /work/t2po-run/bundles/step-$(printf '%03d' "$step").jsonl \
+            --tasks-pool /work/t2po-run/tasks-pool.jsonl \
             --adapter-init $(container_path "$current_adapter") \
-            --reference-adapter /work/clawgym-grpo/_reference_adapter \
-            --out-dir /work/clawgym-grpo/adapter-step-$(printf '%03d' "$step")/ \
+            --reference-adapter /work/t2po-run/_reference_adapter \
+            --out-dir /work/t2po-run/adapter-step-$(printf '%03d' "$step")/ \
             --base-model Qwen/Qwen2.5-7B-Instruct \
-            --lr $LR --kl-beta $KL_BETA --check-weight-delta
+            --lr $LR --kl-beta $KL_BETA \
+            --gigpo-traj-w $GIGPO_TRAJ_W --gigpo-step-w $GIGPO_STEP_W \
+            --check-weight-delta
     " 2>&1 | tee "$step_dir/trainer.log"
     trainer_exit=${PIPESTATUS[0]}
     set -e
@@ -242,7 +266,7 @@ run_step() {
     fi
 
     # 5. Pull adapter back to host
-    docker cp "$CONTAINER:/work/clawgym-grpo/adapter-step-$(printf '%03d' "$step")/" \
+    docker cp "$CONTAINER:/work/t2po-run/adapter-step-$(printf '%03d' "$step")/" \
         "$step_dir/adapter/"
 
     echo "$step_dir/adapter" > "$OUT_DIR/.current_adapter"
@@ -270,11 +294,16 @@ run_eval() {
         --model clawgym \
         | tee "$eval_dir/rollout.log"
     stop_vllm
-    "$HOST_VENV" "$SCRIPTS_DIR/compare_phase5.py" \
-        --base "$OUT_DIR/../2026-05-04-phase5-eval/qwen-base/trajectories.jsonl" \
-        --sft  "$eval_dir/trajectories.jsonl" \
-        --out-json "$eval_dir/comparison.json" \
-        | tee "$eval_dir/compare.log"
+    if [[ -n "$EVAL_BASE_TRAJ" && -f "$EVAL_BASE_TRAJ" ]]; then
+        "$HOST_VENV" "$SCRIPTS_DIR/compare_phase5.py" \
+            --base "$EVAL_BASE_TRAJ" \
+            --sft  "$eval_dir/trajectories.jsonl" \
+            --out-json "$eval_dir/comparison.json" \
+            | tee "$eval_dir/compare.log" || true
+    else
+        echo "[eval] no --eval-base-traj supplied; skipping compare step" \
+            | tee "$eval_dir/compare.log"
+    fi
 }
 
 # ────────────────────────────────────────────────────────────────
@@ -288,12 +317,17 @@ if [[ "$RESUME_STEP" -gt 1 ]]; then
     echo "Resuming from step $RESUME_STEP using $current_adapter"
 fi
 
-# One-time staging of the tasks pool + frozen SFT-init reference adapter
-docker cp "$POOL" "$CONTAINER:/work/clawgym-grpo/tasks-grpo-pool.jsonl"
-docker exec "$CONTAINER" bash -c "rm -rf /work/clawgym-grpo/_reference_adapter && \
-    mkdir -p /work/clawgym-grpo/_reference_adapter"
-docker cp "$INIT/." "$CONTAINER:/work/clawgym-grpo/_reference_adapter/"
-echo "Staged frozen reference adapter (SFT-init = $INIT) → /work/clawgym-grpo/_reference_adapter/"
+# One-time staging of the t2po-run dir, scripts, tasks pool, and frozen
+# SFT-init reference adapter into the container.
+docker exec "$CONTAINER" bash -c "mkdir -p /work/t2po-run /work/t2po-scripts"
+docker cp "$SCRIPTS_DIR/." "$CONTAINER:/work/t2po-scripts/"
+docker cp "$POOL" "$CONTAINER:/work/t2po-run/tasks-pool.jsonl"
+docker exec "$CONTAINER" bash -c "rm -rf /work/t2po-run/_reference_adapter && \
+    mkdir -p /work/t2po-run/_reference_adapter"
+docker cp "$INIT/." "$CONTAINER:/work/t2po-run/_reference_adapter/"
+echo "Staged t2po scripts → /work/t2po-scripts/"
+echo "Staged tasks pool → /work/t2po-run/tasks-pool.jsonl"
+echo "Staged frozen reference adapter (SFT-init = $INIT) → /work/t2po-run/_reference_adapter/"
 
 t_loop=$(date +%s)
 for step in $(seq "$RESUME_STEP" "$STEPS"); do
