@@ -2,11 +2,10 @@
 arxiv_id: 2605.02178
 title: "T^2PO: Uncertainty-Guided Exploration Control for Stable Multi-Turn Agentic Reinforcement Learning"
 published: 2026-05-03
-primary_category: unknown
 hf_upvotes: 5
-popularity_score: 14
+popularity_score: 21
 suggested_stage: training
-suggested_series: Machine that Builds Machines
+suggested_series: "Machine that Builds Machines"
 fast_verdict: spark-feasible
 relevance_score: 0.8
 has_deep_eval: true
@@ -19,7 +18,7 @@ hf_paper_url: https://huggingface.co/papers/2605.02178
 
 # T^2PO: Uncertainty-Guided Exploration Control for Stable Multi-Turn Agentic Reinforcement Learning
 
-**Verdict:** spark-feasible · **Series:** Machine that Builds Machines · **Stage:** training · **Relevance:** 0.80 · **Popularity:** 14/100
+**Verdict:** spark-feasible · **Series:** Machine that Builds Machines · **Stage:** training · **Relevance:** 0.8 · **Popularity:** 21/100
 
 > Uncertainty-guided exploration for multi-turn agentic RL — direct sequel to the GRPO-on-ClawGym arc.
 
@@ -35,13 +34,13 @@ Recent progress in multi-turn reinforcement learning (RL) has significantly impr
 
 ## Repos
 
-| Repo | Stars | Language |
-|------|------:|----------|
-| [WillDreamer/T2PO](https://github.com/WillDreamer/T2PO) | 9 | Python |
+| Repo | Stars | Forks | Last commit | Language |
+|------|------:|------:|-------------|----------|
+| [WillDreamer/T2PO](https://github.com/WillDreamer/T2PO) | 12 | 0 | 2026-05-05 | Python |
 
 ## Citations
 
-`citations: not yet indexed`
+_not yet indexed_
 
 ## Links
 
@@ -56,4 +55,3 @@ Recent progress in multi-turn reinforcement learning (RL) has significantly impr
 ## Promoted
 
 This paper has been promoted to `articles/t2po-uncertainty-guided-rl-on-spark/` (status: upcoming).
-

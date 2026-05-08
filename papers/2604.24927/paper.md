@@ -2,11 +2,10 @@
 arxiv_id: 2604.24927
 title: "Large Language Models Explore by Latent Distilling"
 published: 2026-04-26
-primary_category: unknown
 hf_upvotes: 59
 popularity_score: 29
 suggested_stage: inference
-suggested_series: LLM Wiki
+suggested_series: "LLM Wiki"
 fast_verdict: spark-feasible
 relevance_score: 0.72
 has_deep_eval: true
@@ -39,7 +38,7 @@ _No public repo yet._
 
 ## Citations
 
-`citations: not yet indexed`
+_not yet indexed_
 
 ## Links
 
@@ -54,4 +53,3 @@ _No public repo yet._
 ## Promoted
 
 This paper has been promoted to `articles/test-time-distilling-for-exploration/` (status: upcoming).
-

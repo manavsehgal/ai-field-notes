@@ -6,7 +6,7 @@ primary_category: cs.SE
 hf_upvotes: 22
 popularity_score: 23
 suggested_stage: agentic
-suggested_series: Machine that Builds Machines
+suggested_series: "Machine that Builds Machines"
 fast_verdict: spark-feasible
 relevance_score: 0.78
 has_deep_eval: true
@@ -39,7 +39,7 @@ _No public repo yet._
 
 ## Citations
 
-`citations: not yet indexed`
+_not yet indexed_
 
 ## Links
 
@@ -54,4 +54,3 @@ _No public repo yet._
 ## Promoted
 
 This paper has been promoted to `articles/claw-eval-live-on-spark/` (status: upcoming).
-

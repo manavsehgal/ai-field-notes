@@ -2,11 +2,10 @@
 arxiv_id: 2604.25256
 title: "AutoResearchBench: Benchmarking AI Agents on Complex Scientific Literature Discovery"
 published: 2026-04-27
-primary_category: unknown
 hf_upvotes: 27
 popularity_score: 24
 suggested_stage: agentic
-suggested_series: Machine that Builds Machines
+suggested_series: "Machine that Builds Machines"
 fast_verdict: spark-feasible
 relevance_score: 0.78
 has_deep_eval: true
@@ -39,7 +38,7 @@ _No public repo yet._
 
 ## Citations
 
-`citations: not yet indexed`
+_not yet indexed_
 
 ## Links
 
@@ -54,4 +53,3 @@ _No public repo yet._
 ## Promoted
 
 This paper has been promoted to `articles/autoresearchbench-on-spark/` (status: upcoming).
-
