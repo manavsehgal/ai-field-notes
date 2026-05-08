@@ -1,0 +1,39 @@
+{
+  "arxiv_id": "2605.06200",
+  "title": "A^2TGPO: Agentic Turn-Group Policy Optimization with Adaptive Turn-level Clipping",
+  "abstract": "Reinforcement learning for agentic large language models (LLMs) typically relies on a sparse, trajectory-level outcome reward, making it difficult to evaluate the contribution of individual tool-calls within multi-turn interactions. Existing approaches to such process credit assignment either depend on separate external process reward models that introduce additional consumption, or tree-based structural rollout that merely redistributes the outcome signal while constraining trajectory diversity. A promising alternative leverages the per-turn change in the policy's predicted probability of the ground-truth, termed Information Gain (IG), as an intrinsic process signal without an external evaluator. However, prior work on leveraging IG signals within the RL training loop faces three systematic challenges: normalizing across turns that face heterogeneous positional contexts can distort the relative standing of individual turns, accumulating a variable number of terms causes advantage magnitudes to drift with trajectory depth, and a fixed clipping range governs policy updates identically for turns with vastly different IG signals. In this paper, we propose A^2TGPO (Agentic Turn-Group Policy Optimization with Adaptive Turn-level Clipping), which retains IG as the intrinsic signal but re-designs how it is normalized, accumulated, and consumed: (i) turn-group normalization: normalizes IG within each (prompt, turn-index) group so that each turn is compared only against peers at the same interaction depth; (ii) variance-rescaled discounted accumulation: divides cumulative normalized IG by square root of accumulated terms to keep advantage magnitudes comparable across turn positions; and (iii) adaptive turn-level clipping: modulates each turn's clipping range based on its normalized IG, widening the update region for informative turns and narrowing it for uninformative ones.",
+  "hf_upvotes": 7,
+  "hf_paper_url": "https://huggingface.co/papers/2605.06200",
+  "published": "2026-05-06T20:00:00.000Z",
+  "repos": [],
+  "has_code": false,
+  "citations": 0,
+  "influential_citations": 0,
+  "classify": {
+    "suggested_stage": "fine-tuning",
+    "suggested_series": "Machine that Builds Machines",
+    "topic_tags": [
+      "reinforcement-learning",
+      "grpo",
+      "agentic",
+      "credit-assignment"
+    ],
+    "nvidia_stack": [
+      "NeMo"
+    ],
+    "relevance_score": 0.85,
+    "fast_verdict": "spark-feasible",
+    "chapter_alignment": [
+      10
+    ],
+    "mtbm_station": "forge",
+    "one_line_rationale": "Turn-level adaptive clipping fixes credit-assignment in agentic GRPO without external process reward models — directly applicable on a Spark.",
+    "classified_at": "2026-05-08T14:48:23.336Z"
+  },
+  "popularity_score": 16,
+  "deep_eval": {
+    "path": "papers/2605.06200/eval.md",
+    "evaluated_at": "2026-05-08T15:11:22.075Z",
+    "verdict": "spark-feasible"
+  }
+}

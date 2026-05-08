@@ -8,7 +8,9 @@ suggested_stage: fine-tuning
 suggested_series: "Machine that Builds Machines"
 fast_verdict: spark-feasible
 relevance_score: 0.85
-has_deep_eval: false
+has_deep_eval: true
+deep_verdict: spark-feasible
+promoted_to: a2tgpo-turn-clipping-on-spark
 chapter_alignment: [10]
 mtbm_station: forge
 hf_paper_url: https://huggingface.co/papers/2605.06200
@@ -43,3 +45,11 @@ _No public repo yet._
 ## Links
 
 - [HuggingFace daily papers](https://huggingface.co/papers/2605.06200)
+
+## Deep eval
+
+[Full feasibility eval →](./eval.md) (verdict: **spark-feasible**, evaluated 2026-05-08)
+
+## Promoted
+
+This paper has been promoted to `articles/a2tgpo-turn-clipping-on-spark/` (status: upcoming).

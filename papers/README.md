@@ -10,12 +10,12 @@ These are the papers most worth running through `/frontier-scout eval <id>` next
    _Open recipe for multimodal deep-search agents trained with agentic RL — SFT + RL on a single-Spark-sized policy fits the MTBM forge._
 2. **[Skill1: Unified Evolution of Skill-Augmented Agents via Reinforcement Learning](2605.06130/paper.md)** · 45 upv · spark-feasible · Machine that Builds Machines  
    _Single policy co-evolving skill selection + utilization + distillation from one task-outcome reward — clean MTBM forge case at sub-70B._
-3. **[RaguTeam at SemEval-2026 Task 8: Meno and Friends in a Judge-Orchestrated LLM Ensemble for Faithful Multi-Turn Response Generation](2605.04523/paper.md)** · 27 upv · spark-feasible · LLM Wiki  
-   _Judge-orchestrated 7-LLM ensemble for multi-turn RAG (SemEval-2026 T8 winner) — every member except gpt-oss-120b fits a single Spark._
-4. **[Nonsense Helps: Prompt Space Perturbation Broadens Reasoning Exploration](2605.05566/paper.md)** · 18 upv · spark-feasible · Machine that Builds Machines  
+3. **[Nonsense Helps: Prompt Space Perturbation Broadens Reasoning Exploration](2605.05566/paper.md)** · 18 upv · spark-feasible · Machine that Builds Machines  
    _LoPE breaks the GRPO zero-advantage trap with prompt-space perturbations — a one-line tweak applicable to any sub-70B GRPO loop on the Spark._
-5. **[Auto Research with Specialist Agents Develops Effective and Non-Trivial Training Recipes](2605.05724/paper.md)** · 9 upv · spark-feasible · Machine that Builds Machines  
-   _Closed empirical-loop auto-research with specialist agents and lineage feedback — the literal MTBM picture, fully autonomous over 1,197 trials._
+4. **[MiA-Signature: Approximating Global Activation for Long-Context Understanding](2605.06416/paper.md)** · 36 upv · spark-feasible · LLM Wiki  
+   _Compressed activation-signature conditioning approximates global context for long-context LLMs — drop-in inference technique that exercises KV economics._
+5. **[MiniCPM-o 4.5: Towards Real-Time Full-Duplex Omni-Modal Interaction](2604.27393/paper.md)** · 42 upv · spark-feasible · LLM Wiki  
+   _Open small omni-modal model with full-duplex streaming inference — sub-10B, fits 128 GB envelope and surfaces real-time inference techniques._
 
 ## What's new this run
 
@@ -26,14 +26,14 @@ See [runs/2026-05-08/refresh-summary.md](runs/2026-05-08/refresh-summary.md) for
 ### Second Brain (1)
 
 #### spark-feasible (1)
-- [2605.05242 Beyond Semantic Similarity: Rethinking Retrieval for Agentic Search via Direct Corpus Interaction](2605.05242/paper.md) · 15 · _Agents searching the raw corpus directly via general operators (lexical, conjunctive, multi-step) instead of fixed top-k retrieval — Second Brain extension._
+- [2605.05242 Beyond Semantic Similarity: Rethinking Retrieval for Agentic Search via Direct Corpus Interaction](2605.05242/paper.md) · 15 · _Agents searching the raw corpus directly via general operators (lexical, conjunctive, multi-step) instead of fixed top-k retrieval — Second Brain extension._ · [eval](2605.05242/eval.md)
 
 ### LLM Wiki (6)
 
 #### spark-feasible (6)
 - [2604.24927 Large Language Models Explore by Latent Distilling](2604.24927/paper.md) · 29 · _Lightweight test-time distiller plus reweighted sampling on existing open-weight reasoning models fits comfortably within Spark's 128 GB inference envelope._ · [eval](2604.24927/eval.md) · → `articles/test-time-distilling-for-exploration/`
 - [2605.06416 MiA-Signature: Approximating Global Activation for Long-Context Understanding](2605.06416/paper.md) · 28 · _Compressed activation-signature conditioning approximates global context for long-context LLMs — drop-in inference technique that exercises KV economics._
-- [2605.04523 RaguTeam at SemEval-2026 Task 8: Meno and Friends in a Judge-Orchestrated LLM Ensemble for Faithful Multi-Turn Response Generation](2605.04523/paper.md) · 28 · _Judge-orchestrated 7-LLM ensemble for multi-turn RAG (SemEval-2026 T8 winner) — every member except gpt-oss-120b fits a single Spark._
+- [2605.04523 RaguTeam at SemEval-2026 Task 8: Meno and Friends in a Judge-Orchestrated LLM Ensemble for Faithful Multi-Turn Response Generation](2605.04523/paper.md) · 28 · _Judge-orchestrated 7-LLM ensemble for multi-turn RAG (SemEval-2026 T8 winner) — every member except gpt-oss-120b fits a single Spark._ · [eval](2605.04523/eval.md)
 - [2604.27393 MiniCPM-o 4.5: Towards Real-Time Full-Duplex Omni-Modal Interaction](2604.27393/paper.md) · 27 · _Open small omni-modal model with full-duplex streaming inference — sub-10B, fits 128 GB envelope and surfaces real-time inference techniques._
 - [2605.02910 CreativityBench: Evaluating Agent Creative Reasoning via Affordance-Based Tool Repurposing](2605.02910/paper.md) · 23 · _CreativityBench — affordance-grounded creativity benchmark with 14K tasks evaluating 10 LLMs; eval-pipeline-on-Spark territory._
 - [2605.05662 XL-SafetyBench: A Country-Grounded Cross-Cultural Benchmark for LLM Safety and Cultural Sensitivity](2605.05662/paper.md) · 11 · _XL-SafetyBench — 5,500 country-grounded safety + cultural-sensitivity test cases evaluating LLMs; runs as a judge-pipeline against any Spark-resident model._
@@ -49,9 +49,9 @@ See [runs/2026-05-08/refresh-summary.md](runs/2026-05-08/refresh-summary.md) for
 - [2604.28139 Claw-Eval-Live: A Live Agent Benchmark for Evolving Real-World Workflows](2604.28139/paper.md) · 23 · _Live agent benchmark with execution traces and graders maps cleanly onto NemoClaw/OpenClaw sandboxed agents on Spark for local workflow eval._ · [eval](2604.28139/eval.md) · → `articles/claw-eval-live-on-spark/`
 - [2605.05566 Nonsense Helps: Prompt Space Perturbation Broadens Reasoning Exploration](2605.05566/paper.md) · 23 · _LoPE breaks the GRPO zero-advantage trap with prompt-space perturbations — a one-line tweak applicable to any sub-70B GRPO loop on the Spark._
 - [2605.02178 T^2PO: Uncertainty-Guided Exploration Control for Stable Multi-Turn Agentic Reinforcement Learning](2605.02178/paper.md) · 21 · _Uncertainty-guided exploration for multi-turn agentic RL — direct sequel to the GRPO-on-ClawGym arc._ · [eval](2605.02178/eval.md) · → `articles/t2po-uncertainty-guided-rl-on-spark/`
-- [2605.05724 Auto Research with Specialist Agents Develops Effective and Non-Trivial Training Recipes](2605.05724/paper.md) · 18 · _Closed empirical-loop auto-research with specialist agents and lineage feedback — the literal MTBM picture, fully autonomous over 1,197 trials._
-- [2605.06200 A^2TGPO: Agentic Turn-Group Policy Optimization with Adaptive Turn-level Clipping](2605.06200/paper.md) · 16 · _Turn-level adaptive clipping fixes credit-assignment in agentic GRPO without external process reward models — directly applicable on a Spark._
-- [2605.06614 SkillOS: Learning Skill Curation for Self-Evolving Agents](2605.06614/paper.md) · 15 · _RL-trained skill curator over an external SkillRepo with frozen executor — clean self-evolving-agent shape that fits sub-70B on a Spark._
+- [2605.05724 Auto Research with Specialist Agents Develops Effective and Non-Trivial Training Recipes](2605.05724/paper.md) · 18 · _Closed empirical-loop auto-research with specialist agents and lineage feedback — the literal MTBM picture, fully autonomous over 1,197 trials._ · [eval](2605.05724/eval.md)
+- [2605.06200 A^2TGPO: Agentic Turn-Group Policy Optimization with Adaptive Turn-level Clipping](2605.06200/paper.md) · 16 · _Turn-level adaptive clipping fixes credit-assignment in agentic GRPO without external process reward models — directly applicable on a Spark._ · [eval](2605.06200/eval.md)
+- [2605.06614 SkillOS: Learning Skill Curation for Self-Evolving Agents](2605.06614/paper.md) · 15 · _RL-trained skill curator over an external SkillRepo with frozen executor — clean self-evolving-agent shape that fits sub-70B on a Spark._ · [eval](2605.06614/eval.md)
 - [2605.06651 AI Co-Mathematician: Accelerating Mathematicians with Agentic AI](2605.06651/paper.md) · 11 · _Stateful asynchronous AI co-mathematician workbench — agentic framework around an LLM, runs as inference + tools on a single Spark._
 
 ## Stats
@@ -60,7 +60,7 @@ See [runs/2026-05-08/refresh-summary.md](runs/2026-05-08/refresh-summary.md) for
 |--------|------:|
 | Total tracked | 19 |
 | Classified this run | 13 |
-| Dropped under threshold | 11 |
+| Papers with deep eval | 11 |
 | spark-feasible | 19 |
 | borderline | 0 |
 | out-of-envelope | 0 |

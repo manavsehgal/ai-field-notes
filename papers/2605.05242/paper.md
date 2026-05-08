@@ -8,7 +8,9 @@ suggested_stage: agentic
 suggested_series: "Second Brain"
 fast_verdict: spark-feasible
 relevance_score: 0.8
-has_deep_eval: false
+has_deep_eval: true
+deep_verdict: spark-feasible
+promoted_to: dci-corpus-operators-on-spark
 hf_paper_url: https://huggingface.co/papers/2605.05242
 ---
 
@@ -39,3 +41,11 @@ _No public repo yet._
 ## Links
 
 - [HuggingFace daily papers](https://huggingface.co/papers/2605.05242)
+
+## Deep eval
+
+[Full feasibility eval →](./eval.md) (verdict: **spark-feasible**, evaluated 2026-05-08)
+
+## Promoted
+
+This paper has been promoted to `articles/dci-corpus-operators-on-spark/` (status: upcoming).

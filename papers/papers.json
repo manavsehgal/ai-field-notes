@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-08T14:49:52.324Z",
+  "generated_at": "2026-05-08T15:34:49.429Z",
   "config": {
     "hf_days": 30,
     "arxiv_limit": 60,
@@ -262,7 +262,16 @@
         "one_line_rationale": "Judge-orchestrated 7-LLM ensemble for multi-turn RAG (SemEval-2026 T8 winner) — every member except gpt-oss-120b fits a single Spark.",
         "classified_at": "2026-05-08T14:48:23.336Z"
       },
-      "popularity_score": 28
+      "popularity_score": 28,
+      "deep_eval": {
+        "path": "papers/2605.04523/eval.md",
+        "evaluated_at": "2026-05-08T15:11:22.075Z",
+        "verdict": "spark-feasible"
+      },
+      "promoted_to": {
+        "article_slug": "judge-orchestrated-ensemble-on-spark",
+        "status": "upcoming"
+      }
     },
     {
       "arxiv_id": "2604.26904",
@@ -612,7 +621,16 @@
         "one_line_rationale": "Closed empirical-loop auto-research with specialist agents and lineage feedback — the literal MTBM picture, fully autonomous over 1,197 trials.",
         "classified_at": "2026-05-08T14:48:23.336Z"
       },
-      "popularity_score": 18
+      "popularity_score": 18,
+      "deep_eval": {
+        "path": "papers/2605.05724/eval.md",
+        "evaluated_at": "2026-05-08T15:11:22.075Z",
+        "verdict": "spark-feasible"
+      },
+      "promoted_to": {
+        "article_slug": "auto-research-loop-on-spark",
+        "status": "upcoming"
+      }
     },
     {
       "arxiv_id": "2605.06200",
@@ -646,7 +664,16 @@
         "one_line_rationale": "Turn-level adaptive clipping fixes credit-assignment in agentic GRPO without external process reward models — directly applicable on a Spark.",
         "classified_at": "2026-05-08T14:48:23.336Z"
       },
-      "popularity_score": 16
+      "popularity_score": 16,
+      "deep_eval": {
+        "path": "papers/2605.06200/eval.md",
+        "evaluated_at": "2026-05-08T15:11:22.075Z",
+        "verdict": "spark-feasible"
+      },
+      "promoted_to": {
+        "article_slug": "a2tgpo-turn-clipping-on-spark",
+        "status": "upcoming"
+      }
     },
     {
       "arxiv_id": "2605.06614",
@@ -702,7 +729,16 @@
         "one_line_rationale": "RL-trained skill curator over an external SkillRepo with frozen executor — clean self-evolving-agent shape that fits sub-70B on a Spark.",
         "classified_at": "2026-05-08T14:48:23.336Z"
       },
-      "popularity_score": 15
+      "popularity_score": 15,
+      "deep_eval": {
+        "path": "papers/2605.06614/eval.md",
+        "evaluated_at": "2026-05-08T15:11:22.075Z",
+        "verdict": "spark-feasible"
+      },
+      "promoted_to": {
+        "article_slug": "skill-os-on-spark",
+        "status": "upcoming"
+      }
     },
     {
       "arxiv_id": "2605.05242",
@@ -733,7 +769,16 @@
         "one_line_rationale": "Agents searching the raw corpus directly via general operators (lexical, conjunctive, multi-step) instead of fixed top-k retrieval — Second Brain extension.",
         "classified_at": "2026-05-08T14:48:23.336Z"
       },
-      "popularity_score": 15
+      "popularity_score": 15,
+      "deep_eval": {
+        "path": "papers/2605.05242/eval.md",
+        "evaluated_at": "2026-05-08T15:11:22.075Z",
+        "verdict": "spark-feasible"
+      },
+      "promoted_to": {
+        "article_slug": "dci-corpus-operators-on-spark",
+        "status": "upcoming"
+      }
     },
     {
       "arxiv_id": "2605.06651",

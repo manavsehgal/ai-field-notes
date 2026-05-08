@@ -8,7 +8,9 @@ suggested_stage: inference
 suggested_series: "LLM Wiki"
 fast_verdict: spark-feasible
 relevance_score: 0.7
-has_deep_eval: false
+has_deep_eval: true
+deep_verdict: spark-feasible
+promoted_to: judge-orchestrated-ensemble-on-spark
 hf_paper_url: https://huggingface.co/papers/2605.04523
 ---
 
@@ -41,3 +43,11 @@ _not yet indexed_
 ## Links
 
 - [HuggingFace daily papers](https://huggingface.co/papers/2605.04523)
+
+## Deep eval
+
+[Full feasibility eval →](./eval.md) (verdict: **spark-feasible**, evaluated 2026-05-08)
+
+## Promoted
+
+This paper has been promoted to `articles/judge-orchestrated-ensemble-on-spark/` (status: upcoming).

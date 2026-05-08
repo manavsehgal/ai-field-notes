@@ -9,7 +9,9 @@ suggested_stage: agentic
 suggested_series: "Machine that Builds Machines"
 fast_verdict: spark-feasible
 relevance_score: 0.85
-has_deep_eval: false
+has_deep_eval: true
+deep_verdict: spark-feasible
+promoted_to: skill-os-on-spark
 chapter_alignment: [10]
 mtbm_station: forge
 abs_url: https://arxiv.org/abs/2605.06614
@@ -48,3 +50,11 @@ _not yet indexed_
 - [arXiv abstract](https://arxiv.org/abs/2605.06614)
 - [PDF](https://arxiv.org/pdf/2605.06614)
 - [HuggingFace daily papers](https://huggingface.co/papers/2605.06614)
+
+## Deep eval
+
+[Full feasibility eval →](./eval.md) (verdict: **spark-feasible**, evaluated 2026-05-08)
+
+## Promoted
+
+This paper has been promoted to `articles/skill-os-on-spark/` (status: upcoming).

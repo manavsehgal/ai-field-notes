@@ -8,7 +8,9 @@ suggested_stage: agentic
 suggested_series: "Machine that Builds Machines"
 fast_verdict: spark-feasible
 relevance_score: 0.95
-has_deep_eval: false
+has_deep_eval: true
+deep_verdict: spark-feasible
+promoted_to: auto-research-loop-on-spark
 chapter_alignment: [10, 11]
 mtbm_station: planner
 hf_paper_url: https://huggingface.co/papers/2605.05724
@@ -43,3 +45,11 @@ _not yet indexed_
 ## Links
 
 - [HuggingFace daily papers](https://huggingface.co/papers/2605.05724)
+
+## Deep eval
+
+[Full feasibility eval →](./eval.md) (verdict: **spark-feasible**, evaluated 2026-05-08)
+
+## Promoted
+
+This paper has been promoted to `articles/auto-research-loop-on-spark/` (status: upcoming).
