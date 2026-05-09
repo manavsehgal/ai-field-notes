@@ -124,6 +124,71 @@ Then I ran the held-out eval at step 25 and step 50, plus the post-hoc step 45:
 | @45 | **9/158** | 47.8% (373/780) | 4.87 | 150/158 | **−2.5 pp** |
 | @50 | **11/158** | 47.7% (372/780) | **4.61** | **154/158** | −1.3 pp |
 
+<figure class="fn-diagram" aria-label="Training-step timeline of pool task_pass versus held-out task_pass. X-axis spans 50 training steps. Y-axis shows task_pass as a percentage from 0 to 100. The pool task_pass trace (32-rollout sample, accent) zigzags wildly: 62.5 percent at step 1, 25 at step 11, 37.5 at step 25, peaks at 87.5 percent at step 45 (the highest point of the run), then collapses to 12.5 percent at step 50. The held-out task_pass trace (158-task population, ghost) sits in a narrow band near 7 percent across the only three measured points: 7.6 percent at step 25, 5.7 at step 45, 7.0 at step 50. A vertical highlight at step 45 marks the divergence — pool peak coincides with held-out trough; the 80-percentage-point gap is the article's load-bearing finding.">
+  <svg viewBox="0 0 900 380" role="img" aria-label="Training-step timeline of pool task_pass versus held-out task_pass. X-axis spans 50 training steps. Y-axis shows task_pass as a percentage from 0 to 100. The pool task_pass trace (32-rollout sample, accent) zigzags wildly: 62.5 percent at step 1, 25 at step 11, 37.5 at step 25, peaks at 87.5 percent at step 45 (the highest point of the run), then collapses to 12.5 percent at step 50. The held-out task_pass trace (158-task population, ghost) sits in a narrow band near 7 percent across the only three measured points: 7.6 percent at step 25, 5.7 at step 45, 7.0 at step 50. A vertical highlight at step 45 marks the divergence — pool peak coincides with held-out trough; the 80-percentage-point gap is the article's load-bearing finding." preserveAspectRatio="xMidYMid meet">
+    <defs>
+      <linearGradient id="d-t2po1-plot-grad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"   stop-color="var(--svg-accent-blue)" stop-opacity="0.10"/>
+        <stop offset="100%" stop-color="var(--svg-accent-blue)" stop-opacity="0.02"/>
+      </linearGradient>
+      <linearGradient id="d-t2po1-divergence-grad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"   stop-color="var(--color-primary)" stop-opacity="0.20"/>
+        <stop offset="100%" stop-color="var(--color-primary)" stop-opacity="0.04"/>
+      </linearGradient>
+      <radialGradient id="d-t2po1-peak-halo" cx="0.5" cy="0.5" r="0.6">
+        <stop offset="0%"   stop-color="var(--color-primary)" stop-opacity="0.30"/>
+        <stop offset="100%" stop-color="var(--color-primary)" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <rect x="100" y="40" width="740" height="240" fill="url(#d-t2po1-plot-grad)" stroke="none"/>
+    <rect x="694" y="40" width="44"  height="240" fill="url(#d-t2po1-divergence-grad)" stroke="none"/>
+    <rect class="fn-diagram__node fn-diagram__node--ghost" x="694" y="40" width="44" height="240" rx="0"/>
+    <rect x="690" y="50" width="50" height="40" fill="url(#d-t2po1-peak-halo)" stroke="none"/>
+    <g class="fn-diagram__edges">
+      <path class="fn-diagram__edge fn-diagram__edge--ghost" d="M 100 280 L 840 280" />
+      <path class="fn-diagram__edge fn-diagram__edge--ghost" d="M 100 220 L 840 220" />
+      <path class="fn-diagram__edge fn-diagram__edge--ghost" d="M 100 160 L 840 160" />
+      <path class="fn-diagram__edge fn-diagram__edge--ghost" d="M 100 100 L 840 100" />
+      <path class="fn-diagram__edge fn-diagram__edge--ghost" d="M 100 40  L 840 40"  />
+      <path class="fn-diagram__edge" pathLength="100" d="M 100 40 L 100 280" />
+      <path class="fn-diagram__edge" pathLength="100" d="M 100 280 L 840 280" />
+      <path class="fn-diagram__edge fn-diagram__edge--accent" pathLength="100" d="M 115 130 L 263 220 L 471 190 L 716 70 L 790 250" />
+      <path class="fn-diagram__edge fn-diagram__edge--ghost" d="M 471 261.8 L 716 266.3 L 790 263.2" />
+    </g>
+    <g class="fn-diagram__nodes">
+      <circle class="fn-diagram__dot fn-diagram__dot--accent" cx="115" cy="130" r="5"/>
+      <circle class="fn-diagram__dot fn-diagram__dot--accent" cx="263" cy="220" r="5"/>
+      <circle class="fn-diagram__dot fn-diagram__dot--accent" cx="471" cy="190" r="5"/>
+      <circle class="fn-diagram__dot fn-diagram__dot--accent" cx="716" cy="70"  r="7"/>
+      <circle class="fn-diagram__dot fn-diagram__dot--accent" cx="790" cy="250" r="5"/>
+      <circle class="fn-diagram__dot" cx="471" cy="261.8" r="4"/>
+      <circle class="fn-diagram__dot" cx="716" cy="266.3" r="4"/>
+      <circle class="fn-diagram__dot" cx="790" cy="263.2" r="4"/>
+    </g>
+    <g class="fn-diagram__labels">
+      <text class="fn-diagram__label fn-diagram__label--mono fn-diagram__label--muted" x="92" y="44"  text-anchor="end">100%</text>
+      <text class="fn-diagram__label fn-diagram__label--mono fn-diagram__label--muted" x="92" y="104" text-anchor="end">75</text>
+      <text class="fn-diagram__label fn-diagram__label--mono fn-diagram__label--muted" x="92" y="164" text-anchor="end">50</text>
+      <text class="fn-diagram__label fn-diagram__label--mono fn-diagram__label--muted" x="92" y="224" text-anchor="end">25</text>
+      <text class="fn-diagram__label fn-diagram__label--mono fn-diagram__label--muted" x="92" y="284" text-anchor="end">0</text>
+      <text class="fn-diagram__label fn-diagram__label--mono fn-diagram__label--muted" x="100" y="22" text-anchor="start">task_pass · % of sampled tasks</text>
+      <text class="fn-diagram__label fn-diagram__label--accent" x="100" y="332" text-anchor="start">50-STEP T²PO RUN · 18.5 H WALL</text>
+      <text class="fn-diagram__label fn-diagram__label--mono fn-diagram__label--muted" x="115" y="304" text-anchor="middle">step 1</text>
+      <text class="fn-diagram__label fn-diagram__label--mono fn-diagram__label--muted" x="263" y="304" text-anchor="middle">11</text>
+      <text class="fn-diagram__label fn-diagram__label--mono fn-diagram__label--muted" x="471" y="304" text-anchor="middle">25</text>
+      <text class="fn-diagram__label fn-diagram__label--mono fn-diagram__label--muted" x="716" y="304" text-anchor="middle">45</text>
+      <text class="fn-diagram__label fn-diagram__label--mono fn-diagram__label--muted" x="790" y="304" text-anchor="middle">50</text>
+      <text class="fn-diagram__label fn-diagram__label--display" x="716" y="56"  text-anchor="middle">87.5%</text>
+      <text class="fn-diagram__label fn-diagram__label--mono"   x="678" y="80" text-anchor="end">pool · n=32</text>
+      <text class="fn-diagram__label fn-diagram__label--mono fn-diagram__label--muted" x="450" y="248" text-anchor="middle">held-out · n=158 · ~5–8% across all three checkpoints</text>
+    </g>
+    <g class="fn-diagram__annotations">
+      <text class="fn-diagram__annotation" x="450" y="356" text-anchor="middle">step 45 · pool peak (87.5%) coincides with held-out trough (5.7%) — 81.8pp gap</text>
+    </g>
+  </svg>
+  <figcaption>Pool peak (87.5% at step 45) coincides with held-out trough (5.7% at step 45) — the same adapter looks like the run's best on a 32-rollout pool and its worst on the 158-task held-out set.</figcaption>
+</figure>
+
 The right column is the one to pay attention to: T²PO trails Phase 6 GRPO@34 on task pass at every checkpoint — by 0.6, 2.5, and 1.3 percentage points. The middle column is the load-bearing one for the negative result: **per-assertion sits at 47.6 / 47.8 / 47.7%, three flat numbers spanning 25 gradient steps**. Whatever T²PO is buying at the per-token weight or the entropy resample, it is not lifting the per-assertion ceiling. Mean turns is the only metric that improves monotonically across the three evals (5.37 → 4.87 → 4.61), and the gap to Phase 6 GRPO closes from +0.37 turns at eval-1 to −0.39 turns at eval-2. The model is getting genuinely faster as training progresses; it is not getting more correct.
 
 :::math[The per-assertion ceiling, in three numbers]
