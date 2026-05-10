@@ -121,3 +121,49 @@ And the 2 fixed figures:
 ## Why this works as a feature-only sync
 
 This release is **inert at the schema and infrastructure layer**. Every change lives inside an `articles/<slug>/article.md` body or in a single auto-generated JSON file. There is no behavior contract change, no new component to register, no new directive type, no new localStorage key. A destination that builds clean before pulling will build clean after pulling.
+
+---
+
+## Addendum 2026-05-10 — v2.1 figure-overflow follow-ups (commit `f341514`)
+
+Three small dark-mode-surfaced figure issues caught after v2 landed. Same scope rules as v2: pure article-prose edits, no CSS / component / schema changes.
+
+| Article | Symptom | Fix |
+|---|---|---|
+| `articles/pass-at-k-after-the-seventh-patch/article.md` | (a) orphan italic primer paragraph read like a figcaption with no figure; (b) seven-patch through-line crossed the semi-transparent accent container holding patch #7 | (a) primer wrapped as `:::define[ESamp]:::` block, joining the existing Pass@k / Test-time-scaling define stack; (b) through-line shortened from `M 60 140 L 860 140` to `M 60 140 L 680 140` so it terminates at the dashed test-surface divider instead of bleeding through the accent gradient |
+| `articles/clawgym-on-spark/article.md` | (a) two waterfall annotations centered at SVG `x=100` / `x=800` extended ~95 / ~88 vb-units past the `0..900` viewBox; (b) extra dark inner card behind the chart added a redundant dark-on-dark plate in dark mode | (a) re-anchored: `text-anchor="start" x="60"` for the two left annotations, `text-anchor="end" x="840"` for the right one; (b) removed the `<rect ... fill="var(--svg-card)" opacity="0.4"/>` plate at `x=40 y=40 width=820` |
+| `articles/test-time-distilling-for-exploration/article.md` | most labels in the runtime diagram bled outside their 160-vb-wide corner nodes (longest label was 243 vb-units) and two annotations sat inside `tLLM` or overlapped `BotR` | corner nodes widened 160 → 240 (`x=60→40` left, `x=700→620` right); labels re-anchored `x=75→55` and `x=715→635`; four diagonal edges shortened to start/end at the new node edges; three annotations relocated — top two moved to the `y=176` inter-row gap, bottom long annotation rewritten as `post-filter intervention · reweight after top-k / top-p / min-p` and parked at `y=420 x=450` (figure-bottom sub-line) |
+
+**Why these slipped through v2's smoke pass:** all three render correctly in light mode (where the accent gradient is opaque enough to mask the through-line, and the inner card adds visible separation). They surface only in dark mode, which the v2 audit didn't deep-smoke.
+
+### File-level diff inventory
+
+| File | LOC delta | Kind |
+|---|---:|---|
+| `articles/pass-at-k-after-the-seventh-patch/article.md` | +4 / −2 | define block + path d= |
+| `articles/clawgym-on-spark/article.md` | +3 / −4 | text-anchor + rect removal |
+| `articles/test-time-distilling-for-exploration/article.md` | +23 / −23 | rect/x/edge re-coordinate |
+| `src/data/project-stats.json` | +2 / −2 | regen |
+
+Total: **+32 / −31** across 4 files.
+
+### Test plan (delta from v2)
+
+```bash
+cd /home/nvidia/ai-field-notes
+rm -rf .astro node_modules/.astro
+npm run build  # expect 60 pages clean
+npm run dev    # http://localhost:4321/
+```
+
+Then dark-mode spot-check:
+
+| Article URL | Should see |
+|---|---|
+| `/articles/pass-at-k-after-the-seventh-patch/` | (1) ESamp now appears as a `:::define` aside in the term index alongside Pass@k and Test-time scaling; (2) timeline through-line ends at the dashed divider, accent #7 box is unmarked by the line |
+| `/articles/clawgym-on-spark/` | (1) waterfall: both side annotations sit fully inside the figure box at desktop widths; (2) no dark inner card behind the bars |
+| `/articles/test-time-distilling-for-exploration/` | every node label fits inside its node, no overlap with the diagonal edge lines or other nodes; bottom sub-line "post-filter intervention · reweight after top-k / top-p / min-p" reads cleanly under all rows |
+
+### Conflict avoidance (unchanged from v2)
+
+Same as the parent v2 release: no chrome, no new files, no `localStorage` keys, no `package.json`. Pure article-body + regenerated stats JSON.
