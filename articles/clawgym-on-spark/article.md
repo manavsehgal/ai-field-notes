@@ -234,7 +234,6 @@ The +15.0 pp per-assertion is the load-bearing claim. The +3.8 pp task pass is a
         <stop offset="100%" stop-color="var(--svg-accent-green)" stop-opacity="0"/>
       </radialGradient>
     </defs>
-    <rect x="40" y="40" width="820" height="240" fill="var(--svg-card)" stroke="none" rx="8" opacity="0.4"/>
     <rect x="50" y="50" width="180" height="200" fill="url(#d-cgs2-peak-halo)" stroke="none"/>
     <g class="fn-diagram__edges">
       <path class="fn-diagram__edge fn-diagram__edge--ghost" d="M 40 160 L 860 160" />
@@ -274,9 +273,9 @@ The +15.0 pp per-assertion is the load-bearing claim. The +3.8 pp task pass is a
       <text class="fn-diagram__label fn-diagram__label--mono fn-diagram__label--muted" x="36" y="244" text-anchor="end">−15 pp</text>
     </g>
     <g class="fn-diagram__annotations">
-      <text class="fn-diagram__annotation" x="100" y="296" text-anchor="middle">3 PASS + 4 near-miss in train · adapter learned the pattern</text>
-      <text class="fn-diagram__annotation" x="200" y="312" text-anchor="middle">1 near-miss in train · cross-persona generalization</text>
-      <text class="fn-diagram__annotation" x="800" y="296" text-anchor="middle">base solves cleanly in 1–2 turns · adapter tramples state</text>
+      <text class="fn-diagram__annotation" x="60"  y="296" text-anchor="start">3 PASS + 4 near-miss in train · adapter learned the pattern</text>
+      <text class="fn-diagram__annotation" x="60"  y="312" text-anchor="start">1 near-miss in train · cross-persona generalization</text>
+      <text class="fn-diagram__annotation" x="840" y="296" text-anchor="end">base solves cleanly in 1–2 turns · adapter tramples state</text>
       <text class="fn-diagram__annotation fn-diagram__annotation--accent" x="450" y="350" text-anchor="middle">SFT teaches operational primitives where there's headroom; trades clean-stop behavior for it on tasks where the base already solves</text>
     </g>
   </svg>
