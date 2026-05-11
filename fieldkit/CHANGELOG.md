@@ -6,6 +6,40 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+## [0.3.0] — 2026-05-11
+
+Third public release. One new top-level module (`fieldkit.lineage`) lifted from the [auto-research-loop-on-spark article](https://ainative.business/field-notes/auto-research-loop-on-spark/) — the portable part of cxcscmu's *Auto-Research-Recipes* harness, decomposed into a pure-stdlib substrate any harness on the Spark can write into.
+
+### Added — `fieldkit.lineage` (new module)
+
+The portable part of cxcscmu's *Auto-Research-Recipes* harness, extracted into a top-level submodule. The case for the primitive is in the released `pg_ablation_lineage_on` vs `pg_ablation_lineage_off` runs: same agent, same prompt template, same 201-trial budget on Parameter Golf — only whether the agent's session prompt includes the rendered lineage block differs. With lineage on: 16 keeps (8.0%), 38 eval-budget overruns. Without: 3 keeps (1.5%), 123 eval-budget overruns. **5.3× more keeps · 3.2× fewer wall-wastes**, with no model change, no compute change, no prompt-template change. ([extract from #auto-research-loop-on-spark])
+
+The new module is pure-stdlib (no torch, no numpy) — ~200 LOC of public surface, ~330 LOC including docstrings + renderer helpers.
+
+- **`fieldkit.lineage.FailureLabel`** — 10-class string enum (`keep`, `discard`, `crash`, `eval_budget_overrun`, `train_budget_overrun`, `size_blocked`, `preflight_crash`, `harness_abort`, `disqualified`, `baseline`). `.value` round-trips byte-identically to cxcscmu TSVs. The `is_informational` property is the cxcscmu `_QUARANTINED_STATUSES` rule as a method — returns `False` only for `harness_abort` (bookkeeping kills); every other class carries usable signal for the next agent.
+- **`fieldkit.lineage.Trial`** — frozen dataclass for one TSV row. 17 fields in canonical order. `core_metric` is the task-agnostic primary metric (so the module works for Parameter Golf, NanoChat-D12, CIFAR, and any future task in the arc); `val_bpb` is preserved alongside for direct interop with cxcscmu-shaped data. `Trial.header()` / `Trial.to_row()` / `Trial.from_row(dict)` give exact TSV round-trip — `None` floats serialize as empty strings (matches cxcscmu convention).
+- **`fieldkit.lineage.LineageStore(root, *, lower_is_better=True)`** — append-only TSV writer at `root/results.tsv` with `fcntl.flock` exclusive locking across header + row writes (concurrent specialists can write without interleaving). Read-side accessors: `all_trials()`, `latest(n)`, `best()`, `chain_to(exp_id)` (walks `parent_exp` pointers root-first, terminates on missing or self-referential parents), and `render_prompt(...)` — the deterministic Markdown emitter.
+- **`fieldkit.lineage.LineageSnapshot`** — frozen dataclass returned by `render_prompt`. Carries the rendered Markdown string plus the underlying structured data (`current_best`, `chain_to_best`, `top_k_leaderboard`, `recent_n_activity`, `last_m_with_full_hypothesis`) so callers can index in without re-parsing.
+- **`fieldkit.lineage.RecipeEdit`** — pairs a keep trial with its workdir `snapshot_path` and `parent_snapshot_path`. `diff()` computes a unified diff of every text file in the snapshot vs the parent (binary files elide with a `Binary files ... differ` marker); baseline trials with no parent return an empty diff.
+
+Rendered Markdown output mirrors cxcscmu's `release_artifacts/example_lineage_pg_lineage_on_arch.txt` shape: header line + `## LEADERBOARD.md` (current best + top-K kept table) + `## KNOWLEDGE.md` (current-best lineage as a nested `└─` chain + recent-activity table + last-M detailed entries). Determinism is tested — same TSV state in produces byte-identical Markdown across calls.
+
+### Test suite
+
+**29 new tests** for `fieldkit.lineage` (`tests/test_lineage.py`): `FailureLabel` value parity + `is_informational` predicate + 10-class enum surface lock; `Trial` round-trip via TSV; `LineageStore` append / latest / best / `chain_to` correctness across linear and branched topologies; `render_prompt` determinism, top-K filtering, chain rendering with `← BEST` marker; `RecipeEdit.diff()` against parent snapshots including new-file detection.
+
+Total fieldkit test count: **249 passed, 3 skipped** offline (`pytest -q`) — the 3 skips are 1 module-level torch importorskip in `test_training.py` and 2 `--spark`-gated live integration tests.
+
+### Articles in this release
+
+- [`auto-research-loop-on-spark`](https://ainative.business/field-notes/auto-research-loop-on-spark/) — anchor article. Walks the 17-column schema, the 10-class enum semantics, and the cxcscmu lineage ablation that proves the primitive's value.
+
+### Schema change — `FIELDKIT_MODULES`
+
+`src/content.config.ts` extended to include `'lineage'` in the `FIELDKIT_MODULES` tuple (order: `capabilities, nim, rag, eval, training, lineage, cli`). Required so articles can declare `fieldkit_modules: ['lineage']` in their frontmatter.
+
+[extract from #auto-research-loop-on-spark]: https://github.com/manavsehgal/ai-field-notes/tree/main/articles/auto-research-loop-on-spark
+
 ## [0.2.0] — 2026-05-05
 
 Second public release. One new module (`fieldkit.training`) plus four extensions to the v0.1 `fieldkit.eval` surface, all lifted from articles in [ai-field-notes](https://ainative.business/field-notes/) — primarily the `clawgym-on-spark` and Frontier Scout arcs. The `fieldkit.agents` and `fieldkit.inference` modules originally targeted for v0.2 are deferred to v0.3+ because their public APIs need a second article's use case to lock in (see "Deferred to v0.3+" below).
