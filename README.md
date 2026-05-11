@@ -18,7 +18,7 @@
 
 > One builder maximising the NVIDIA DGX Spark as a personal AI power user and edge AI rig. Every article is a session transcript turned into a deep-dive essay.
 
-<sub><b>33 articles published</b> &nbsp;·&nbsp; Apache 2.0 &nbsp;·&nbsp; by <a href="https://github.com/manavsehgal">Manav Sehgal</a></sub>
+<sub><b>34 articles published</b> &nbsp;·&nbsp; Apache 2.0 &nbsp;·&nbsp; by <a href="https://github.com/manavsehgal">Manav Sehgal</a></sub>
 
 ---
 
@@ -26,18 +26,18 @@
 
 | Articles | Words | Lines of code | Models | NVIDIA products |
 |:-:|:-:|:-:|:-:|:-:|
-| **33** *(+4 upcoming)* | **114,166** | **20,810** | **8** | **11** |
+| **34** *(+4 upcoming)* | **117,403** | **21,023** | **8** | **11** |
 
 ### Stages
 
 | Stage | Published | Upcoming |
 |---|:-:|:-:|
 | [Foundations](https://ainative.business/field-notes/stage/foundations/) | 12 | — |
-| [Training](https://ainative.business/field-notes/stage/training/) | 11 | 1 |
-| [Fine-tuning](https://ainative.business/field-notes/stage/fine-tuning/) | 7 | 1 |
+| [Training](https://ainative.business/field-notes/stage/training/) | 12 | 1 |
+| [Fine-tuning](https://ainative.business/field-notes/stage/fine-tuning/) | 8 | 1 |
 | [Inference](https://ainative.business/field-notes/stage/inference/) | 14 | — |
 | [Deployment](https://ainative.business/field-notes/stage/deployment/) | 2 | — |
-| [Agentic](https://ainative.business/field-notes/stage/agentic/) | 13 | — |
+| [Agentic](https://ainative.business/field-notes/stage/agentic/) | 14 | — |
 | [Observability](https://ainative.business/field-notes/stage/observability/) | 6 | 1 |
 | [Dev-tools](https://ainative.business/field-notes/stage/dev-tools/) | 2 | 1 |
 
@@ -46,8 +46,8 @@
 | Product | Articles |
 |---|:-:|
 | NVIDIA NIM | 30 |
-| DGX Spark | 27 |
-| NeMo Framework | 26 |
+| DGX Spark | 28 |
+| NeMo Framework | 27 |
 | TensorRT-LLM | 16 |
 | Triton Inference Server | 12 |
 | pgvector | 12 |
@@ -94,6 +94,7 @@ Each article is a deep-dive essay grown from a single session transcript on the 
 
 ### Fine-tuning
 
+- **[Adaptive Turn Clipping on a Single Spark — A²TGPO, Studied from Source](https://ainative.business/field-notes/articles/a2tgpo-turn-clipping-on-spark/)** — A²TGPO redesigns how Information Gain feeds GRPO: turn-group normalization, variance-rescaled accumulation, and adaptive turn-level clipping. The paper's release is the code; the Spark's contribution is the lineage primitive that records what each trial learned.
 - **[T²PO on Spark — When the Training Pool Says 28/32 and Held-out Says 9/158](https://ainative.business/field-notes/articles/t2po-uncertainty-guided-rl-on-spark/)** — T²PO's two deltas on the Phase 6 ClawGym harness: mean turns 5.00 → 4.61, task_complete 154/158, but the per-assertion ceiling stays flat at 47.7%. The strongest training-side step (45) is the worst held-out checkpoint — pool saturation lies on a single Spark.
 - **[ClawGym GRPO on Spark — Closing the Loop the SFT Adapter Couldn't](https://ainative.business/field-notes/articles/clawgym-on-spark-grpo/)** — Phase 5 SFT taught the agent to keep working but never to stop. 34 GRPO steps with a shaped reward unlearn the failure mode — same model, same base, same LoRA-init, but task_complete climbs 0/158 → 154/158, mean turns drop 12 → 5, and per-assertion still inches up +3.1 pp.
 - **[ClawGym on Spark — A 7B Base, A LoRA Adapter, and the +15 pp the Adapter Earned](https://ainative.business/field-notes/articles/clawgym-on-spark/)** — ClawGym shipped only a .github profile, so we built the substrate ourselves — persona task synth, sandbox harness, 200-task corpus, LoRA SFT, matched-base eval. The adapter earns +3.8 pp task pass and +15.0 pp per-assertion against its own base. The diagnostic is the lift.

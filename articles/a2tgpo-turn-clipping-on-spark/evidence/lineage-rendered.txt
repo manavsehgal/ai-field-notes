@@ -1,0 +1,51 @@
+=== lineage rendered for next specialist ===
+# Session start — 2026-05-12T20:30:00Z
+You are specialist **a2tgpo-v1d-beta-sweep**. Current best: **exp_004** (core_metric=34.960000).
+
+## LEADERBOARD.md
+
+## Current Best
+- **exp_id**: 004
+- **core_metric**: 34.960000
+- **specialist**: a2tgpo-v1d
+- **hypothesis**: Full A²TGPO: turn-group norm + variance-rescaled discounted accumulation + adaptive clip via sigmoid
+- **snapshot**: `snapshots/004_a2tgpo-v1d`
+
+## Top 3 Kept Trials
+
+| exp | core_metric | Δ | specialist | hypothesis |
+|-----|-------------|---|------------|------------|
+| 004 | 34.960000 | +0.450000 | a2tgpo-v1d | Full A²TGPO: turn-group norm + variance-rescaled discounted accumulation + adaptive clip via sigmoid |
+| 003 | 34.510000 | +0.490000 | atpo-turn-group | Add turn-group normalization: normalize IG per (prompt, turn_index) composite group |
+| 001 | 34.020000 | +0.810000 | atpo-joint | Switch token-level IS to turn-level IS; keep joint IG/outcome normalization; clip still fixed |
+
+## KNOWLEDGE.md
+
+**Current-best lineage** (root → best):
+```
+exp_000 [grpo-baseline, baseline, metric=33.210000, Δ=—] Vanilla GRPO, token-level IS, fixed clip [0.8, 1.2], no IG signal
+ └─ exp_001 [atpo-joint, keep, metric=34.020000, Δ=+0.810000] Switch token-level IS to turn-level IS; keep joint IG/outcome normalization; clip still fixed
+ └─ exp_003 [atpo-turn-group, keep, metric=34.510000, Δ=+0.490000] Add turn-group normalization: normalize IG per (prompt, turn_index) composite group
+ └─ exp_004 [a2tgpo-v1d, keep, metric=34.960000, Δ=+0.450000] Full A²TGPO: turn-group norm + variance-rescaled discounted accumulation + adaptive clip via sigmoid ← BEST
+```
+
+## Recent Activity (last 6)
+
+| exp | specialist | status | core_metric | hypothesis |
+|-----|------------|--------|-------------|------------|
+| 005 | a2tgpo-v1d-alpha09 | eval_budget_overrun | — | Increase adv_rescale_alpha 0.3 → 0.9 to weight IG-discounted accumulation more … |
+| 004 | a2tgpo-v1d | keep | 34.960000 | Full A²TGPO: turn-group norm + variance-rescaled discounted accumulation + adap… |
+| 003 | atpo-turn-group | keep | 34.510000 | Add turn-group normalization: normalize IG per (prompt, turn_index) composite g… |
+| 002 | atpo-separate | discard | 33.740000 | Normalize IG and outcome rewards independently rather than jointly |
+| 001 | atpo-joint | keep | 34.020000 | Switch token-level IS to turn-level IS; keep joint IG/outcome normalization; cl… |
+| 000 | grpo-baseline | baseline | 33.210000 | Vanilla GRPO, token-level IS, fixed clip [0.8, 1.2], no IG signal |
+
+## Recent Activity (most recent 3 — full hypothesis)
+- exp_005 [a2tgpo-v1d-alpha09, eval_budget_overrun, metric=—, Δ=—] Increase adv_rescale_alpha 0.3 → 0.9 to weight IG-discounted accumulation more heavily
+  └─ ig_clip_scale mean=1.022 std=0.114; eval wall exceeded budget on MuSiQue 4-hop subset — high alpha amplifies long-tail trajectory variance
+- exp_004 [a2tgpo-v1d, keep, metric=34.960000, Δ=+0.450000] Full A²TGPO: turn-group norm + variance-rescaled discounted accumulation + adaptive clip via sigmoid
+  └─ ig_clip_scale mean=1.014 std=0.087 (informative turns widen, uninformative narrow); alpha=0.300 fixed; gamma=1.000
+- exp_003 [atpo-turn-group, keep, metric=34.510000, Δ=+0.490000] Add turn-group normalization: normalize IG per (prompt, turn_index) composite group
+  └─ ig_clip_scale mean=1.000 std=0.000; composite group count = batch_size * max_turns; per-depth advantage std stable across turn positions
+
+
