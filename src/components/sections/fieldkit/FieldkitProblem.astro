@@ -10,7 +10,7 @@ const base = import.meta.env.BASE_URL.replace(/\/+$/, '/') || '/';
 
 const stats = [
   { value: `${articleCount}`, label: 'articles already distill into fieldkit', source: base },
-  { value: '5', label: 'modules, one import each', source: 'fieldkit.{capabilities,nim,rag,eval,cli}' },
+  { value: '7', label: 'modules, one import each', source: 'fieldkit.{capabilities,nim,rag,eval,training,lineage,cli}' },
   { value: '8192', label: 'token preflight catches NIM 400s', source: 'before the network call' },
 ];
 
