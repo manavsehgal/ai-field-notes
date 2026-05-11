@@ -5,11 +5,13 @@
   Last reset: 2026-05-11 (prior content covered the auto-research-loop article publish; shipped through `649c534` and consumed).
 -->
 
-# SYNC-HANDOFF — Project-stats methodology change: count original code only (2026-05-11)
+# SYNC-HANDOFF — Project-stats methodology change + LOC tile breakdown surface (2026-05-11)
 
-Single-file release. The home-page "At a glance" infographic was reporting **369,415 LOC**, which conflated four categories: original article evidence scripts, the fieldkit Python package, the Astro site infrastructure, and (the dominant contributor at ~93%) **vendored Frontier-Scout `articles/<slug>/evidence/repo-snapshot/` upstream-repo dumps** kept for study. This release narrows `total_loc` to **code written for this project only**: article evidence (excluding `/repo-snapshot/`) plus `fieldkit/{src,tests,samples,scripts}/`. The Astro site under `src/` is infrastructure, not the deliverable, and is no longer counted. New `total_loc` is **19,860** (94.6% reduction).
+The home-page "At a glance" infographic was reporting **369,415 LOC**, which conflated four categories: original article evidence scripts, the fieldkit Python package, the Astro site infrastructure, and (the dominant contributor at ~93%) **vendored Frontier-Scout `articles/<slug>/evidence/repo-snapshot/` upstream-repo dumps** kept for study. This release narrows `total_loc` to **code written for this project only**: article evidence (excluding `/repo-snapshot/`) plus `fieldkit/{src,tests,samples,scripts}/`. The Astro site under `src/` is infrastructure, not the deliverable, and is no longer counted. New `total_loc` is **19,860** (94.6% reduction).
 
-**Source range:** head of `main` (single commit on top of `649c534`).
+A small follow-up commit on top surfaces the new lineage data in the KPI itself: the "Lines of code" tile now shows a sub-line `14k article · 6k package` beneath the headline `19,860`, with a `title` tooltip carrying the full breakdown (article evidence + fieldkit package = original LOC, plus the tracked-but-excluded vendored count).
+
+**Source range:** head of `main` — two commits on top of `649c534` (`87a2ebe` stats methodology + the LOC tile breakdown UI commit on top).
 
 ---
 
@@ -83,16 +85,26 @@ If the destination CC instance has a clone of this skill, mirror the same edits 
 
 ---
 
+## LOC tile breakdown surface (UI follow-up commit)
+
+Two-file edit landed on top of the methodology change to give the new `evidence_loc` / `fieldkit_loc` / `vendored_loc` keys a visual home:
+
+- `src/components/ProjectStats.astro` — reads the three new JSON keys, formats them via a small `kfmt(n)` helper (`Math.round(n/1000) + 'k'` for ≥1000), and renders a `<div class="kpi__breakdown">14k article · 6k package</div>` between the headline `19,860` value and the `LINES OF CODE` label. A `title` attribute on the `<article class="kpi">` element carries the full unrounded numbers plus the vendored-excluded count — surfaces on hover, accessible without cluttering the visual.
+- `src/styles/global.css` — adds a 10-line `.kpi__breakdown` rule (mono font, 0.6rem, dim color, tight letter-spacing, ellipsis-on-overflow) immediately after `.kpi__label`. No grid-template changes; the existing `.kpi__text` flex-column accommodates the third line naturally.
+
+Verified at 1400×900 (desktop, 5-col KPI grid) and 700×900 (narrow, 2-col collapse) — both render cleanly without overflow or label collision. Only the LOC tile carries a `kpi__breakdown` line; the other four tiles are byte-identical.
+
+---
+
 ## Conflict-avoidance notes
 
-- This release does not touch CSS, components, plugins, or article markdown. Destination's chrome customizations cannot conflict.
+- The methodology change does not touch CSS, components, plugins, or article markdown. The breakdown UI commit on top touches `ProjectStats.astro` (additive — new sub-element + `title` attribute) and `global.css` (additive — one new class rule). Destination's chrome customizations should not conflict; if they have customized `ProjectStats.astro` independently, merge the new `kpi__breakdown` sub-line into their version.
 - The `project-stats.json` file is *generated* on both sides; the destination's local skill run will reproduce the same numbers as long as the methodology matches.
-- No new fields are *required* by `ProjectStats.astro`; the component reads `total_loc` and ignores the rest. Adding the new `fieldkit_loc` and `vendored_loc` keys is safe.
+- The new `kpi__breakdown` class name is namespaced under the existing `.kpi` BEM convention and unlikely to collide.
 
 ---
 
 ## Out of scope (intentionally deferred)
 
-- **Surfacing `fieldkit_loc` and `vendored_loc` in the infographic itself.** The KPI tile still shows a single number ("Lines of code"). Splitting it into "Article code · Package code · (excluded: vendored)" would require a component edit; the data is in the JSON when that visual lands.
 - **A "code lineage" companion figure** that breaks down per-article LOC vs vendored — could host on the home page or on `/about/` if a future article needs the meta-thread.
 - **Historical project-stats values** — `git log src/data/project-stats.json` already gives a timeline; no archival shim needed.

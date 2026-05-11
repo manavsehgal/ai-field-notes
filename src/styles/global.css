@@ -654,6 +654,17 @@ html[data-theme="light"] .masthead__plate-frame img {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.kpi__breakdown {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.04em;
+  color: var(--color-text-dim);
+  line-height: 1.25;
+  margin-top: 0.05rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
 .project-stats__row {
   display: grid;
