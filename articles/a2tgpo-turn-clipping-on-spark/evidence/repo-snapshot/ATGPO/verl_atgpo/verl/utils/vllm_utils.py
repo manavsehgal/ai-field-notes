@@ -50,7 +50,10 @@ from typing import List
 
 from msgspec import field
 from packaging import version as vs
-from vllm.lora.models import LoRAModel
+try:
+    from vllm.lora.models import LoRAModel  # vllm <= 0.8.x
+except ImportError:
+    from vllm.lora.lora_model import LoRAModel  # vllm 0.20+: file renamed
 from vllm.lora.request import LoRARequest
 from vllm.lora.utils import get_adapter_absolute_path
 from vllm.lora.worker_manager import LRUCacheWorkerLoRAManager

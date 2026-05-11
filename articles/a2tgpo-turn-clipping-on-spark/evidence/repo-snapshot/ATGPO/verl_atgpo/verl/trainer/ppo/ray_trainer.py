@@ -648,9 +648,13 @@ class RayPPOTrainer:
 
             collate_fn = default_collate_fn
 
+        # OmegaConf.get returns the existing-but-None value (unlike dict.get); coerce explicitly
+        _gen_bs = self.config.data.get("gen_batch_size", None)
+        if _gen_bs is None:
+            _gen_bs = self.config.data.train_batch_size
         self.train_dataloader = StatefulDataLoader(
             dataset=self.train_dataset,
-            batch_size=self.config.data.get("gen_batch_size", self.config.data.train_batch_size),
+            batch_size=_gen_bs,
             num_workers=self.config.data.get("dataloader_num_workers", 8),
             drop_last=True,
             collate_fn=collate_fn,
