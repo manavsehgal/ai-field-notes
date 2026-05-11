@@ -18,7 +18,7 @@
 
 > One builder maximising the NVIDIA DGX Spark as a personal AI power user and edge AI rig. Every article is a session transcript turned into a deep-dive essay.
 
-<sub><b>32 articles published</b> &nbsp;·&nbsp; Apache 2.0 &nbsp;·&nbsp; by <a href="https://github.com/manavsehgal">Manav Sehgal</a></sub>
+<sub><b>33 articles published</b> &nbsp;·&nbsp; Apache 2.0 &nbsp;·&nbsp; by <a href="https://github.com/manavsehgal">Manav Sehgal</a></sub>
 
 ---
 
@@ -26,18 +26,18 @@
 
 | Articles | Words | Lines of code | Models | NVIDIA products |
 |:-:|:-:|:-:|:-:|:-:|
-| **32** *(+4 upcoming)* | **110,027** | **369,325** | **8** | **11** |
+| **33** *(+4 upcoming)* | **114,166** | **20,810** | **8** | **11** |
 
 ### Stages
 
 | Stage | Published | Upcoming |
 |---|:-:|:-:|
-| [Foundations](https://ainative.business/field-notes/stage/foundations/) | 11 | — |
-| [Training](https://ainative.business/field-notes/stage/training/) | 10 | 1 |
+| [Foundations](https://ainative.business/field-notes/stage/foundations/) | 12 | — |
+| [Training](https://ainative.business/field-notes/stage/training/) | 11 | 1 |
 | [Fine-tuning](https://ainative.business/field-notes/stage/fine-tuning/) | 7 | 1 |
 | [Inference](https://ainative.business/field-notes/stage/inference/) | 14 | — |
 | [Deployment](https://ainative.business/field-notes/stage/deployment/) | 2 | — |
-| [Agentic](https://ainative.business/field-notes/stage/agentic/) | 12 | — |
+| [Agentic](https://ainative.business/field-notes/stage/agentic/) | 13 | — |
 | [Observability](https://ainative.business/field-notes/stage/observability/) | 6 | 1 |
 | [Dev-tools](https://ainative.business/field-notes/stage/dev-tools/) | 2 | 1 |
 
@@ -45,9 +45,9 @@
 
 | Product | Articles |
 |---|:-:|
-| NVIDIA NIM | 29 |
+| NVIDIA NIM | 30 |
 | DGX Spark | 27 |
-| NeMo Framework | 25 |
+| NeMo Framework | 26 |
 | TensorRT-LLM | 16 |
 | Triton Inference Server | 12 |
 | pgvector | 12 |
@@ -120,6 +120,7 @@ Each article is a deep-dive essay grown from a single session transcript on the 
 
 ### Agentic
 
+- **[Reading the Lineage Primitive — cxcscmu Auto-Research, Studied from release_artifacts](https://ainative.business/field-notes/articles/auto-research-loop-on-spark/)** — cxcscmu's own lineage_on vs lineage_off ablation closes the case: same agent, same trial budget, same prompt template — only the rendered lineage block differs, and the run with lineage produces 5.3× more keeps and 3.2× less wall-time waste. This piece extracts that primitive into fieldkit.lineage.
 - **[Guardrails Before the Agent Edits — Code-Edit Policy as a Programmatic Funnel](https://ainative.business/field-notes/articles/guardrails-for-code-generation/)** — Five programmatic rails between the Autoresearch agent's proposal and any mutation of train.py — schema, menu, range, cross-constraint, diff lint. 27 adversarial test cases: block recall 1.0, clean pass 1.0, every rail attribution correct. Zero LLM-as-judge calls.
 - **[The Autoresearch Loop — 50 Iterations of an LLM Editing Its Own Trainer Overnight](https://ainative.business/field-notes/articles/autoresearch-agent-loop/)** — NIM Llama 3.1 8B drives a structured-perturbation agent loop against a 354M GPT pretrain. 50 iterations, 73.4 min wall, 0.07 kWh of electricity. 8 keeps, 42 reverts, 0 rail blocks, 0 crashes. Best result: val_bpb 10.8534, +0.93% over baseline at d_model=768.
 - **[Second Brain as a Tool — Wrapping the RAG Stack in MCP for Claude Code](https://ainative.business/field-notes/articles/mcp-second-brain-in-claude-code/)** — Closing the Second Brain arc. Four MCP tools wrap the RAG chain — embed, retrieve, optionally rerank, generate — and any Claude Code session anywhere on the box becomes a grounded research client. 200 lines of Python, one launcher, one .mcp.json entry.
