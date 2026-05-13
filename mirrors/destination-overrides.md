@@ -8,8 +8,7 @@
 > adds a new top-level page or override, Mac CC opens a PR back to source updating only this
 > file (PR title prefix: `mirror: destination-overrides update — <date> — <summary>`).
 >
-> **Last reverse-sync: TODO — pending first Mac inventory.** When Mac fills in the TBD
-> sections below, replace this line with the inventory date.
+> **Last reverse-sync: 2026-05-12.**
 
 ## Top-level pages (Mac-authoritative)
 
@@ -18,7 +17,14 @@ These pages live in the Mac destination repo only. Spark CC never adds files und
 - `/book/**` — Ch10–11 MTBM thesis + all book chapters. Mac CC owns end-to-end.
 - `/pricing/**` — commercial license tiers for G-cluster artifacts (G1 embedder licenses, G3/G4 paid-tier quants, G6 dataset commercial tier, G8 adapter licenses, G9 LoRA commissions). Mac CC owns.
 - `/about/**` — marketing about page; biographical chrome only (articles themselves live on Spark).
-- `/` (root landing) — marketing hero. Spark's homepage at `:4321/` is dev preview; production landing on `ainative.business` is Mac-rendered.
+- `/` (root landing — `src/pages/index.astro`) — marketing hero. Spark's homepage at `:4321/` is a dev preview; production landing on `ainative.business` is Mac-rendered.
+- `/projects/**` — marketing projects page (`src/pages/projects.astro`).
+- `/privacy/**`, `/terms/**` — legal pages.
+- `/bookmarks/**` — reader bookmarks surface (paired with the explainers feature).
+- `/glossary/**` — glossary surface (consumes `src/lib/field-notes/article-glossary.mjs`).
+- `/docs/**` — product documentation subsite (synced separately from `ainative` product via `apply-product-docs` skill, not from `ai-field-notes`).
+- `/confirmed` (`src/pages/confirmed.astro`) — newsletter double-opt-in landing.
+- `/feed.xml`, `/feed.json`, `/llms.txt`, `/llms-full.txt` — Mac-managed feeds/discovery endpoints.
 
 ## Forthcoming top-level pages (Phase 2; chrome owned by Mac, data from Spark manifests)
 
@@ -35,22 +41,33 @@ These will appear as `fieldkit v0.4` ships artifact-publishing modules. Mac owns
 
 ## Style overrides
 
-> **TBD — to be filled by Mac's one-time inventory.** Expected scope:
->
-> - Design tokens (OKLCH palette, font stack overrides beyond Geist baseline)
-> - `astro.config.mjs` production base = `/field-notes/` on ainative.business
-> - Custom layouts or component overrides Mac maintains for marketing chrome
-> - Any divergence from Spark's `src/components/` (Mac may extend, never edit Spark-owned)
+The destination ships its own design system. Spark CC never edits `src/styles/**` on the Mac side.
+
+- **Design tokens** — OKLCH palette in `src/styles/global.css` (surface / text / primary / success / border / SVG tokens), driven by CSS custom properties. Stagent → ainative.business is **light-first**; dark surfaces are token-defaulted but the production site renders light.
+- **Font stack** — self-hosted Geist Sans (400 / 500 / 700) and Geist Mono via `public/fonts/*.woff2`, declared with `@font-face` and `<link rel="preload">` in `src/layouts/Layout.astro`. No CDN fonts.
+- **Stylesheet layers** — `src/styles/{global,prose,api-prose,book,explainers,field-notes}.css`. Each layer scopes a surface; Mac CC owns all six.
+- **Layouts** — `src/layouts/{Layout,FieldNotesLayout,BookLayout,DocsLayout,ApiDocsLayout}.astro`. Mac-owned; Spark articles render inside `FieldNotesLayout` but never read from these files.
+- **Mac-only field-notes components** — `src/components/field-notes/{ArticleArcNav,BookmarkStar,ProjectStats,ReaderSettings,SeriesFilter,StageFilter,TermsInThisPiece,TocDrawer}.astro`. `ArticleCard.astro` mirrors source but Mac may extend it for marketing chrome.
+- **Mac-extended signature components** — `src/components/field-notes/svg/*.astro` mirrors source's `src/components/svg/` (one-way Spark → Mac). Mac may have signatures source doesn't (e.g., signatures for the two reframed research papers `ai-transformation` and `solo-builder-case-study`); Spark never deletes destination-only signatures.
+- **Mac-only utility libraries** — `src/lib/field-notes/{article-glossary,article-order,remark-explainers,rehype-explainer-figure}.mjs`. The two remark/rehype plugins are wired into `astro.config.mjs` markdown pipeline; source's markdown pipeline configures itself independently.
 
 ## Build / deploy config (Mac-authoritative)
 
-> **TBD by Mac:**
->
-> - Deploy hooks / GitHub Pages workflow (`.github/workflows/`)
-> - `_redirects` (or equivalent on whatever host serves ainative.business)
-> - Custom 404 page
-> - Mac-side `sync-field-notes` skill location + version pin
-> - Any CI checks Mac runs on pull beyond Spark's `npm run build`
+- **Hosting** — GitHub Pages from `manavsehgal/ainative-business.github.io` with a CNAME at `public/CNAME = ainative.business`. Production base URL is **`/`**, not `/field-notes/` (corrected from earlier TBD note — `/field-notes/` is a route family inside a root-served site, not the Astro `base`).
+- **Astro config** — `astro.config.mjs` sets `site: 'https://ainative.business'`, `trailingSlash: 'always'`. No `base`. Sitemap priority/changefreq is route-family-aware (root + field-notes weekly, docs weekly, about/projects/fieldkit monthly, privacy/terms yearly).
+- **Redirects** — destination-owned `redirects:` map in `astro.config.mjs`:
+  - `/research/` → `/field-notes/series/ai-native-platform/`
+  - `/research/ai-transformation/` → `/field-notes/ai-transformation/`
+  - `/research/solo-builder-case-study/` → `/field-notes/solo-builder-case-study/`
+  - `/rss.xml/` → `/feed.xml/`
+  - `/field-notes/series/autoresearch/` → `/field-notes/series/machine-that-builds-machines/` (the receipt of the 2026-05-08 series rename)
+  - Auto-generated `/articles/<slug>/` → `/field-notes/<slug>/` for every article folder so Spark's intra-article cross-links resolve on the destination.
+- **Custom 404** — none authored; Astro auto-generates from the layout. If/when a custom 404 ships at `src/pages/404.astro`, it's Mac-owned.
+- **Deploy workflow** — `.github/workflows/deploy.yml`. Triggers on push to `main` and `workflow_dispatch`. Two jobs: build (Node 20, npm ci, install Chrome via `browser-actions/setup-chrome@v1` for OG image generation, `npm run build`, upload `dist/`) → deploy (`actions/deploy-pages@v4`). `concurrency: pages, cancel-in-progress: true`.
+- **OG image pipeline** — Mac-owned `scripts/generate-slashless-duplicates.mjs` + `npm run build:og`; outputs to `public/og/field-notes/<slug>.png` for every article. Spark never touches `public/og/**`.
+- **Discovery endpoints** — `src/pages/{feed.xml,feed.json,llms.txt,llms-full.txt}.ts`. Mac-owned.
+- **Mac-side `sync-field-notes` skill** — lives at `.claude/skills/sync-field-notes/` in the destination repo only. Version-pinned via git commits on the destination side; no source-side version file. Source-skill script changes (handoff §B work) ship as PRs to destination.
+- **Mac-side companion skills** — `.claude/skills/{ainative-stats,apply-api-docs,apply-book-update,apply-product-docs,apply-product-release,apply-screengrabs,deck,frontend-design,pptx}/`. None interact with Spark; listed for inventory completeness.
 
 ## Reverse-sync contract
 
