@@ -4,8 +4,11 @@ import { glob } from 'astro/loaders';
 // fieldkit module reference markdown lives outside src/ in the package
 // directory so the Python repo and the docs site stay in sync. Order
 // matters for nav rendering — capabilities first, then nim, rag, eval,
-// training, lineage, cli.
-export const FIELDKIT_MODULES = ['capabilities', 'nim', 'rag', 'eval', 'training', 'lineage', 'cli'] as const;
+// training, lineage, quant, publish, cli. `quant` + `publish` were
+// added in v0.4 for the G3 GGUF publisher pick (MTBM Pick #1) and
+// underpin the Phase 2 sync contract — `publish` writes per-artifact
+// manifests into `src/content/artifacts/<slug>.yaml`.
+export const FIELDKIT_MODULES = ['capabilities', 'nim', 'rag', 'eval', 'training', 'lineage', 'quant', 'publish', 'cli'] as const;
 
 // Articles live at ../articles/<slug>/article.md and are authored via the
 // tech-writer skill. We keep that authoring workflow by loading articles
@@ -121,4 +124,48 @@ const fieldkit_docs = defineCollection({
   }),
 });
 
-export const collections = { articles, fieldkit_docs };
+// Phase 2 of the sync contract — per-artifact YAML manifests. `fieldkit.publish`
+// writes one of these per HF push; the source repo validates the schema, the
+// Mac destination renders `/artifacts/<kind>/` catalog pages from
+// `getCollection('artifacts')`. Schema mirrors `ArtifactManifest.to_dict()`
+// in `fieldkit/src/fieldkit/publish/__init__.py`.
+export const ARTIFACT_KINDS = [
+  'quant',
+  'lora',
+  'adapter',
+  'embed',
+  'reranker',
+  'dataset',
+  'space',
+  'bench',
+] as const;
+
+const artifacts = defineCollection({
+  loader: glob({
+    pattern: '*.yaml',
+    base: './src/content/artifacts',
+    generateId: ({ entry }) => entry.replace(/\.yaml$/, ''),
+  }),
+  schema: z.object({
+    slug: z.string(),
+    kind: z.enum(ARTIFACT_KINDS),
+    class: z.string(),
+    base_model: z.string(),
+    hf_repo: z.string(),
+    variants: z.array(z.string()).default([]),
+    perplexity: z.record(z.string(), z.number()).optional(),
+    spark_tokens_per_sec: z.record(z.string(), z.number()).optional(),
+    sustained_load_minutes: z.number().optional(),
+    lineage_run_id: z.string().optional(),
+    license: z.object({
+      tier: z.string().default('free'),
+      commercial_tier: z.string().optional(),
+    }),
+    article: z.string().optional(),
+    civitai_id: z.number().int().optional(),
+    download_count: z.number().int().optional(),
+    published_at: z.string().optional(),
+  }),
+});
+
+export const collections = { articles, fieldkit_docs, artifacts };

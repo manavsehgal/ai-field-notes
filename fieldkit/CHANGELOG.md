@@ -6,6 +6,50 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+Fourth release in flight. Two new top-level modules (`fieldkit.publish` + `fieldkit.quant`) scaffolded for the G3 GGUF / Quantization Publisher pick (MTBM Pick #1 per `ideas/mtbm-use-cases.md` §6). The two modules together unlock most of Cluster G; this cut implements the GGUF critical path and stubs the other quant formats with named entry points pointing at the v0.5+ roadmap.
+
+### Added — `fieldkit.publish` (new module)
+
+HuggingFace Hub adapter + auto model card builder from `fieldkit.lineage`. Three public surfaces:
+
+- **`fieldkit.publish.ModelCard`** — frontmatter + body builder. Renders the canonical card every Orionfold artifact gets: YAML frontmatter (license, library_name, base_model, pipeline_tag, tags, model_creator), a title + elevator, a **Spark-tested** block (per-variant perplexity + tok/s + thermal envelope), a variants table, **How to run** (`ollama pull` + `from_pretrained` snippets), an optional **Lineage** block (rendered from a `fieldkit.lineage.LineageStore` if provided), a **Methods** backlink to `ainative.business/field-notes/<slug>/`, and a footer attributing the publication to Orionfold LLC.
+- **`fieldkit.publish.ArtifactManifest`** — frozen dataclass for the `src/content/artifacts/<slug>.yaml` Phase-2 sync record (per memory `project_artifact_manifests_phase2`). `to_yaml()` emits via a hand-rolled stdlib emitter so the module has no runtime YAML dep. The source repo writes one of these per push; the Mac destination renders `/artifacts/<kind>/` catalog pages from `getCollection('artifacts')`.
+- **`fieldkit.publish.HFHubAdapter`** — lazy-`huggingface_hub` wrapper. Defaults to `dry_run=True` (stages files on disk, logs the would-be calls, no network). Flip `dry_run=False` to push via `HfApi().upload_folder(...)`. Token resolution order: explicit `token=` → `HF_TOKEN` env → cached login. The dry-run path is fully testable offline.
+
+Plus an orchestrator: **`fieldkit.publish.publish_quant(...)`** — one-line caller that ingests a `QuantReport`-shaped object (duck-typed; produced by `fieldkit.quant.quantize_gguf`), renders the card, writes the manifest, stages the variant files, and pushes (or dry-runs) the HF commit.
+
+Branded constants: `ORIONFOLD_BRAND = "Orionfold LLC"`, `ORIONFOLD_HF_ORG = "orionfoldllc"`. Per the 2026-05-12 HANDOFF Q3 decision: Orionfold LLC is the parent brand for all AI-artifact publishing surfaces; repo names follow the Bartowski shape (`orionfoldllc/<model>-GGUF`, `orionfoldllc/<model>-LoRA`).
+
+### Added — `fieldkit.quant` (new module)
+
+Quantization dispatcher. GGUF path implemented; AWQ/GPTQ/EXL3/MLX/NVFP4 declared as named stubs pointing at the roadmap.
+
+- **`fieldkit.quant.quantize_gguf(...)`** — wraps `llama.cpp/convert_hf_to_gguf.py` + `llama-quantize` to emit one GGUF file per requested variant (canonical Orionfold set: `Q4_K_M`, `Q5_K_M`, `Q6_K`, `Q8_0`, `F16`). Auto-derives F16 from a HF Transformers checkpoint when the source isn't already a GGUF. `dry_run=True` enumerates the would-be subprocess commands into `report.notes` without invoking them — used by tests and CI.
+- **`fieldkit.quant.measure_perplexity_gguf(...)`** — wraps `llama-perplexity`. Parses output via `parse_perplexity_output()` which recognizes the standard `Final estimate: PPL = N.NNN` shape and the lowercase `perplexity = N.NNN` fallback. Returns `None` on parse failure (cards ship without a perplexity column if measurement was skipped).
+- **`fieldkit.quant.measure_tokens_per_sec_gguf(...)`** — wraps `llama-bench`. Parses output via `parse_llama_bench_output()` for `tg` (text-gen, default) or `pp` (prompt-process) tok/s.
+- **`fieldkit.quant.ThermalProbe`** — pure-stdlib `nvidia-smi` poll loop. Reports sustained-load minutes before throttle, per the 2026-05-12 HANDOFF Q9 decision to publish duty-cycle limits on every Orionfold card.
+- **`fieldkit.quant.LlamaCppPaths`** — locator for `llama-quantize` / `llama-perplexity` / `llama-bench` / `convert_hf_to_gguf.py`. Env defaults: `LLAMA_CPP_BIN` directory, `LLAMA_CPP_CONVERT` script path. Override any field directly.
+- **`fieldkit.quant.QuantReport`** — canonical dataclass output. The contract `fieldkit.publish.publish_quant()` consumes.
+- **`fieldkit.quant.quantize_awq` / `quantize_gptq` / `quantize_exl3` / `quantize_mlx` / `quantize_nvfp4`** — named entry-point stubs. Raise `NotImplementedError` with a one-liner pointing at `ideas/mtbm-use-cases.md` §7. Locks the v0.4 public surface so v0.5+ implementations slot in without an API break.
+
+### Schema changes
+
+- `src/content.config.ts` — `FIELDKIT_MODULES` extended to include `'quant'` and `'publish'` in canonical order (`capabilities, nim, rag, eval, training, lineage, quant, publish, cli`).
+- `src/content.config.ts` — new `artifacts` Astro collection (Phase 2 sync contract). Loads YAML manifests from `src/content/artifacts/*.yaml`; Zod schema mirrors `fieldkit.publish.ArtifactManifest`. `ARTIFACT_KINDS` enum exposed alongside `FIELDKIT_MODULES` for downstream filtering. `src/content/artifacts/` directory created (empty + `.gitkeep`); first manifest will land when the first quant ships.
+
+### Test suite
+
+**63 new tests** across `tests/test_publish.py` (26) and `tests/test_quant.py` (37). Total: **312 passed, 3 skipped** offline (`pytest -q`). The 3 skips are unchanged from v0.3.0 (1 module-level torch importorskip + 2 `--spark`-gated live integration tests). All new tests run offline — `dry_run=True` paths for `HFHubAdapter`, `publish_quant`, and `quantize_gguf` exercise the full code path without `huggingface_hub`, llama.cpp binaries, or `nvidia-smi` available.
+
+### Articles in this release
+
+- `articles/becoming-a-gguf-publisher-on-spark/` — placeholder (`status: upcoming`) scaffolded for the G3 v0 anchor article. Will be promoted to `status: published` after the first 5 Orionfold GGUF quants ship and the 14-day milestone in HANDOFF §2 is met.
+
+### Deferred to v0.5
+
+- `fieldkit.image-lora` + `fieldkit.civitai` — Pick #2 (G9) prep. Deferred per the 2026-05-12 HANDOFF Q10 decision to sequence G3 → G9 rather than parallelize. Will land once G3 v0 proves the `fieldkit.publish` infra.
+- Non-GGUF formats in `fieldkit.quant` (AWQ, GPTQ, EXL3, MLX, NVFP4). The G3 v0 niche-positioning is Nemotron-family GGUFs with the Spark-tested layer; other formats are pure surface-area expansion and can wait for an audience signal.
+
 ## [0.3.0] — 2026-05-11
 
 Third public release. One new top-level module (`fieldkit.lineage`) lifted from the [auto-research-loop-on-spark article](https://ainative.business/field-notes/auto-research-loop-on-spark/) — the portable part of cxcscmu's *Auto-Research-Recipes* harness, decomposed into a pure-stdlib substrate any harness on the Spark can write into.
