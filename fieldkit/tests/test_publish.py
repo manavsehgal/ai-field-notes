@@ -104,6 +104,53 @@ def test_model_card_spark_tested_block_renders_with_measurements() -> None:
     assert "**42 min**" in out
 
 
+def test_model_card_renders_vertical_eval_column_when_provided() -> None:
+    card = ModelCard(
+        title="finance-Llama3-8B-GGUF",
+        one_liner="Vertical-curator quants.",
+        base_model="instruction-pretrain/finance-Llama3-8B",
+        variants=(
+            {"name": "Q4_K_M", "size": "4.6 GB", "recommended": "Default."},
+            {"name": "Q8_0", "size": "8.5 GB", "recommended": "Lossless-ish."},
+        ),
+        perplexity={"Q4_K_M": 8.4, "Q8_0": 8.1},
+        tokens_per_sec={"Q4_K_M": 72.3, "Q8_0": 45.1},
+        sustained_load_minutes=18.0,
+        vertical_eval={"Q4_K_M": 0.62, "Q8_0": 0.66},
+        vertical_eval_name="FinanceBench (n=50, numeric_match)",
+    )
+    out = card.render()
+    assert "## Spark-tested" in out
+    # Header now has the 5th column
+    assert (
+        "| Variant | Size | Perplexity (wikitext-2) | tok/s on Spark"
+        " | FinanceBench (n=50, numeric_match) |"
+    ) in out
+    # Each row carries the percentage-formatted accuracy
+    assert "| Q4_K_M | 4.6 GB | 8.400 | 72.3 | 62.0% |" in out
+    assert "| Q8_0 | 8.5 GB | 8.100 | 45.1 | 66.0% |" in out
+    # The intro copy switches to "measurement quad"
+    assert "measurement quad" in out
+    assert "FinanceBench (n=50, numeric_match)" in out
+
+
+def test_model_card_skips_vertical_column_when_eval_empty() -> None:
+    card = ModelCard(
+        title="Foo-GGUF",
+        one_liner="x",
+        base_model="x/y",
+        variants=({"name": "Q4_K_M", "size": "4 GB", "recommended": "x"},),
+        perplexity={"Q4_K_M": 7.0},
+        tokens_per_sec={"Q4_K_M": 60.0},
+        sustained_load_minutes=10.0,
+        # vertical_eval intentionally omitted
+    )
+    out = card.render()
+    # Falls back to 4-column header (no vertical column)
+    assert "| Variant | Size | Perplexity (wikitext-2) | tok/s on Spark |" in out
+    assert "measurement triple" in out
+
+
 def test_model_card_skips_spark_tested_block_without_measurements() -> None:
     card = ModelCard(
         title="Foo-30B-GGUF",
@@ -242,6 +289,8 @@ def test_artifact_manifest_elides_optional_fields_when_unset() -> None:
     assert "perplexity" not in d
     assert "spark_tokens_per_sec" not in d
     assert "sustained_load_minutes" not in d
+    assert "vertical_eval" not in d
+    assert "vertical_eval_name" not in d
 
 
 def test_artifact_manifest_includes_optional_fields_when_set() -> None:
@@ -265,6 +314,26 @@ def test_artifact_manifest_includes_optional_fields_when_set() -> None:
     assert d["civitai_id"] == 1234
     assert d["download_count"] == 99
     assert d["license"] == {"tier": "free", "commercial_tier": "orionfold-pro"}
+
+
+def test_artifact_manifest_carries_vertical_eval_when_set() -> None:
+    m = ArtifactManifest(
+        slug="finance",
+        kind="quant",
+        artifact_class="gguf",
+        base_model="instruction-pretrain/finance-Llama3-8B",
+        hf_repo="orionfoldllc/finance-Llama3-8B-GGUF",
+        variants=("Q4_K_M", "Q8_0"),
+        vertical_eval={"Q4_K_M": 0.62, "Q8_0": 0.66},
+        vertical_eval_name="FinanceBench (n=50, numeric_match)",
+    )
+    d = m.to_dict()
+    assert d["vertical_eval"] == {"Q4_K_M": 0.62, "Q8_0": 0.66}
+    assert d["vertical_eval_name"] == "FinanceBench (n=50, numeric_match)"
+    # And the YAML output carries them too
+    yaml_text = m.to_yaml()
+    assert "vertical_eval:" in yaml_text
+    assert "vertical_eval_name:" in yaml_text
 
 
 def test_artifact_manifest_yaml_is_parseable_round_trip() -> None:
@@ -415,6 +484,52 @@ def test_publish_quant_dry_run_end_to_end(tmp_path: Path) -> None:
     manifest = result.manifest_path.read_text()
     assert "slug: foo-30b-gguf" in manifest
     assert "hf_repo: orionfoldllc/Foo-30B-GGUF" in manifest
+
+
+def test_publish_quant_threads_vertical_eval_into_card_and_manifest(
+    tmp_path: Path,
+) -> None:
+    qr = _stub_quant_report(tmp_path / "source")
+    result = publish_quant(
+        quant_report=qr,
+        base_model="instruction-pretrain/finance-Llama3-8B",
+        repo_name="finance-Llama3-8B-GGUF",
+        staging_dir=tmp_path / "stage",
+        artifacts_dir=tmp_path / "content" / "artifacts",
+        article_slug="becoming-a-gguf-publisher-on-spark",
+        vertical_eval={"Q4_K_M": 0.62, "Q8_0": 0.66},
+        vertical_eval_name="FinanceBench (n=50, numeric_match)",
+        dry_run=True,
+    )
+    card = result.card_path.read_text()
+    # Card surfaces the 5th column with percentage formatting
+    assert "FinanceBench (n=50, numeric_match)" in card
+    assert "62.0%" in card and "66.0%" in card
+    assert "measurement quad" in card
+    # Manifest YAML carries vertical_eval fields
+    manifest = result.manifest_path.read_text()
+    assert "vertical_eval:" in manifest
+    assert "vertical_eval_name:" in manifest
+
+
+def test_publish_quant_reads_vertical_eval_from_quant_report_duck_typed(
+    tmp_path: Path,
+) -> None:
+    # When kwargs are not supplied, the duck-typed report's vertical_eval
+    # attributes flow through automatically.
+    qr = _stub_quant_report(tmp_path / "source")
+    qr.vertical_eval = {"Q4_K_M": 0.55, "Q8_0": 0.60}
+    qr.vertical_eval_name = "LegalBench (mini)"
+    result = publish_quant(
+        quant_report=qr,
+        base_model="x/y",
+        repo_name="y-GGUF",
+        staging_dir=tmp_path / "stage",
+        dry_run=True,
+    )
+    card = result.card_path.read_text()
+    assert "LegalBench (mini)" in card
+    assert "55.0%" in card and "60.0%" in card
 
 
 def test_publish_quant_lineage_store_duck_typed(tmp_path: Path) -> None:

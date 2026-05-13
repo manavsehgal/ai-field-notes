@@ -27,7 +27,7 @@ set -euo pipefail
 
 # --- Config (env-overridable) -----------------------------------------------
 
-MODEL_ID="${MODEL_ID:-nvidia/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-BF16}"
+MODEL_ID="${MODEL_ID:-instruction-pretrain/finance-Llama3-8B}"
 MODEL_SLUG="${MODEL_SLUG:-$(basename "$MODEL_ID")}"
 BASE_MODEL_ARG="${BASE_MODEL_ARG:-$MODEL_ID}"
 LLAMA_CPP_DIR="${LLAMA_CPP_DIR:-/home/nvidia/llama.cpp}"
@@ -40,8 +40,16 @@ STAGE_DIR="${STAGE_DIR:-/tmp/orionfold-stage}"
 ARTIFACTS_DIR="${ARTIFACTS_DIR:-/home/nvidia/ai-field-notes/src/content/artifacts}"
 ARTICLE_SLUG="${ARTICLE_SLUG:-becoming-a-gguf-publisher-on-spark}"
 QUANT_VARIANTS="${QUANT_VARIANTS:-Q4_K_M,Q5_K_M,Q6_K,Q8_0,F16}"
-WIKITEXT_CORPUS="${WIKITEXT_CORPUS:-/home/nvidia/data/calibration/wikitext-2-raw/wiki.test.raw}"
+WIKITEXT_CORPUS="${WIKITEXT_CORPUS:-/home/nvidia/data/calibration/wikitext-2-raw-v1/wiki.test.raw}"
+FINBENCH_JSONL="${FINBENCH_JSONL:-/home/nvidia/data/eval-benches/financebench/financebench_merged.jsonl}"
 REPO_NAME="${REPO_NAME:-${MODEL_SLUG}-GGUF}"
+
+# HF cache redirect — system /home/nvidia/.cache/huggingface is root-owned
+# (legacy from a past sudo run), so xet and hub cache fall back to a writable
+# location under /home/nvidia/data/. Disabling xet too — direct HTTP is more
+# reliable when xet's log dir is unwritable and silently degrades to noise.
+export HF_HOME="${HF_HOME:-/home/nvidia/data/.hf-cache}"
+export HF_HUB_DISABLE_XET="${HF_HUB_DISABLE_XET:-1}"
 
 # --- Logging helpers --------------------------------------------------------
 
@@ -135,51 +143,24 @@ for v, info in report.variant_files.items():
 PYEOF
 }
 
-# --- Step 5: measure perplexity + tok/s ------------------------------------
+# --- Step 5: measure perplexity + tok/s + thermal + FinanceBench ----------
 
 step_measure() {
-  local out_dir="${QUANTS_DIR}/${MODEL_SLUG}"
   if [[ ! -f "$WIKITEXT_CORPUS" ]]; then
     log "warn: wikitext corpus not found at $WIKITEXT_CORPUS — skipping perplexity pass"
-    log "      download via: hf download Salesforce/wikitext --local-dir /home/nvidia/data/calibration --include 'wikitext-2-raw-v1/*'"
+    log "      download via: hf download Salesforce/wikitext --repo-type dataset --local-dir /home/nvidia/data/calibration --include 'wikitext-2-raw-v1/*'"
     return
   fi
-  log "measuring perplexity + tok/s per variant"
+  if [[ ! -f "$FINBENCH_JSONL" ]]; then
+    log "warn: FinanceBench corpus not at $FINBENCH_JSONL — vertical-eval will be skipped"
+    log "      download via: hf download PatronusAI/financebench --repo-type dataset --local-dir /home/nvidia/data/eval-benches/financebench"
+    export SKIP_VERTICAL=1
+  fi
+  log "measuring 4 axes per variant (perplexity / tok-s / thermal / FinanceBench)"
+  MODEL_SLUG="$MODEL_SLUG" QUANTS_DIR="$QUANTS_DIR" QUANT_VARIANTS="$QUANT_VARIANTS" \
+  WIKITEXT_CORPUS="$WIKITEXT_CORPUS" FINBENCH_JSONL="$FINBENCH_JSONL" \
   LLAMA_CPP_BIN="$LLAMA_CPP_BIN" \
-    "${HF_VENV}/bin/python" - <<PYEOF
-import json
-from pathlib import Path
-from fieldkit.quant import (
-    LlamaCppPaths,
-    measure_perplexity_gguf,
-    measure_tokens_per_sec_gguf,
-)
-
-paths = LlamaCppPaths().resolve()
-out_dir = Path("${out_dir}")
-variants = "${QUANT_VARIANTS}".split(",")
-report = {"perplexity": {}, "tokens_per_sec": {}}
-
-for v in variants:
-    gguf = out_dir / f"model-{v}.gguf"
-    if not gguf.exists():
-        continue
-    print(f"measuring {v} …")
-    ppl = measure_perplexity_gguf(
-        gguf_path=gguf,
-        corpus_path="${WIKITEXT_CORPUS}",
-        paths=paths,
-    )
-    tps = measure_tokens_per_sec_gguf(
-        gguf_path=gguf,
-        paths=paths,
-    )
-    report["perplexity"][v] = ppl
-    report["tokens_per_sec"][v] = tps
-    print(f"  perplexity={ppl} tok/s={tps}")
-
-(out_dir / "measurements.json").write_text(json.dumps(report, indent=2))
-PYEOF
+    "${HF_VENV}/bin/python" "$(dirname "$0")/g3_measure_variants.py"
 }
 
 # --- Step 6: dry-run publish -----------------------------------------------
@@ -195,21 +176,57 @@ from fieldkit.publish import publish_quant
 
 out_dir = Path("${out_dir}")
 variants = "${QUANT_VARIANTS}".split(",")
-measurements = json.loads((out_dir / "measurements.json").read_text()) if (out_dir / "measurements.json").exists() else {"perplexity": {}, "tokens_per_sec": {}}
+measurements = json.loads((out_dir / "measurements.json").read_text()) if (out_dir / "measurements.json").exists() else {}
+
+# Map gguf bytes to a "4.6 GB" / "16.0 GB" human size label.
+def _human(n):
+    if not n:
+        return ""
+    gb = n / (1024 ** 3)
+    return f"{gb:.1f} GB"
 
 variant_files = {}
+gguf_bytes = measurements.get("gguf_bytes", {})
 for v in variants:
     gguf = out_dir / f"model-{v}.gguf"
     if gguf.exists():
-        variant_files[v] = {"path": str(gguf), "rel": gguf.name, "size": ""}
+        variant_files[v] = {
+            "path": str(gguf),
+            "rel": gguf.name,
+            "size": _human(gguf_bytes.get(v) or gguf.stat().st_size),
+        }
+
+# tokens_per_sec in measurements.json is {variant: {"tg": x, "pp": y}};
+# publish_quant's card expects {variant: float} (tg only).
+tps_raw = measurements.get("tokens_per_sec", {})
+tokens_per_sec = {
+    v: (tps_raw[v].get("tg") if isinstance(tps_raw.get(v), dict) else tps_raw.get(v))
+    for v in variants
+    if tps_raw.get(v) is not None
+}
+
+# Sustained load — take the minimum across variants as the honest worst-case
+# disclosure (matches Q9 a "publish duty-cycle limits on every card").
+sustained_per_var = measurements.get("sustained_load_minutes", {}) or {}
+sustained_floats = [v for v in sustained_per_var.values() if isinstance(v, (int, float))]
+sustained = min(sustained_floats) if sustained_floats else None
+
+# Vertical eval — FinanceBench accuracy per variant; name encodes n + scorer.
+fb_acc = measurements.get("financebench_accuracy", {}) or {}
+fb_n_per_var = measurements.get("financebench_n", {}) or {}
+fb_n = next((n for n in fb_n_per_var.values() if isinstance(n, int) and n > 0), 0)
+vertical_eval = {v: fb_acc[v] for v in variants if isinstance(fb_acc.get(v), (int, float))}
+vertical_eval_name = (
+    f"FinanceBench (n={fb_n}, numeric_match)" if vertical_eval else None
+)
 
 report = SimpleNamespace(
     format="gguf",
     variants=tuple(variants),
     variant_files=variant_files,
     perplexity=measurements.get("perplexity", {}),
-    tokens_per_sec=measurements.get("tokens_per_sec", {}),
-    sustained_load_minutes=None,
+    tokens_per_sec=tokens_per_sec,
+    sustained_load_minutes=sustained,
 )
 
 result = publish_quant(
@@ -219,7 +236,9 @@ result = publish_quant(
     staging_dir="${STAGE_DIR}/${MODEL_SLUG}",
     artifacts_dir="${ARTIFACTS_DIR}",
     article_slug="${ARTICLE_SLUG}",
-    article_title="Becoming a GGUF publisher on the Spark",
+    article_title="Vertical-curator quants on Spark — finance-Llama3-8B-GGUF + FinanceBench mini-eval",
+    vertical_eval=vertical_eval,
+    vertical_eval_name=vertical_eval_name,
     dry_run=True,
 )
 print()

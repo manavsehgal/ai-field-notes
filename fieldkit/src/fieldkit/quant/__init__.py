@@ -39,6 +39,7 @@ from __future__ import annotations
 
 import math
 import os
+import sys
 import re
 import shutil
 import subprocess
@@ -237,7 +238,7 @@ def quantize_gguf(
         else:
             f16 = out_dir / "model-f16.gguf"
             convert_cmd = [
-                "python3",
+                os.environ.get("LLAMA_CPP_PYTHON") or sys.executable,
                 str(paths.require("convert")),
                 str(model_path),
                 "--outfile",
@@ -322,13 +323,14 @@ def measure_tokens_per_sec_gguf(
     n_prompt: int = 512,
     extra_args: Sequence[str] = (),
     dry_run: bool = False,
-) -> Optional[float]:
-    """Run `llama-bench` and return the text-generation `tok/s` for `n_gen=N`.
+) -> Optional[dict[str, Optional[float]]]:
+    """Run `llama-bench` and return `{"tg": tok/s, "pp": tok/s}`.
 
-    Reports the `tg` (text-gen) number rather than `pp` (prompt-process)
-    because real-world chat / completion latency is dominated by the
-    decode-side throughput. Both numbers are parseable from the same output —
-    swap to `parse_llama_bench_output(..., metric="pp")` if needed.
+    Both axes matter for a real Spark card: `tg` (text-generation) dominates
+    interactive decode latency, `pp` (prompt-process) dominates long-context
+    ingestion. Returns `None` on `dry_run`. The returned dict's values may
+    individually be `None` if the corresponding row isn't in `llama-bench`'s
+    output for that build.
     """
     paths = paths or LlamaCppPaths().resolve()
     cmd = [
@@ -344,7 +346,10 @@ def measure_tokens_per_sec_gguf(
     if dry_run:
         return None
     result = _run(cmd, label=f"llama-bench {Path(gguf_path).name}", capture=True)
-    return parse_llama_bench_output(result.stdout, metric="tg")
+    return {
+        "tg": parse_llama_bench_output(result.stdout, metric="tg"),
+        "pp": parse_llama_bench_output(result.stdout, metric="pp"),
+    }
 
 
 # --- Output parsers (pure, testable) -------------------------------------

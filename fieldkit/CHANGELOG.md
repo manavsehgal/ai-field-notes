@@ -32,14 +32,31 @@ Quantization dispatcher. GGUF path implemented; AWQ/GPTQ/EXL3/MLX/NVFP4 declared
 - **`fieldkit.quant.QuantReport`** — canonical dataclass output. The contract `fieldkit.publish.publish_quant()` consumes.
 - **`fieldkit.quant.quantize_awq` / `quantize_gptq` / `quantize_exl3` / `quantize_mlx` / `quantize_nvfp4`** — named entry-point stubs. Raise `NotImplementedError` with a one-liner pointing at `ideas/mtbm-use-cases.md` §7. Locks the v0.4 public surface so v0.5+ implementations slot in without an API break.
 
+### Added — `fieldkit.eval.VerticalBench` (v0.4.x — vertical-curator overlay)
+
+Lightweight JSONL-loader wrapper around `fieldkit.eval.Bench` for vertical-domain accuracy scoring (FinanceBench / LegalBench / SemEval / generic). Drives the **vertical-curator pivot** announced 2026-05-13 (HANDOFF §2 + `ideas/mtbm-use-cases.md` §6 Pick #1.b + §8.5.1): every Orionfold quant card now ships with a vertical-domain accuracy axis, not just wikitext perplexity. Lives in `fieldkit/src/fieldkit/eval/vertical.py`; re-exported at the package root for `from fieldkit.eval import VerticalBench`.
+
+- **`fieldkit.eval.VerticalBench`** + **`VerticalQA`** — bench shape, JSONL loader, scorer plumbing. Accepts any `Callable[[str], str]` as the model function so subprocess (`llama-cli`), in-process (`llama-cpp-python`), or NIM-backed scoring all slot in. Per-call latency aggregates alongside accuracy + refusal via the underlying `Bench`.
+- **`fieldkit.eval.VerticalBench.from_jsonl(path, format='auto', ...)`** — auto-detects `financebench` / `legalbench` / `generic` JSONL shapes from the first row's field signature. Per-row metadata (company, doc_period, question_type, task) flows into per-call tags for slice-by aggregation downstream.
+- **Scorers** — `exact_match`, `contains`, `numeric_match` (with configurable `rel_tolerance`, default 1% — FinanceBench convention). The bench picks `numeric_match` by default for FinanceBench-shape JSONL, `exact_match` for LegalBench-shape.
+
+### Added — vertical-eval surface on `fieldkit.publish`
+
+`ModelCard` + `ArtifactManifest` + `publish_quant(...)` extended to thread per-variant vertical-eval scores through to the rendered card and the Phase-2 sync manifest:
+
+- **`ModelCard.vertical_eval: dict[str, float]`** + **`ModelCard.vertical_eval_name: str`** — when set, the **Spark-tested** block renders a 5-column table (Variant / Size / Perplexity / tok/s / *Vertical-eval-name*) instead of the 4-column default, and the introductory copy switches from "measurement triple" to "measurement quad". Accuracy values render as percentages (`62.0%`). Cards without vertical eval render identically to v0.4.0 — backwards-compatible.
+- **`ArtifactManifest.vertical_eval` + `vertical_eval_name`** — written into the YAML manifest under the same key names. Mac destination Zod schema (`src/content.config.ts`) extended to accept both. Manifests without vertical eval skip the field entirely.
+- **`publish_quant(..., vertical_eval=, vertical_eval_name=)`** — explicit kwargs override whatever the duck-typed `quant_report` carries. Useful when scoring happens out-of-band from quantization (the canonical path on Spark: quantize 5 variants → measure each variant via `g3_measure_variants.py`, which calls `VerticalBench.run(llama_cli_fn)` and then feeds the resulting accuracy dict back into `publish_quant`).
+
 ### Schema changes
 
 - `src/content.config.ts` — `FIELDKIT_MODULES` extended to include `'quant'` and `'publish'` in canonical order (`capabilities, nim, rag, eval, training, lineage, quant, publish, cli`).
 - `src/content.config.ts` — new `artifacts` Astro collection (Phase 2 sync contract). Loads YAML manifests from `src/content/artifacts/*.yaml`; Zod schema mirrors `fieldkit.publish.ArtifactManifest`. `ARTIFACT_KINDS` enum exposed alongside `FIELDKIT_MODULES` for downstream filtering. `src/content/artifacts/` directory created (empty + `.gitkeep`); first manifest will land when the first quant ships.
+- `src/content.config.ts` — `artifacts` schema extended with optional `vertical_eval: Record<string, number>` + `vertical_eval_name: string` (vertical-curator pivot 2026-05-13).
 
 ### Test suite
 
-**63 new tests** across `tests/test_publish.py` (26) and `tests/test_quant.py` (37). Total: **312 passed, 3 skipped** offline (`pytest -q`). The 3 skips are unchanged from v0.3.0 (1 module-level torch importorskip + 2 `--spark`-gated live integration tests). All new tests run offline — `dry_run=True` paths for `HFHubAdapter`, `publish_quant`, and `quantize_gguf` exercise the full code path without `huggingface_hub`, llama.cpp binaries, or `nvidia-smi` available.
+**102 new tests** across `tests/test_publish.py` (31, +5 from v0.4 scaffold), `tests/test_quant.py` (37), and `tests/test_vertical_bench.py` (39, new file). Total: **356 passed, 3 skipped** offline (`pytest -q`). The 3 skips are unchanged from v0.3.0 (1 module-level torch importorskip + 2 `--spark`-gated live integration tests). All new tests run offline — `dry_run=True` paths for `HFHubAdapter`, `publish_quant`, and `quantize_gguf` exercise the full code path without `huggingface_hub`, llama.cpp binaries, or `nvidia-smi` available. `VerticalBench` tests run without a model — `model_fn` is a callable, so a plain `lambda` exercises the full scoring + bench-aggregation path.
 
 ### Articles in this release
 

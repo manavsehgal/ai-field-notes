@@ -1,0 +1,358 @@
+# Copyright 2026 Manav Sehgal
+# SPDX-License-Identifier: Apache-2.0
+"""Vertical-domain eval-bench wrapper around `fieldkit.eval.Bench`.
+
+`VerticalBench` is the Spark-overlay scorer for FinanceBench / LegalBench /
+SemEval-style JSONL test sets. Per `ideas/mtbm-use-cases.md` §6 Pick #1.b +
+§8.5.1 cross-walk, vertical-curator quants ship four measurement axes per
+variant: perplexity (from `fieldkit.quant.measure_perplexity_gguf`), tok/s
+(`measure_tokens_per_sec_gguf`), sustained-load minutes (`ThermalProbe`), and
+**vertical-eval accuracy** — the load-bearing axis this module supplies.
+
+The bench is intentionally callable-shaped: it accepts a `model_fn(prompt) -> str`
+and times each call via the existing `Bench` harness, so latency aggregates
+alongside accuracy and refusal. Network access lives in the caller (llama-cli,
+NIM, vLLM, etc.), keeping the bench offline-only for unit tests.
+
+Supported JSONL shapes (auto-detected by `VerticalBench.from_jsonl`):
+
+- **financebench** — Patronus AI's FinanceBench schema. Maps
+  ``question`` → prompt, ``answer`` (or ``gold_standard``) → reference. Pulls
+  ``company``, ``doc_period``, ``question_type`` into per-row tags.
+- **legalbench** — Stanford CRFM's LegalBench schema. Most tasks use
+  ``text`` / ``input`` for prompt and ``answer`` / ``label`` for reference.
+- **generic** — `{question, answer}` (or `{prompt, expected}`) JSONL. Falls
+  back here when no FinanceBench / LegalBench signature matches.
+
+Three scorers ship in v0.4.x; callers pass any `Callable[[str, str], float]`
+for custom scoring. ``exact_match`` and ``contains`` are deterministic;
+``numeric_match`` extracts the first number from the prediction and compares
+to the reference under a relative tolerance — the right default for
+FinanceBench's quantitative questions.
+"""
+
+from __future__ import annotations
+
+import json
+import re
+from collections.abc import Callable, Iterable
+from dataclasses import asdict, dataclass, field
+from pathlib import Path
+from typing import Any
+
+from fieldkit.eval import Bench, BenchCall, is_refusal
+
+
+__all__ = [
+    "VerticalBench",
+    "VerticalQA",
+    "contains",
+    "exact_match",
+    "numeric_match",
+]
+
+
+@dataclass(frozen=True, slots=True)
+class VerticalQA:
+    """One vertical-eval test case.
+
+    `qid` is the row's stable id (FinanceBench `financebench_id`, etc.) so
+    per-row scores can be cross-referenced against the source JSONL. `tags`
+    carry per-row metadata (company, doc_period, question_type) that flow
+    through to `Bench` for slice-by aggregation downstream.
+    """
+
+    qid: str
+    question: str
+    expected: str
+    tags: dict[str, Any] = field(default_factory=dict)
+
+
+# --- Scorers -------------------------------------------------------------
+
+
+def exact_match(predicted: str, expected: str) -> float:
+    """1.0 if `predicted.strip().lower() == expected.strip().lower()` else 0.0.
+
+    Whitespace-insensitive and case-insensitive. The right default for
+    LegalBench-style single-label classification (yes / no / hold / overrule).
+    """
+    return 1.0 if predicted.strip().lower() == expected.strip().lower() else 0.0
+
+
+def contains(predicted: str, expected: str) -> float:
+    """1.0 if `expected.strip().lower()` appears in `predicted.strip().lower()`.
+
+    The right default when the model is asked to produce a paragraph and the
+    reference is a key fact / number / phrase that must appear somewhere in
+    the answer.
+    """
+    e = expected.strip().lower()
+    if not e:
+        return 0.0
+    return 1.0 if e in predicted.strip().lower() else 0.0
+
+
+_NUM_RE = re.compile(r"-?\d[\d,]*(?:\.\d+)?")
+
+
+def numeric_match(
+    predicted: str,
+    expected: str,
+    *,
+    rel_tolerance: float = 0.01,
+) -> float:
+    """1.0 if the first number in `predicted` is within `rel_tolerance` of
+    the first number in `expected`, else 0.0.
+
+    Commas in numbers (`1,234.56`) are stripped before parsing. Returns 0.0 if
+    either side has no parseable number — that includes refusals, so the
+    refusal-rate counter elsewhere doesn't need to gate this scorer.
+    The default `rel_tolerance=0.01` matches FinanceBench's quantitative-answer
+    grading convention (±1%).
+    """
+    pn = _first_number(predicted)
+    en = _first_number(expected)
+    if pn is None or en is None:
+        return 0.0
+    if en == 0.0:
+        return 1.0 if abs(pn) <= rel_tolerance else 0.0
+    return 1.0 if abs(pn - en) / abs(en) <= rel_tolerance else 0.0
+
+
+def _first_number(s: str) -> float | None:
+    m = _NUM_RE.search(s)
+    if not m:
+        return None
+    try:
+        return float(m.group(0).replace(",", ""))
+    except ValueError:
+        return None
+
+
+# --- JSONL loaders -------------------------------------------------------
+
+
+def _detect_format(row: dict[str, Any]) -> str:
+    """Auto-detect JSONL schema from the first row's field signature."""
+    keys = set(row.keys())
+    if "financebench_id" in keys or "gold_standard" in keys:
+        return "financebench"
+    if {"text", "answer"}.issubset(keys) or {"input", "label"}.issubset(keys):
+        return "legalbench"
+    return "generic"
+
+
+def _row_to_qa(row: dict[str, Any], fmt: str, fallback_idx: int) -> VerticalQA | None:
+    """Map a JSONL row to `VerticalQA`. Returns None if required fields missing."""
+    if fmt == "financebench":
+        qid = str(row.get("financebench_id") or f"fb-{fallback_idx}")
+        question = row.get("question") or ""
+        expected = (
+            row.get("gold_standard")
+            or row.get("metric_eval_text")
+            or row.get("answer")
+            or ""
+        )
+        tags = {
+            k: row[k]
+            for k in ("company", "doc_period", "doc_type", "question_type")
+            if k in row
+        }
+    elif fmt == "legalbench":
+        qid = str(row.get("id") or row.get("index") or f"lb-{fallback_idx}")
+        question = row.get("text") or row.get("input") or row.get("question") or ""
+        expected = row.get("answer") or row.get("label") or ""
+        tags = {k: row[k] for k in ("task", "subtask") if k in row}
+    else:
+        qid = str(row.get("id") or row.get("qid") or f"q-{fallback_idx}")
+        question = row.get("question") or row.get("prompt") or row.get("input") or ""
+        expected = (
+            row.get("answer")
+            or row.get("expected")
+            or row.get("gold")
+            or row.get("label")
+            or ""
+        )
+        tags = {}
+    if not question or not expected:
+        return None
+    return VerticalQA(qid=qid, question=str(question), expected=str(expected), tags=tags)
+
+
+# --- VerticalBench -------------------------------------------------------
+
+
+@dataclass
+class VerticalBench:
+    """Wraps `Bench` to score model outputs against a vertical-eval JSONL.
+
+    Usage::
+
+        vb = VerticalBench.from_jsonl("financebench.jsonl", scorer=numeric_match)
+
+        def model_fn(prompt: str) -> str:
+            return llama_cli_call(gguf_path, prompt)
+
+        bench = vb.run(model_fn, limit=50)
+        print(bench.report())
+        # → table with accuracy, refusal_rate, latency_ms aggregated
+
+    The returned `Bench` carries one `BenchCall` per question with metrics
+    ``accuracy`` (0.0/1.0 via the scorer) and ``refusal`` (0.0/1.0 via
+    `is_refusal`). Per-row tags from the JSONL flow through to `BenchCall.tags`,
+    so callers can slice by `company` / `doc_period` / `question_type`
+    downstream.
+    """
+
+    name: str
+    questions: list[VerticalQA]
+    scorer: Callable[..., float] = exact_match
+    """Pluggable. `exact_match` / `contains` / `numeric_match` ship; pass any
+    `Callable[[predicted, expected], float]` for custom scoring (LLM-judge,
+    BLEU, etc.). Extra kwargs to the scorer (e.g. `rel_tolerance`) go through
+    `scorer_kwargs`."""
+    scorer_kwargs: dict[str, Any] = field(default_factory=dict)
+
+    @classmethod
+    def from_jsonl(
+        cls,
+        path: str | Path,
+        *,
+        name: str | None = None,
+        format: str = "auto",
+        limit: int | None = None,
+        scorer: Callable[..., float] | None = None,
+        scorer_kwargs: dict[str, Any] | None = None,
+    ) -> VerticalBench:
+        """Load a JSONL test set from disk and return a configured bench.
+
+        `format` is one of ``"auto"`` (sniff the first row), ``"financebench"``,
+        ``"legalbench"``, or ``"generic"``. The auto-sniffer reads only the
+        first row, so a partially-corrupt JSONL still triggers
+        format-specific behavior. Rows missing question or expected are
+        silently dropped (they show up as a row-count delta vs the JSONL).
+        """
+        p = Path(path)
+        questions: list[VerticalQA] = []
+        fmt: str | None = None if format == "auto" else format
+        with p.open() as f:
+            for i, line in enumerate(f):
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    row = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                if fmt is None:
+                    fmt = _detect_format(row)
+                qa = _row_to_qa(row, fmt, fallback_idx=i)
+                if qa is not None:
+                    questions.append(qa)
+                if limit is not None and len(questions) >= limit:
+                    break
+        # Pick a sensible default scorer per format if caller didn't override.
+        if scorer is None:
+            scorer = numeric_match if fmt == "financebench" else exact_match
+        return cls(
+            name=name or p.stem,
+            questions=questions,
+            scorer=scorer,
+            scorer_kwargs=scorer_kwargs or {},
+        )
+
+    def run(
+        self,
+        model_fn: Callable[[str], str],
+        *,
+        limit: int | None = None,
+        on_error: str = "record",
+        extra_tags: dict[str, Any] | None = None,
+    ) -> Bench:
+        """Run `model_fn(question.question)` per question; score against `expected`.
+
+        Returns the underlying `Bench` so callers can `.summary()` /
+        `.report()` / `.dump()` it through the existing reporting pipeline.
+        Each call's `BenchCall.metrics` carries ``accuracy`` and ``refusal``;
+        per-row metadata (company, doc_period, etc.) lands in `BenchCall.tags`
+        alongside any `extra_tags` the caller supplies (e.g. the gguf variant
+        being scored — useful when the caller does `for variant in variants:`).
+        """
+        import time
+
+        if on_error not in ("record", "raise"):
+            raise ValueError(f"on_error must be 'record' or 'raise', got {on_error!r}")
+
+        bench = Bench(self.name, metrics=["accuracy", "refusal"])
+        items = self.questions if limit is None else self.questions[:limit]
+        takes_kwargs = _accepts_kwargs(self.scorer)
+        with bench:
+            for q in items:
+                tags = {"qid": q.qid, **q.tags, **(extra_tags or {})}
+                t0 = time.perf_counter()
+                try:
+                    out = model_fn(q.question)
+                except Exception as exc:
+                    if on_error == "raise":
+                        raise
+                    latency_ms = round((time.perf_counter() - t0) * 1000.0, 2)
+                    bench.record(
+                        input=q.question,
+                        output=None,
+                        latency_ms=latency_ms,
+                        success=False,
+                        error=f"{type(exc).__name__}: {exc}",
+                        tags=tags,
+                    )
+                    continue
+                latency_ms = round((time.perf_counter() - t0) * 1000.0, 2)
+                if takes_kwargs:
+                    acc = float(self.scorer(out, q.expected, **self.scorer_kwargs))
+                else:
+                    acc = float(self.scorer(out, q.expected))
+                refusal = 1.0 if is_refusal(out) else 0.0
+                bench.record(
+                    input=q.question,
+                    output=out,
+                    latency_ms=latency_ms,
+                    success=True,
+                    tags=tags,
+                    accuracy=acc,
+                    refusal=refusal,
+                )
+        return bench
+
+    def summary(self) -> dict[str, Any]:
+        """Lightweight summary without invoking a model — row counts + tags.
+
+        Useful for the lineage entry (V2 in HANDOFF) where we want to record
+        what the bench will measure before the model has actually run.
+        """
+        return {
+            "name": self.name,
+            "n": len(self.questions),
+            "scorer": getattr(self.scorer, "__name__", "custom"),
+            "tag_keys": sorted({k for q in self.questions for k in q.tags.keys()}),
+        }
+
+
+def _accepts_kwargs(fn: Callable[..., Any]) -> bool:
+    """True iff `fn` declares **kwargs or any default-valued kwarg.
+
+    Lets `VerticalBench.run` pass `scorer_kwargs` through to scorers like
+    `numeric_match(..., rel_tolerance=0.01)` without breaking the two-arg
+    `exact_match` / `contains` signatures.
+    """
+    import inspect
+
+    try:
+        sig = inspect.signature(fn)
+    except (TypeError, ValueError):
+        return False
+    for p in sig.parameters.values():
+        if p.kind == p.VAR_KEYWORD:
+            return True
+        if p.kind == p.KEYWORD_ONLY:
+            return True
+    return False

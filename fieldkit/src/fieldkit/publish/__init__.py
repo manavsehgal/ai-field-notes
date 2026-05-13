@@ -167,6 +167,13 @@ class ModelCard:
     perplexity: dict[str, float] = field(default_factory=dict)
     tokens_per_sec: dict[str, float] = field(default_factory=dict)
     sustained_load_minutes: Optional[float] = None
+    vertical_eval: dict[str, float] = field(default_factory=dict)
+    """Per-variant vertical-eval accuracy (FinanceBench / LegalBench / SemEval).
+    Added in v0.4.x for the vertical-curator quant pattern — every Orionfold
+    card carries a vertical-domain accuracy score, not just wikitext perplexity."""
+    vertical_eval_name: Optional[str] = None
+    """Display name for the vertical eval column (e.g.,
+    "FinanceBench (n=50, numeric_match)")."""
     ollama_pull_handle: Optional[str] = None
     transformers_snippet: Optional[str] = None
     lineage_prompt: Optional[str] = None
@@ -239,19 +246,40 @@ def _render_model_card(card: ModelCard) -> str:
     lines.append("")
 
     # Spark-tested block — the Orionfold differentiator.
-    if card.tokens_per_sec or card.perplexity or card.sustained_load_minutes is not None:
+    if (
+        card.tokens_per_sec
+        or card.perplexity
+        or card.sustained_load_minutes is not None
+        or card.vertical_eval
+    ):
+        has_vertical = bool(card.vertical_eval)
+        vertical_label = card.vertical_eval_name or "Vertical eval"
         lines.append("## Spark-tested")
         lines.append("")
+        triple_or_quad = "measurement quad" if has_vertical else "measurement triple"
+        axes = (
+            "perplexity, sustained `tok/s`, thermal envelope, and"
+            f" **{vertical_label}** accuracy"
+            if has_vertical
+            else "perplexity, sustained `tok/s`, and thermal envelope"
+        )
         lines.append(
-            "Every Orionfold quant ships with a measurement triple on the NVIDIA"
-            " DGX Spark (GB10, 128 GB unified memory): perplexity, sustained"
-            " `tok/s`, and thermal envelope. The numbers below are the actual"
-            " run, not a wishlist."
+            f"Every Orionfold quant ships with a {triple_or_quad} on the NVIDIA"
+            f" DGX Spark (GB10, 128 GB unified memory): {axes}. The numbers"
+            f" below are the actual run, not a wishlist."
         )
         lines.append("")
-        if card.tokens_per_sec or card.perplexity:
-            lines.append("| Variant | Size | Perplexity (wikitext-2) | tok/s on Spark |")
-            lines.append("|---|---|---|---|")
+        if card.tokens_per_sec or card.perplexity or has_vertical:
+            if has_vertical:
+                header = (
+                    f"| Variant | Size | Perplexity (wikitext-2) | tok/s on Spark | {vertical_label} |"
+                )
+                sep = "|---|---|---|---|---|"
+            else:
+                header = "| Variant | Size | Perplexity (wikitext-2) | tok/s on Spark |"
+                sep = "|---|---|---|---|"
+            lines.append(header)
+            lines.append(sep)
             seen: list[str] = []
             for variant in card.variants:
                 name = variant.get("name", "")
@@ -263,16 +291,28 @@ def _render_model_card(card: ModelCard) -> str:
                 tps = card.tokens_per_sec.get(name)
                 ppl_str = f"{ppl:.3f}" if isinstance(ppl, (int, float)) else "—"
                 tps_str = f"{tps:.1f}" if isinstance(tps, (int, float)) else "—"
-                lines.append(f"| {name} | {size} | {ppl_str} | {tps_str} |")
+                if has_vertical:
+                    ve = card.vertical_eval.get(name)
+                    ve_str = f"{ve:.1%}" if isinstance(ve, (int, float)) else "—"
+                    lines.append(f"| {name} | {size} | {ppl_str} | {tps_str} | {ve_str} |")
+                else:
+                    lines.append(f"| {name} | {size} | {ppl_str} | {tps_str} |")
             # Catch perplexity/tps entries with no matching variant row.
-            for name in card.perplexity.keys():
-                if name not in seen:
-                    ppl = card.perplexity.get(name)
-                    tps = card.tokens_per_sec.get(name)
-                    ppl_str = f"{ppl:.3f}" if isinstance(ppl, (int, float)) else "—"
-                    tps_str = f"{tps:.1f}" if isinstance(tps, (int, float)) else "—"
+            extra_names = set(card.perplexity.keys()) | set(card.vertical_eval.keys())
+            for name in extra_names:
+                if name in seen:
+                    continue
+                ppl = card.perplexity.get(name)
+                tps = card.tokens_per_sec.get(name)
+                ppl_str = f"{ppl:.3f}" if isinstance(ppl, (int, float)) else "—"
+                tps_str = f"{tps:.1f}" if isinstance(tps, (int, float)) else "—"
+                if has_vertical:
+                    ve = card.vertical_eval.get(name)
+                    ve_str = f"{ve:.1%}" if isinstance(ve, (int, float)) else "—"
+                    lines.append(f"| {name} | — | {ppl_str} | {tps_str} | {ve_str} |")
+                else:
                     lines.append(f"| {name} | — | {ppl_str} | {tps_str} |")
-                    seen.append(name)
+                seen.append(name)
             lines.append("")
         if card.sustained_load_minutes is not None:
             lines.append(
@@ -373,6 +413,13 @@ class ArtifactManifest:
     perplexity: dict[str, float] = field(default_factory=dict)
     spark_tokens_per_sec: dict[str, float] = field(default_factory=dict)
     sustained_load_minutes: Optional[float] = None
+    vertical_eval: dict[str, float] = field(default_factory=dict)
+    """Per-variant vertical-eval accuracy (FinanceBench / LegalBench / SemEval).
+    Added in v0.4.x alongside `ModelCard.vertical_eval` for the vertical-curator
+    pattern. Empty for non-vertical (cross-cutting) quants."""
+    vertical_eval_name: Optional[str] = None
+    """Display name for the vertical eval (e.g.,
+    "FinanceBench (n=50, numeric_match)")."""
     lineage_run_id: Optional[str] = None
     license_tier: str = "free"
     license_commercial_tier: Optional[str] = None
@@ -401,6 +448,10 @@ class ArtifactManifest:
             d["spark_tokens_per_sec"] = dict(self.spark_tokens_per_sec)
         if self.sustained_load_minutes is not None:
             d["sustained_load_minutes"] = self.sustained_load_minutes
+        if self.vertical_eval:
+            d["vertical_eval"] = dict(self.vertical_eval)
+        if self.vertical_eval_name:
+            d["vertical_eval_name"] = self.vertical_eval_name
         if self.lineage_run_id:
             d["lineage_run_id"] = self.lineage_run_id
         d["license"] = {"tier": self.license_tier}
@@ -643,6 +694,8 @@ def publish_quant(
     extra_tags: Sequence[str] = (),
     ollama_pull_handle: Optional[str] = None,
     transformers_snippet: Optional[str] = None,
+    vertical_eval: Optional[dict[str, float]] = None,
+    vertical_eval_name: Optional[str] = None,
 ) -> PublishResult:
     """Orchestrate model-card render + manifest write + HF push.
 
@@ -651,22 +704,27 @@ def publish_quant(
         from fieldkit.quant import quantize_gguf
         from fieldkit.publish import publish_quant
 
-        report = quantize_gguf(model="Nemotron-3-Nano-30B-A3B", outdir="/data/quants/...")
+        report = quantize_gguf(model="instruction-pretrain/finance-Llama3-8B", outdir="/data/quants/...")
         publish_quant(
             quant_report=report,
-            base_model="nvidia/Nemotron-3-Nano-30B-A3B",
-            repo_name="Nemotron-3-Nano-30B-A3B-GGUF",
-            staging_dir="/tmp/orionfold-stage/nemotron",
+            base_model="instruction-pretrain/finance-Llama3-8B",
+            repo_name="finance-Llama3-8B-GGUF",
+            staging_dir="/tmp/orionfold-stage/finance",
             artifacts_dir="/home/nvidia/ai-field-notes/src/content/artifacts",
             article_slug="becoming-a-gguf-publisher-on-spark",
-            article_title="Becoming a GGUF publisher on the Spark",
+            article_title="Vertical-curator quants on Spark — FinanceBench, day 7",
+            vertical_eval={"Q4_K_M": 0.62, "Q5_K_M": 0.66, ...},
+            vertical_eval_name="FinanceBench (n=50, numeric_match)",
             dry_run=True,
         )
 
     `quant_report` is duck-typed; any object with `format`, `variants`,
-    `perplexity`, `tokens_per_sec`, `sustained_load_minutes`, `variant_files`
-    works. (The canonical producer is `fieldkit.quant.QuantReport`; this
-    module imports nothing from `fieldkit.quant` to avoid a circular dep.)
+    `perplexity`, `tokens_per_sec`, `sustained_load_minutes`,
+    `vertical_eval`, `vertical_eval_name`, `variant_files` works. (The
+    canonical producer is `fieldkit.quant.QuantReport`; this module imports
+    nothing from `fieldkit.quant` to avoid a circular dep.) Explicit kwargs
+    `vertical_eval` / `vertical_eval_name` override whatever the report
+    carries — handy when scoring happens out-of-band from quantization.
     """
     # Pull duck-typed fields off the report.
     quant_format = str(getattr(quant_report, "format", "gguf"))
@@ -675,6 +733,10 @@ def publish_quant(
     tokens_per_sec = dict(getattr(quant_report, "tokens_per_sec", {}) or {})
     sustained = getattr(quant_report, "sustained_load_minutes", None)
     variant_files = dict(getattr(quant_report, "variant_files", {}) or {})
+    if vertical_eval is None:
+        vertical_eval = dict(getattr(quant_report, "vertical_eval", {}) or {})
+    if vertical_eval_name is None:
+        vertical_eval_name = getattr(quant_report, "vertical_eval_name", None)
 
     # Build the card.
     tag_set: list[str] = [
@@ -720,6 +782,8 @@ def publish_quant(
         perplexity=perplexity,
         tokens_per_sec=tokens_per_sec,
         sustained_load_minutes=sustained,
+        vertical_eval=vertical_eval,
+        vertical_eval_name=vertical_eval_name,
         ollama_pull_handle=ollama_pull_handle,
         transformers_snippet=transformers_snippet,
         lineage_prompt=lineage_prompt,
@@ -751,6 +815,8 @@ def publish_quant(
             perplexity=perplexity,
             spark_tokens_per_sec=tokens_per_sec,
             sustained_load_minutes=sustained,
+            vertical_eval=vertical_eval,
+            vertical_eval_name=vertical_eval_name,
             lineage_run_id=lineage_run_id,
             article=f"articles/{article_slug}/" if article_slug else None,
             published_at=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),

@@ -156,6 +156,8 @@ const artifacts = defineCollection({
     perplexity: z.record(z.string(), z.number()).optional(),
     spark_tokens_per_sec: z.record(z.string(), z.number()).optional(),
     sustained_load_minutes: z.number().optional(),
+    vertical_eval: z.record(z.string(), z.number()).optional(),
+    vertical_eval_name: z.string().optional(),
     lineage_run_id: z.string().optional(),
     license: z.object({
       tier: z.string().default('free'),

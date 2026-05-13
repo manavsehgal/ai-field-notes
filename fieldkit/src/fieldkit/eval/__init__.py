@@ -63,7 +63,12 @@ __all__ = [
     "Trajectory",
     "TrajectoryIter",
     "TurnDetail",
+    "VerticalBench",
+    "VerticalQA",
+    "contains",
+    "exact_match",
     "is_refusal",
+    "numeric_match",
     "pass_at_k_estimator",
     "summarize_agent_runs",
     "summarize_metric",
@@ -1848,3 +1853,15 @@ class MatchedBaseComparison:
             for rec in src:
                 if isinstance(rec, dict):
                     yield rec
+
+
+# Re-export VerticalBench (lives in vertical.py to keep __init__.py navigable;
+# imported here at the end of the module to break the Bench → VerticalBench
+# back-reference cycle).
+from fieldkit.eval.vertical import (  # noqa: E402
+    VerticalBench,
+    VerticalQA,
+    contains,
+    exact_match,
+    numeric_match,
+)
