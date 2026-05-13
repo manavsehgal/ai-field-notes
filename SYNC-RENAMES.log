@@ -1,0 +1,41 @@
+# SYNC-RENAMES.log — append-only history of identifier renames affecting
+# ai-field-notes + ainative.business. Spark writes entries; Mac sync-field-notes
+# replays unfinished entries on every pull and flips the status to `complete`.
+#
+# Schema:
+#   - date: YYYY-MM-DD               # when the rename happened on Spark side
+#     kind: <repo|series|tag|slug|module|path|brand>
+#     old: <old identifier>
+#     new: <new identifier>
+#     affected: [<scope1>, <scope2>, ...]   # frontmatter fields, prose mentions, URLs, etc.
+#     status: <source-applied|destination-needs-replay|complete>
+#
+# Status values:
+#   source-applied            = Spark-side change is in main; Mac hasn't swept yet.
+#   destination-needs-replay  = Mac sync-field-notes needs to apply this on next pull.
+#   complete                  = Mac sweep finished; both sides aligned.
+#
+# Mac flips the status from destination-needs-replay → complete via a PR back to
+# source after its sweep finishes (or by writing into the next SYNC-HANDOFF's
+# prose body that references the entry, and then a follow-up PR updates this log).
+
+- date: 2026-04-24
+  kind: repo
+  old: nvidia-learn
+  new: ai-field-notes
+  affected: [github_url, pages_url, local_path]
+  status: complete
+
+- date: 2026-05-02
+  kind: brand
+  old: nvidia-learn.github.io
+  new: ainative.business/field-notes
+  affected: [destination_url, canonical_links, opengraph]
+  status: complete
+
+- date: 2026-05-08
+  kind: series
+  old: Autoresearch
+  new: Machine that Builds Machines
+  affected: [frontmatter.series, prose_mentions]
+  status: destination-needs-replay

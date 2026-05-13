@@ -11,7 +11,52 @@ One article published. The piece [`a2tgpo-turn-clipping-on-spark`](articles/a2tg
 
 The article walks the three primitives the paper adds to the GRPO loss family — turn-group normalization, variance-rescaled discounted accumulation, adaptive turn-level clipping — and demonstrates the lineage primitive recording each A²TGPO trial's IG-clip-scale telemetry via a working `evidence/lineage-demo.py` that prints the same Markdown block the next specialist would see at session entry.
 
-**Source range:** one new commit on top of `500e9f4` (the head after the fieldkit v0.3.0 landing-page follow-ups).
+**Source range:** the a2tgpo article publish (commit `17bb24b`) plus the overnight-harness preflight (`88ca4be`) plus the stats refresh (`34e33d9`), all on top of `500e9f4` — *plus* the sync-contract bootstrap landing in this same pull cycle (see §"Mac CC action bundle" below).
+
+**Also bundled in this pull cycle:** the sync-contract bootstrap (Phase 1 of the new Spark ↔ Mac sync strategy — see `SYNC-CONTRACT.md`, `SYNC-RENAMES.log`, `mirrors/destination-overrides.md` at source repo root). Bundled because it is a one-time additive contract that must land *before* any further releases use the new YAML-frontmatter schema. After Mac CC executes the bundle actions below, the next release rotation starts fresh with the new schema.
+
+---
+
+## Mac CC action bundle — sync-contract bootstrap (one-time, this pull only)
+
+These actions are intentionally explicit so Mac CC's next consumption pass picks them up without needing a follow-up prompt from the user. Execute in order: A → B → C → D.
+
+### A. Memory entries to save (Mac side)
+
+| Memory | Type | Slug | Body |
+|---|---|---|---|
+| Sync contract pointer | reference | `reference_sync_contract` | Pointer to `SYNC-CONTRACT.md` at source repo root. By-glob authoritative-side table (articles/fieldkit/papers/evidence/scripts/ideas/content/stats/svg are Spark; book/pricing/about/landing/artifacts-chrome/skills are Mac). Forward YAML-frontmatter schema for SYNC-HANDOFF effective next release. |
+| Renames log pointer | reference | `reference_sync_renames_log` | Append-only YAML log at source repo root. Replay protocol: on every pull, read the log, find entries with `status: destination-needs-replay`, apply, flip to `complete` via PR back to source (PR title: `mirror: SYNC-RENAMES.log status update — <date> — <summary>`). |
+| Destination overrides mirror | reference | `reference_destination_overrides_mirror` | Mac-authored file at `mirrors/destination-overrides.md` in source repo. Mac CC keeps it current; opens PRs to source updating only this file when destination IA changes. Heartbeat: update `Last reverse-sync` date on every consumption cycle, even if content unchanged. |
+| New SYNC-HANDOFF schema | feedback | `feedback_sync_handoff_frontmatter_schema` | Starting after this release, SYNC-HANDOFF.md gets YAML frontmatter (fields: `release_slug`, `status`, `source_range`, `articles_added`, `articles_updated`, `artifacts_added`, `artifacts_updated`, `fieldkit_modules_changed`, `renames_to_replay`, `removes`, `new_top_level_pages`, `breaking_changes`, `destination_overrides_to_preserve`, `hf_repos_added`, `civitai_artifacts_added`). Parse mechanically with `yaml.safe_load`; prose below the frontmatter stays human-readable. **Why:** structured deltas catch the rename + override + new-page drift modes that the 2026-04 → 2026-05 series rename surfaced. **How to apply:** sync-field-notes skill reads frontmatter first, then prose. |
+| Phase 2 artifact manifests plan | project | `project_artifact_manifests_phase2` | When `fieldkit v0.4` lands `fieldkit.publish`, source begins writing `src/content/artifacts/<slug>.yaml` per artifact (quants, LoRAs, adapters, embedders, datasets, spaces, benchmarks). Mac renders `/artifacts/<kind>/` catalog pages from `getCollection('artifacts')`. **Why:** MTBM pivot ships AI-native artifacts at G3-quant cadence (3–5 days first ship, then ~weekly); manual SYNC-HANDOFF entries don't scale. **How to apply:** when first manifest appears on a pull, scaffold the `/artifacts/<kind>/` index + detail templates on Mac. |
+
+### B. sync-field-notes skill updates
+
+Add the following capabilities. Each can land as one self-contained PR or batched into one PR titled `feat(sync-field-notes): contract-aware sweep`.
+
+1. **Parse SYNC-HANDOFF YAML frontmatter.** Detect the `---\n...\n---` block at the top; if present, parse with `yaml.safe_load`. Drive the sweep from structured fields. Fall back to prose-only parsing if frontmatter is absent (this current release — the bundle below acts as the inline equivalent).
+2. **Replay SYNC-RENAMES.log.** On every pull: read the YAML log, find entries with `status: destination-needs-replay`, apply each rename across `articles/**` frontmatter + prose + tag/index pages, then open a PR back to source flipping the status to `complete`.
+3. **Respect destination-overrides.** Before editing any path, check it against `mirrors/destination-overrides.md` globs. If the path is destination-owned, skip silently. (This is the no-clobber gate that prevents Spark from stomping `/book/`, `/pricing/`, etc.)
+4. **Render `/artifacts/<kind>/` catalogs (Phase 2 stub).** No-op until `src/content/artifacts/` collection exists in a future pull. When it appears: query `getCollection('artifacts')`, filter by `kind`, render cards. Detail pages at `/artifacts/<kind>/<slug>/`.
+5. **Acknowledge SYNC-HANDOFF consumption.** After sweep, flip the file's HTML-comment status marker from `STATUS: NEW` → `STATUS: SHIPPED` in a PR (or as part of the SYNC-RENAMES.log status-flip PR).
+
+### C. One-time PRs from Mac → Source
+
+1. **`mirrors/destination-overrides.md` inventory PR.** Replace the TBD placeholders with the actual destination-owned inventory: top-level pages (book, pricing, about, landing — confirm globs), style overrides (design tokens, OKLCH palette, font stack divergences), build config (`astro.config.mjs` prod base = `/field-notes/`, deploy hooks, redirects, 404). Update the `Last reverse-sync` heartbeat date. PR title: `mirror: destination-overrides update — 2026-05-12 — initial Mac inventory`.
+2. **SYNC-RENAMES.log status flip PR** (after the Autoresearch → MTBM sweep finishes — see §D). Flip the 2026-05-08 entry from `destination-needs-replay` to `complete`. PR title: `mirror: SYNC-RENAMES.log status update — 2026-05-12 — autoresearch→MTBM swept`.
+3. **SYNC-HANDOFF.md SHIPPED flip** (can ride along with PR #2 or stand alone). Flip the `STATUS: NEW` comment to `STATUS: SHIPPED` so the next release rotation has a clean signal.
+
+### D. Autoresearch → MTBM rename sweep target
+
+Per the 2026-05-08 entry in `SYNC-RENAMES.log`:
+
+- **`frontmatter.series`**: any article with `series: Autoresearch` → `series: Machine that Builds Machines`. Affected articles (from memory `project_nvidia_learn_editorial` + recent SYNC-HANDOFFs): `autoresearch-agent-loop`, `trajectory-eval-is-the-agent-flailing`, `clawgym-on-spark-grpo`, `t2po-uncertainty-guided-rl-on-spark`, plus any newer MTBM entries. Spot-check by grepping `src/content/articles/**/*.md` for `series:.*Autoresearch`.
+- **Prose mentions**: case-insensitive `Autoresearch` → `Machine that Builds Machines` *only* inside articles/pages content under `src/content/articles/**` and rendered `/articles/` pages. **Do not touch** historical mentions inside `HANDOFF.md`, prior SYNC-HANDOFF.md entries (already SHIPPED), memory files, or git history — those are historical records.
+- **Tag/index pages**: any rendered tag-cloud or series-index page that still surfaces "Autoresearch" gets regenerated from the updated frontmatter.
+- **Article slugs are unchanged**. `articles/autoresearch-agent-loop` stays — the rename was series-level, not slug-level (per `feedback_article_prose_numbering` memory: prefer slug links over numbers because slugs survive reordering).
+
+After the sweep, open the flip-status PR per §C.2.
 
 ---
 
