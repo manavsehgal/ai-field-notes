@@ -1,5 +1,5 @@
 <!--
-  ⚠️ STATUS: NEW — content below ships in the head commit on `main` after this release lands.
+  ✅ STATUS: SHIPPED — consumed by Mac CC on 2026-05-12 (sweep commit: manavsehgal/ainative-business.github.io@71293af). Content below remains for historical reference until the next release rotation clears the file.
   At the next release prompt, **clear this entire file and start fresh** (do NOT append to existing sections).
   The file is *one feature/release at a time* — not a running log.
   Last reset: 2026-05-11 (prior content covered the fieldkit v0.3.0 release window — shipped through `53fe370`, `ab125e5`, `f53a9dc`, `87a2ebe`, plus landing-page follow-ups `0ba1fd1`, `2a08e6f`, `500e9f4`; all consumed).
