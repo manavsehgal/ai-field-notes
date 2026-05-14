@@ -1,12 +1,15 @@
 <!--
-  🆕 STATUS: NEW — pending Mac sweep.
+  ✅ STATUS: SHIPPED — Mac sweep complete.
   This file is one feature/release at a time, not a running log.
   At the next release prompt, **clear this entire file and start fresh** (do NOT append to existing sections).
   Last reset: 2026-05-14 (prior content covered the Orionfold/finance-chat-GGUF release + customer-link audit + ORIONFOLD_HF_ORG → HANDLE brand rename, consumed by Mac CC on 2026-05-14 — sweep commit `manavsehgal/ainative-business.github.io@85f9307`).
+  Current cycle consumed by Mac CC on 2026-05-14 — sweep commit `manavsehgal/ainative-business.github.io@f7ea7aa`.
 -->
 ---
 release_slug: 2026-05-14-fieldkit-v0.4.0
-status: NEW
+status: SHIPPED
+swept_at: 2026-05-14
+swept_by: manavsehgal/ainative-business.github.io@f7ea7aa
 source_range: e322af2..HEAD
 articles_added: []
 articles_updated:
