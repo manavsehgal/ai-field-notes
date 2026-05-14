@@ -18,7 +18,7 @@
 
 > One builder maximising the NVIDIA DGX Spark as a personal AI power user and edge AI rig. Every article is a session transcript turned into a deep-dive essay.
 
-<sub><b>34 articles published</b> &nbsp;·&nbsp; Apache 2.0 &nbsp;·&nbsp; by <a href="https://github.com/manavsehgal">Manav Sehgal</a></sub>
+<sub><b>35 articles published</b> &nbsp;·&nbsp; Apache 2.0 &nbsp;·&nbsp; by <a href="https://github.com/manavsehgal">Manav Sehgal</a></sub>
 
 ---
 
@@ -26,7 +26,7 @@
 
 | Articles | Words | Lines of code | Models | NVIDIA products |
 |:-:|:-:|:-:|:-:|:-:|
-| **34** *(+4 upcoming)* | **117,403** | **21,023** | **8** | **11** |
+| **35** *(+4 upcoming)* | **120,093** | **24,026** | **8** | **11** |
 
 ### Stages
 
@@ -36,9 +36,9 @@
 | [Training](https://ainative.business/field-notes/stage/training/) | 12 | 1 |
 | [Fine-tuning](https://ainative.business/field-notes/stage/fine-tuning/) | 8 | 1 |
 | [Inference](https://ainative.business/field-notes/stage/inference/) | 14 | — |
-| [Deployment](https://ainative.business/field-notes/stage/deployment/) | 2 | — |
+| [Deployment](https://ainative.business/field-notes/stage/deployment/) | 3 | — |
 | [Agentic](https://ainative.business/field-notes/stage/agentic/) | 14 | — |
-| [Observability](https://ainative.business/field-notes/stage/observability/) | 6 | 1 |
+| [Observability](https://ainative.business/field-notes/stage/observability/) | 7 | 1 |
 | [Dev-tools](https://ainative.business/field-notes/stage/dev-tools/) | 2 | 1 |
 
 ### Products & frameworks
@@ -46,14 +46,14 @@
 | Product | Articles |
 |---|:-:|
 | NVIDIA NIM | 30 |
-| DGX Spark | 28 |
+| DGX Spark | 29 |
 | NeMo Framework | 27 |
 | TensorRT-LLM | 16 |
 | Triton Inference Server | 12 |
 | pgvector | 12 |
 | NeMo Retriever | 10 |
 | NemoClaw | 8 |
-| Ollama | 5 |
+| Ollama | 6 |
 | NeMo Guardrails | 4 |
 | OpenClaw | 3 |
 
@@ -117,6 +117,7 @@ Each article is a deep-dive essay grown from a single session transcript on the 
 
 ### Deployment
 
+- **[Orionfold/finance-chat-GGUF on Spark — five variants, FinanceBench mini-eval, four-axis measurement card](https://ainative.business/field-notes/articles/becoming-a-gguf-publisher-on-spark/)** — Five GGUF variants of AdaptLLM/finance-chat measured on a DGX Spark — Q8_0 perplexity-matches F16 losslessly, Q4_K_M ships at 31 tok/s. Each card carries perplexity, sustained tok/s, thermal envelope, and FinanceBench accuracy.
 - **[TensorRT-LLM on the Spark — FP8 Isn't the Reason to Drop NIM. NVFP4 Is.](https://ainative.business/field-notes/articles/trtllm-and-triton-on-spark/)** — Dropping below NIM to raw TensorRT-LLM on a GB10 Spark. FP8 beats NIM's vLLM by 10-15% — barely worth the rebuild. NVFP4 beats it by 76% on decode, 43% on TTFT, and ships a 34%-smaller engine. The reason to drop NIM is the Blackwell-native 4-bit kernel, not FP8.
 
 ### Agentic
