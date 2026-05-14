@@ -49,6 +49,21 @@ QUANT_VARIANTS="${QUANT_VARIANTS:-Q4_K_M,Q5_K_M,Q6_K,Q8_0,F16}"
 WIKITEXT_CORPUS="${WIKITEXT_CORPUS:-/home/nvidia/data/calibration/wikitext-2-raw-v1/wiki.test.raw}"
 FINBENCH_JSONL="${FINBENCH_JSONL:-/home/nvidia/data/eval-benches/financebench/financebench_merged.jsonl}"
 REPO_NAME="${REPO_NAME:-${MODEL_SLUG}-GGUF}"
+# Upstream-model HF license tag — flows to README frontmatter `license:` and
+# Astro manifest `license.model:`. Default `apache-2.0` matches most NVIDIA-blessed
+# fine-tunes; AdaptLLM/finance-chat (Llama-2 derivative) overrides to `llama2`.
+MODEL_LICENSE="${MODEL_LICENSE:-apache-2.0}"
+# `llama_cpp.Llama(chat_format=...)` value threaded into the default
+# llama-cpp-python snippet on the rendered card. Empty disables the kw arg.
+CHAT_FORMAT="${CHAT_FORMAT:-}"
+# Variant name to feature in the default How-to-run pull/serve snippets.
+RECOMMENDED_VARIANT="${RECOMMENDED_VARIANT:-Q5_K_M}"
+case "$MODEL_ID" in
+  AdaptLLM/finance-chat)
+    MODEL_LICENSE="${MODEL_LICENSE_OVERRIDE:-llama2}"
+    CHAT_FORMAT="${CHAT_FORMAT_OVERRIDE:-llama-2}"
+    ;;
+esac
 
 # HF cache redirect — system /home/nvidia/.cache/huggingface is root-owned
 # (legacy from a past sudo run), so xet and hub cache fall back to a writable
@@ -250,6 +265,10 @@ report = SimpleNamespace(
     sustained_load_minutes=sustained,
 )
 
+model_license_arg = "${MODEL_LICENSE}".strip() or None
+chat_format_arg = "${CHAT_FORMAT}".strip() or None
+recommended_variant_arg = "${RECOMMENDED_VARIANT}".strip() or None
+
 result = publish_quant(
     quant_report=report,
     base_model="${BASE_MODEL_ARG}",
@@ -260,6 +279,9 @@ result = publish_quant(
     article_title="Vertical-curator quants on Spark — ${REPO_NAME} + FinanceBench mini-eval",
     vertical_eval=vertical_eval,
     vertical_eval_name=vertical_eval_name,
+    model_license=model_license_arg,
+    chat_format=chat_format_arg,
+    recommended_variant=recommended_variant_arg,
     dry_run=True,
 )
 print()

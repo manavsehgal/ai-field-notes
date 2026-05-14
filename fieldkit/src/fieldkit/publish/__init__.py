@@ -164,6 +164,13 @@ class ModelCard:
     one_liner: str
     base_model: str
     license: str = "apache-2.0"
+    """HuggingFace-frontmatter license tag for the *upstream model* (e.g.
+    `apache-2.0`, `mit`, `llama2`, `llama3`, `cc-by-nc-4.0`). HF surfaces this
+    as the model's license badge — it must reflect the base model's actual
+    terms, not the Orionfold commercial-distribution tier (which lives on
+    `ArtifactManifest.license_tier`). publish_quant resolves this from its
+    `model_license=` kwarg, the duck-typed `quant_report.model_license`
+    attribute, or this default — in that order."""
     library_name: str = "gguf"
     pipeline_tag: str = "text-generation"
     language: tuple[str, ...] = ("en",)
@@ -180,6 +187,20 @@ class ModelCard:
     vertical_eval_name: Optional[str] = None
     """Display name for the vertical eval column (e.g.,
     "FinanceBench (n=50, numeric_match)")."""
+    hf_repo: Optional[str] = None
+    """Fully-qualified HF repo id (e.g. `Orionfold/finance-chat-GGUF`).
+    Used to template the default `## How to run` snippets when caller does not
+    supply explicit ollama/transformers strings. publish_quant fills this in
+    automatically; standalone ModelCard callers may set it manually."""
+    chat_format: Optional[str] = None
+    """Optional `llama_cpp.Llama(chat_format=...)` value (e.g. `llama-2`,
+    `chatml`). Threaded into the default llama-cpp-python snippet so the card
+    matches the model's actual chat template. Omit to fall back to the
+    no-chat-format default."""
+    recommended_variant: Optional[str] = None
+    """Variant to feature in the default How-to-run snippets (e.g. `Q5_K_M`).
+    Falls back to `Q5_K_M` if present in `variants`, else the first listed
+    variant."""
     ollama_pull_handle: Optional[str] = None
     transformers_snippet: Optional[str] = None
     lineage_prompt: Optional[str] = None
@@ -229,6 +250,95 @@ def _render_yaml_block(data: dict[str, Any], indent: int = 0) -> list[str]:
                 out.append(f"{prefix}  - {_render_yaml_scalar(item)}")
         else:
             out.append(f"{prefix}{key}: {_render_yaml_scalar(value)}")
+    return out
+
+
+def _pick_recommended_variant(card: ModelCard) -> Optional[str]:
+    """Return the variant name to feature in the default How-to-run snippets."""
+    if card.recommended_variant:
+        return card.recommended_variant
+    names = [v.get("name", "") for v in card.variants if v.get("name")]
+    if not names:
+        return None
+    if "Q5_K_M" in names:
+        return "Q5_K_M"
+    return names[0]
+
+
+def _render_how_to_run(card: ModelCard) -> list[str]:
+    """Render the body of the `## How to run` section.
+
+    Order:
+      1. Ollama one-liner (only if `ollama_pull_handle` is set)
+      2. HuggingFace Transformers (only if `transformers_snippet` is set)
+      3. GGUF defaults (always for `quant_format=="gguf"` when an `hf_repo`
+         is known): `huggingface-cli` pull → `llama-server` serve →
+         `llama-cpp-python` in-process. These mirror the article's
+         "Using this release" section so the customer sees the same path.
+
+    Returns an empty list when nothing renders — callers use that to skip the
+    enclosing `## How to run` header entirely (avoids the empty-section bug
+    that the v0.4.x dry-run surfaced on `Orionfold/finance-chat-GGUF`).
+    """
+    out: list[str] = []
+    if card.ollama_pull_handle:
+        out.append("Ollama (one-liner):")
+        out.append("")
+        out.append("```bash")
+        out.append(f"ollama pull {card.ollama_pull_handle}")
+        out.append("```")
+        out.append("")
+    if card.transformers_snippet:
+        out.append("HuggingFace Transformers:")
+        out.append("")
+        out.append("```python")
+        out.append(card.transformers_snippet.rstrip())
+        out.append("```")
+        out.append("")
+    if card.quant_format == "gguf" and card.hf_repo:
+        variant = _pick_recommended_variant(card)
+        if variant:
+            gguf_file = f"model-{variant}.gguf"
+            local_dir = "./models/" + card.hf_repo.split("/")[-1].lower().removesuffix("-gguf")
+            out.append("Pull a variant:")
+            out.append("")
+            out.append("```bash")
+            out.append(
+                f"huggingface-cli download {card.hf_repo} {gguf_file} \\"
+            )
+            out.append(f"  --local-dir {local_dir}")
+            out.append("```")
+            out.append("")
+            out.append("Serve it via `llama-server` (OpenAI-compatible API):")
+            out.append("")
+            out.append("```bash")
+            out.append(f"llama-server -m {local_dir}/{gguf_file} \\")
+            out.append("  -c 4096 -ngl 99 -t 8 \\")
+            out.append("  --host 0.0.0.0 --port 8080")
+            out.append("```")
+            out.append("")
+            out.append("Or run in-process via `llama-cpp-python`:")
+            out.append("")
+            out.append("```python")
+            out.append("from llama_cpp import Llama")
+            chat_format_kw = (
+                f', chat_format="{card.chat_format}"' if card.chat_format else ""
+            )
+            out.append("llm = Llama(")
+            out.append(f'    model_path="{local_dir}/{gguf_file}",')
+            out.append(f"    n_ctx=4096, n_gpu_layers=99{chat_format_kw},")
+            out.append(")")
+            out.append("out = llm.create_chat_completion(")
+            out.append('    messages=[{"role": "user", "content": "Explain working capital."}],')
+            out.append("    temperature=0.0,")
+            out.append(")")
+            out.append('print(out["choices"][0]["message"]["content"])')
+            out.append("```")
+            out.append("")
+            out.append(
+                "LM Studio and Ollama (via a Modelfile) load the GGUF directly with no additional setup."
+            )
+            out.append("")
     return out
 
 
@@ -343,22 +453,11 @@ def _render_model_card(card: ModelCard) -> str:
         lines.append("")
 
     # How to run.
-    lines.append("## How to run")
-    lines.append("")
-    if card.ollama_pull_handle:
-        lines.append("Ollama (one-liner):")
+    run_blocks = _render_how_to_run(card)
+    if run_blocks:
+        lines.append("## How to run")
         lines.append("")
-        lines.append("```bash")
-        lines.append(f"ollama pull {card.ollama_pull_handle}")
-        lines.append("```")
-        lines.append("")
-    if card.transformers_snippet:
-        lines.append("HuggingFace Transformers:")
-        lines.append("")
-        lines.append("```python")
-        lines.append(card.transformers_snippet.rstrip())
-        lines.append("```")
-        lines.append("")
+        lines.extend(run_blocks)
 
     if card.lineage_prompt:
         lines.append("## Lineage")
@@ -429,6 +528,13 @@ class ArtifactManifest:
     lineage_run_id: Optional[str] = None
     license_tier: str = "free"
     license_commercial_tier: Optional[str] = None
+    model_license: Optional[str] = None
+    """Upstream model license — HF-frontmatter scalar like `apache-2.0`,
+    `llama2`, `cc-by-nc-4.0`. Distinct from `license_tier` (Orionfold's
+    commercial-distribution tier). When set, `publish_quant` uses it for the
+    model card's `license:` frontmatter and the manifest emits it under
+    `license.model:`. Same value flows to both surfaces so the HF badge and
+    the destination catalog page stay in sync."""
     article: Optional[str] = None
     civitai_id: Optional[int] = None
     download_count: Optional[int] = None
@@ -463,6 +569,8 @@ class ArtifactManifest:
         d["license"] = {"tier": self.license_tier}
         if self.license_commercial_tier:
             d["license"]["commercial_tier"] = self.license_commercial_tier
+        if self.model_license:
+            d["license"]["model"] = self.model_license
         if self.article:
             d["article"] = self.article
         if self.civitai_id is not None:
@@ -702,6 +810,9 @@ def publish_quant(
     transformers_snippet: Optional[str] = None,
     vertical_eval: Optional[dict[str, float]] = None,
     vertical_eval_name: Optional[str] = None,
+    model_license: Optional[str] = None,
+    chat_format: Optional[str] = None,
+    recommended_variant: Optional[str] = None,
 ) -> PublishResult:
     """Orchestrate model-card render + manifest write + HF push.
 
@@ -743,6 +854,12 @@ def publish_quant(
         vertical_eval = dict(getattr(quant_report, "vertical_eval", {}) or {})
     if vertical_eval_name is None:
         vertical_eval_name = getattr(quant_report, "vertical_eval_name", None)
+    if model_license is None:
+        model_license = getattr(quant_report, "model_license", None)
+    if chat_format is None:
+        chat_format = getattr(quant_report, "chat_format", None)
+    if recommended_variant is None:
+        recommended_variant = getattr(quant_report, "recommended_variant", None)
 
     # Build the card.
     tag_set: list[str] = [
@@ -777,7 +894,13 @@ def publish_quant(
         for v in variants
     )
 
-    card = ModelCard(
+    # Construct adapter first so we can resolve the qualified hf_repo before
+    # rendering the card (the card's default How-to-run snippets template
+    # against `hf_repo`).
+    adapter = HFHubAdapter(staging_dir=staging_dir, dry_run=dry_run, token=token, org=org)
+    hf_repo = adapter.repo_id(repo_name)
+
+    card_kwargs: dict[str, Any] = dict(
         title=title,
         one_liner=one_liner,
         base_model=base_model,
@@ -790,15 +913,20 @@ def publish_quant(
         sustained_load_minutes=sustained,
         vertical_eval=vertical_eval,
         vertical_eval_name=vertical_eval_name,
+        hf_repo=hf_repo,
+        chat_format=chat_format,
+        recommended_variant=recommended_variant,
         ollama_pull_handle=ollama_pull_handle,
         transformers_snippet=transformers_snippet,
         lineage_prompt=lineage_prompt,
         article_slug=article_slug,
         article_title=article_title,
     )
+    if model_license is not None:
+        card_kwargs["license"] = model_license
+    card = ModelCard(**card_kwargs)
 
     # Stage the card + variant files.
-    adapter = HFHubAdapter(staging_dir=staging_dir, dry_run=dry_run, token=token, org=org)
     card_path = adapter.stage_text(card.render(), "README.md")
     for v, info in variant_files.items():
         if isinstance(info, dict) and "path" in info:
@@ -816,7 +944,7 @@ def publish_quant(
             kind="quant",
             artifact_class=quant_format,
             base_model=base_model,
-            hf_repo=adapter.repo_id(repo_name),
+            hf_repo=hf_repo,
             variants=variants,
             perplexity=perplexity,
             spark_tokens_per_sec=tokens_per_sec,
@@ -824,6 +952,7 @@ def publish_quant(
             vertical_eval=vertical_eval,
             vertical_eval_name=vertical_eval_name,
             lineage_run_id=lineage_run_id,
+            model_license=model_license,
             article=f"articles/{article_slug}/" if article_slug else None,
             published_at=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         )

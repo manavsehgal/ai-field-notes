@@ -189,6 +189,101 @@ def test_model_card_renders_run_instructions() -> None:
     assert "from transformers import AutoModel" in out
 
 
+def test_model_card_renders_default_gguf_run_snippets_when_hf_repo_set() -> None:
+    """Card with no explicit ollama/transformers handle should still get a real
+    ## How to run body — llama-server + llama-cpp-python templated from hf_repo.
+
+    Regression test for the v0.4.x dry-run bug on `Orionfold/finance-chat-GGUF`
+    where `## How to run` rendered as a header with no body."""
+    card = ModelCard(
+        title="finance-chat-GGUF",
+        one_liner="x",
+        base_model="AdaptLLM/finance-chat",
+        quant_format="gguf",
+        hf_repo="Orionfold/finance-chat-GGUF",
+        chat_format="llama-2",
+        variants=(
+            {"name": "Q4_K_M", "size": "3.8 GB", "recommended": "Default."},
+            {"name": "Q5_K_M", "size": "4.5 GB", "recommended": "Balanced."},
+        ),
+    )
+    out = card.render()
+    assert "## How to run" in out
+    # huggingface-cli pull line uses the repo + a featured variant
+    assert "huggingface-cli download Orionfold/finance-chat-GGUF model-Q5_K_M.gguf" in out
+    assert "--local-dir ./models/finance-chat" in out
+    # llama-server snippet
+    assert "llama-server -m ./models/finance-chat/model-Q5_K_M.gguf" in out
+    # llama-cpp-python snippet with chat_format threaded through
+    assert "from llama_cpp import Llama" in out
+    assert 'chat_format="llama-2"' in out
+
+
+def test_model_card_default_run_snippet_picks_first_variant_without_q5_k_m() -> None:
+    card = ModelCard(
+        title="x",
+        one_liner="y",
+        base_model="z",
+        quant_format="gguf",
+        hf_repo="Orionfold/Foo-GGUF",
+        variants=(
+            {"name": "Q4_K_M", "size": "3 GB", "recommended": "x"},
+            {"name": "Q8_0", "size": "7 GB", "recommended": "x"},
+        ),
+    )
+    out = card.render()
+    # Falls back to first listed variant when Q5_K_M is absent
+    assert "model-Q4_K_M.gguf" in out
+
+
+def test_model_card_recommended_variant_override_respected() -> None:
+    card = ModelCard(
+        title="x",
+        one_liner="y",
+        base_model="z",
+        quant_format="gguf",
+        hf_repo="Orionfold/Foo-GGUF",
+        recommended_variant="Q8_0",
+        variants=(
+            {"name": "Q4_K_M", "size": "3 GB", "recommended": "x"},
+            {"name": "Q5_K_M", "size": "4 GB", "recommended": "x"},
+            {"name": "Q8_0", "size": "7 GB", "recommended": "x"},
+        ),
+    )
+    out = card.render()
+    assert "model-Q8_0.gguf" in out
+    # Should NOT default to Q5_K_M when override is set
+    assert "model-Q5_K_M.gguf" not in out
+
+
+def test_model_card_skips_how_to_run_section_entirely_when_nothing_to_render() -> None:
+    """No ollama_pull_handle, no transformers_snippet, no hf_repo → no section."""
+    card = ModelCard(
+        title="x",
+        one_liner="y",
+        base_model="z",
+        # Note: no hf_repo, no ollama_pull_handle, no transformers_snippet
+    )
+    out = card.render()
+    assert "## How to run" not in out
+
+
+def test_model_card_license_overridable_for_non_apache_models() -> None:
+    """HF frontmatter `license:` must reflect the upstream model's actual
+    license, not the apache-2.0 default. Regression for the finance-chat
+    `license: apache-2.0` bug (model is actually Llama-2 Community License)."""
+    card = ModelCard(
+        title="finance-chat-GGUF",
+        one_liner="x",
+        base_model="AdaptLLM/finance-chat",
+        license="llama2",
+    )
+    out = card.render()
+    head, _, _ = out.partition("---\n\n")
+    assert "license: llama2" in head
+    assert "license: apache-2.0" not in head
+
+
 def test_model_card_renders_lineage_when_provided() -> None:
     card = ModelCard(
         title="x",
@@ -314,6 +409,32 @@ def test_artifact_manifest_includes_optional_fields_when_set() -> None:
     assert d["civitai_id"] == 1234
     assert d["download_count"] == 99
     assert d["license"] == {"tier": "free", "commercial_tier": "orionfold-pro"}
+
+
+def test_artifact_manifest_emits_model_license_under_license_block() -> None:
+    """`model_license` lives alongside `tier` in the manifest's `license:` block."""
+    m = ArtifactManifest(
+        slug="finance",
+        kind="quant",
+        artifact_class="gguf",
+        base_model="AdaptLLM/finance-chat",
+        hf_repo="Orionfold/finance-chat-GGUF",
+        model_license="llama2",
+    )
+    d = m.to_dict()
+    assert d["license"] == {"tier": "free", "model": "llama2"}
+    yaml_text = m.to_yaml()
+    assert "  model: llama2" in yaml_text
+
+
+def test_artifact_manifest_omits_model_license_when_unset() -> None:
+    m = ArtifactManifest(
+        slug="s", kind="quant", artifact_class="gguf",
+        base_model="b", hf_repo="Orionfold/x",
+    )
+    d = m.to_dict()
+    assert d["license"] == {"tier": "free"}
+    assert "model" not in d["license"]
 
 
 def test_artifact_manifest_carries_vertical_eval_when_set() -> None:
@@ -530,6 +651,84 @@ def test_publish_quant_reads_vertical_eval_from_quant_report_duck_typed(
     card = result.card_path.read_text()
     assert "LegalBench (mini)" in card
     assert "55.0%" in card and "60.0%" in card
+
+
+def test_publish_quant_threads_model_license_into_card_and_manifest(
+    tmp_path: Path,
+) -> None:
+    """`model_license` kwarg flows to README frontmatter AND to manifest YAML."""
+    qr = _stub_quant_report(tmp_path / "source")
+    result = publish_quant(
+        quant_report=qr,
+        base_model="AdaptLLM/finance-chat",
+        repo_name="finance-chat-GGUF",
+        staging_dir=tmp_path / "stage",
+        artifacts_dir=tmp_path / "content" / "artifacts",
+        model_license="llama2",
+        dry_run=True,
+    )
+    card = result.card_path.read_text()
+    head, _, _ = card.partition("---\n\n")
+    assert "license: llama2" in head
+    assert "license: apache-2.0" not in head
+    manifest = result.manifest_path.read_text()
+    assert "  model: llama2" in manifest
+
+
+def test_publish_quant_default_license_is_apache_2_0_when_unspecified(
+    tmp_path: Path,
+) -> None:
+    qr = _stub_quant_report(tmp_path / "source")
+    result = publish_quant(
+        quant_report=qr,
+        base_model="x/y",
+        repo_name="y-GGUF",
+        staging_dir=tmp_path / "stage",
+        dry_run=True,
+    )
+    card = result.card_path.read_text()
+    head, _, _ = card.partition("---\n\n")
+    assert "license: apache-2.0" in head
+
+
+def test_publish_quant_renders_default_how_to_run_with_hf_repo(
+    tmp_path: Path,
+) -> None:
+    """publish_quant fills in hf_repo on the card so the default ## How to run
+    body templates against it — no caller plumbing required."""
+    qr = _stub_quant_report(tmp_path / "source")
+    result = publish_quant(
+        quant_report=qr,
+        base_model="AdaptLLM/finance-chat",
+        repo_name="finance-chat-GGUF",
+        staging_dir=tmp_path / "stage",
+        chat_format="llama-2",
+        dry_run=True,
+    )
+    card = result.card_path.read_text()
+    assert "## How to run" in card
+    assert "huggingface-cli download Orionfold/finance-chat-GGUF" in card
+    assert "llama-server -m" in card
+    assert 'chat_format="llama-2"' in card
+
+
+def test_publish_quant_reads_model_license_from_quant_report_duck_typed(
+    tmp_path: Path,
+) -> None:
+    qr = _stub_quant_report(tmp_path / "source")
+    qr.model_license = "cc-by-nc-4.0"
+    result = publish_quant(
+        quant_report=qr,
+        base_model="x/y",
+        repo_name="y-GGUF",
+        staging_dir=tmp_path / "stage",
+        dry_run=True,
+    )
+    card = result.card_path.read_text()
+    head, _, _ = card.partition("---\n\n")
+    assert "license:" in head
+    # cc-by-nc-4.0 contains hyphens; YAML emitter should leave bare scalar
+    assert "license: cc-by-nc-4.0" in head
 
 
 def test_publish_quant_lineage_store_duck_typed(tmp_path: Path) -> None:

@@ -162,6 +162,10 @@ const artifacts = defineCollection({
     license: z.object({
       tier: z.string().default('free'),
       commercial_tier: z.string().optional(),
+      // Upstream model license tag — `apache-2.0`, `llama2`, `cc-by-nc-4.0`,
+      // etc. Mirrors the HF README frontmatter `license:` scalar so the
+      // catalog page and HF badge stay in sync.
+      model: z.string().optional(),
     }),
     article: z.string().optional(),
     civitai_id: z.number().int().optional(),

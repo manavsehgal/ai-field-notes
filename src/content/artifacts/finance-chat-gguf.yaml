@@ -31,5 +31,6 @@ vertical_eval:
 vertical_eval_name: "FinanceBench (n=50, numeric_match)"
 license:
   tier: free
+  model: llama2
 article: articles/becoming-a-gguf-publisher-on-spark/
-published_at: "2026-05-14T03:32:50Z"
+published_at: "2026-05-14T04:46:11Z"
