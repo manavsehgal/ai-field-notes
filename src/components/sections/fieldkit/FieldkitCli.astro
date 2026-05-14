@@ -1,8 +1,14 @@
 ---
 import SectionLabel from '../../ui/SectionLabel.astro';
 
+interface Props {
+  version: string;
+}
+
+const { version } = Astro.props;
+
 const cli = `$ fieldkit version
-0.2.0
+${version}
 
 $ fieldkit envelope "70B params fp8"
 ~70 GB weights; leaves ~50 GB for KV + activations + system; tight but possible
