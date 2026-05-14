@@ -1,17 +1,18 @@
 <!--
-  🆕 STATUS: NEW — pending Mac sweep.
+  ✅ STATUS: SHIPPED — swept by Mac.
   This file is one feature/release at a time, not a running log.
   At the next release prompt, **clear this entire file and start fresh** (do NOT append to existing sections).
   Last reset: 2026-05-14 (this rotation supersedes the v0.4.0 cycle scope; the v0.4.0 PyPI release commits e322af2..2190824 are bundled here under the v0.4.1 umbrella).
 
   Prior Mac sweep receipts (preserved here since SYNC-HANDOFF is per-release-not-running-log; Mac will sweep this v0.4.1 cycle next):
+  - 2026-05-14 v0.4.1 cycle: swept at destination commit manavsehgal/ainative-business.github.io@e1b16de (this sweep).
   - 2026-05-14 v0.4.0 cycle: swept at destination commit manavsehgal/ainative-business.github.io@f7ea7aa (Mac PR #4 against this repo — conflicted on rotation; safe to close, receipt captured here).
   - 2026-05-14 Orionfold/finance-chat-GGUF cycle: swept at destination commit manavsehgal/ainative-business.github.io@85f9307 (Mac PR #3, merged).
   - 2026-05-12 Autoresearch→MTBM rename: swept at destination commit manavsehgal/ainative-business.github.io@71293af (Mac PR #2, merged).
 -->
 ---
 release_slug: 2026-05-14-fieldkit-v0.4.1
-status: NEW
+status: SHIPPED
 source_range: 7f1159e..HEAD
 articles_added:
   - becoming-a-legal-curator-on-spark      # new long-form deep-dive; status: published; customer-link audited; signature SVG reused from VerticalCuratorRetry (no new SVG this cycle)
