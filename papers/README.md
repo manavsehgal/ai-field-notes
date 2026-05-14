@@ -1,25 +1,31 @@
 # Frontier Scout — paper triage
 
-_Last refresh: 2026-05-08 · 19 papers tracked · [run history](runs/index.md)_
+_Last refresh: 2026-05-14 · 32 papers tracked · [run history](runs/index.md)_
 
 ## Recommended dive-deep candidates
 
-These are the papers most worth running through `/frontier-scout eval <id>` next, ranked by combined relevance × popularity × verdict-feasibility:
+These are the papers most worth running through `/frontier-scout eval <id>` next, ranked by combined relevance × popularity × verdict-feasibility. Updated 2026-05-14:
 
-1. **[OpenSearch-VL: An Open Recipe for Frontier Multimodal Search Agents](2605.05185/paper.md)** · 87 upv · spark-feasible · Machine that Builds Machines  
-   _Open recipe for multimodal deep-search agents trained with agentic RL — SFT + RL on a single-Spark-sized policy fits the MTBM forge._
-2. **[Skill1: Unified Evolution of Skill-Augmented Agents via Reinforcement Learning](2605.06130/paper.md)** · 45 upv · spark-feasible · Machine that Builds Machines  
-   _Single policy co-evolving skill selection + utilization + distillation from one task-outcome reward — clean MTBM forge case at sub-70B._
-3. **[Nonsense Helps: Prompt Space Perturbation Broadens Reasoning Exploration](2605.05566/paper.md)** · 18 upv · spark-feasible · Machine that Builds Machines  
-   _LoPE breaks the GRPO zero-advantage trap with prompt-space perturbations — a one-line tweak applicable to any sub-70B GRPO loop on the Spark._
-4. **[MiA-Signature: Approximating Global Activation for Long-Context Understanding](2605.06416/paper.md)** · 36 upv · spark-feasible · LLM Wiki  
-   _Compressed activation-signature conditioning approximates global context for long-context LLMs — drop-in inference technique that exercises KV economics._
-5. **[MiniCPM-o 4.5: Towards Real-Time Full-Duplex Omni-Modal Interaction](2604.27393/paper.md)** · 42 upv · spark-feasible · LLM Wiki  
-   _Open small omni-modal model with full-duplex streaming inference — sub-10B, fits 128 GB envelope and surfaces real-time inference techniques._
+1. **[MinT: Managed Infrastructure for Training and Serving Millions of LLMs](2605.13779/paper.md)** · 137 upv · spark-feasible · Machine that Builds Machines  
+   _LoRA serving + training infra for many policies over few base deployments — architectural sibling to fieldkit.publish + g3_build_first_quant; direct MTBM Pick #1 fit._
+2. **[HAGE: Harnessing Agentic Memory via RL-Driven Weighted Graph Evolution](2605.09942/paper.md)** · 10 upv · spark-feasible · Second Brain  
+   _RL-driven weighted graph evolution for agentic memory; replaces flat vector search + fixed binary relational graphs with query-dependent graph weights._
+3. **[Useful Memories Become Faulty When Continuously Updated by LLMs](2605.12978/paper.md)** · 16 upv · spark-feasible · Second Brain  
+   _Counter-narrative: episodic traces stay reliable while consolidated abstractions drift over rewrites — publishable "what NOT to do" piece on agentic memory._
+4. **[Retrieval is Cheap, Show Me the Code: Executable Multi-Hop Reasoning for RAG](2605.12975/paper.md)** · 7 upv · spark-feasible · LLM Wiki  
+   _Executable multi-hop reasoning for RAG. Code-generation in the retrieval loop — maps to fieldkit.rag composition._
+5. **[Covering Human Action Space for Computer Use](2605.12501/paper.md)** · 13 upv · spark-feasible · Machine that Builds Machines  
+   _Computer-use agents via data synthesis + benchmark. Adjacent to ClawGym / clawnav work; agentic + benchmark in one paper._
+
+### Carried over from prior refresh (still strong picks)
+
+- **[OpenSearch-VL: An Open Recipe for Frontier Multimodal Search Agents](2605.05185/paper.md)** · 87 upv · spark-feasible · MTBM
+- **[Skill1: Unified Evolution of Skill-Augmented Agents via RL](2605.06130/paper.md)** · 45 upv · spark-feasible · MTBM
+- **[MiA-Signature: Approximating Global Activation for Long-Context Understanding](2605.06416/paper.md)** · 36 upv · spark-feasible · LLM Wiki
 
 ## What's new this run
 
-See [runs/2026-05-08/refresh-summary.md](runs/2026-05-08/refresh-summary.md) for new + dropped + distributions.
+See [runs/2026-05-14/refresh-summary.md](runs/2026-05-14/refresh-summary.md) for 13 new entries, ~12 dropped (off-mainline image/video/voice/robot), top-5 picks rationale, and stats.
 
 ## Full listing
 

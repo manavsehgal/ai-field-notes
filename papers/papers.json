@@ -1,16 +1,46 @@
 {
-  "generated_at": "2026-05-08T15:34:49.429Z",
-  "config": {
-    "hf_days": 30,
-    "arxiv_limit": 60,
-    "relevance_threshold": 0.5
-  },
-  "counts": {
-    "total": 19,
-    "classified_this_run": 13,
-    "dropped_low_relevance": 11
-  },
+  "generated_at": "2026-05-14T17:50:00Z",
   "papers": [
+    {
+      "arxiv_id": "2605.13779",
+      "title": "MinT: Managed Infrastructure for Training and Serving Millions of LLMs",
+      "abstract": "We present MindLab Toolkit (MinT), a managed infrastructure system for Low-Rank Adaptation (LoRA) post-training and online serving. MinT targets a setting where many trained policies are produced over a small number of expensive base-model deployments. Instead of materializing each policy as a merged full checkpoint, MinT keeps the base model resident and moves exported LoRA adapter revisions through rollout, update, export, evaluation, serving, and rollback, hiding distributed training, serving, scheduling, and data movement behind a service interface. MinT scales this path along three axes. ",
+      "authors": [],
+      "published": "2026-05-12T20:00:00.000Z",
+      "hf_upvotes": 137,
+      "sources": [
+        "huggingface"
+      ],
+      "classify": {
+        "series": "mtbm",
+        "verdict": "spark-feasible",
+        "stage": "fine-tuning",
+        "relevance_score": 0.92,
+        "rationale": "LoRA serving + training infrastructure for many policies over few base deployments. Maps directly to MTBM Pick #1 (vertical curator) \u2014 sibling architecture to fieldkit.publish + g3_build_first_quant flow.",
+        "classified_at": "2026-05-14T17:50:00Z"
+      },
+      "popularity_score": 137.0
+    },
+    {
+      "arxiv_id": "2605.13831",
+      "title": "Training Long-Context Vision-Language Models Effectively with Generalization Beyond 128K Context",
+      "abstract": "Long-context modeling is becoming a core capability of modern large vision-language models (LVLMs), enabling sustained context management across long-document understanding, video analysis, and multi-turn tool use in agentic workflows. Yet practical training recipes remain insufficiently explored, particularly for designing and balancing long-context data mixtures. In this work, we present a systematic study of long-context continued pre-training for LVLMs, extending a 7B model from 32K to 128K context with extensive ablations on long-document data. We first show that long-document VQA is subs",
+      "authors": [],
+      "published": "2026-05-12T20:00:00.000Z",
+      "hf_upvotes": 70,
+      "sources": [
+        "huggingface"
+      ],
+      "classify": {
+        "series": "foundations",
+        "verdict": "out-of-envelope",
+        "stage": "foundations",
+        "relevance_score": 0.55,
+        "rationale": "Long-context VLM training (>128K). LVLM training is multi-GPU; Spark can only document/extrapolate.",
+        "classified_at": "2026-05-14T17:50:00Z"
+      },
+      "popularity_score": 70.0
+    },
     {
       "arxiv_id": "2605.05185",
       "title": "OpenSearch-VL: An Open Recipe for Frontier Multimodal Search Agents",
@@ -55,10 +85,30 @@
           10
         ],
         "mtbm_station": "forge",
-        "one_line_rationale": "Open recipe for multimodal deep-search agents trained with agentic RL — SFT + RL on a single-Spark-sized policy fits the MTBM forge.",
+        "one_line_rationale": "Open recipe for multimodal deep-search agents trained with agentic RL \u2014 SFT + RL on a single-Spark-sized policy fits the MTBM forge.",
         "classified_at": "2026-05-08T14:48:23.336Z"
       },
       "popularity_score": 49
+    },
+    {
+      "arxiv_id": "2605.12411",
+      "title": "Predicting Decisions of AI Agents from Limited Interaction through Text-Tabular Modeling",
+      "abstract": "AI agents negotiate and transact in natural language with unfamiliar counterparts: a buyer bot facing an unknown seller, or a procurement assistant negotiating with a supplier. In such interactions, the counterpart's LLM, prompts, control logic, and rule-based fallbacks are hidden, while each decision can have monetary consequences. We ask whether an agent can predict an unfamiliar counterpart's next decision from a few interactions. To avoid real-world logging confounds, we study this problem in controlled bargaining and negotiation games, formulating it as target-adaptive text-tabular predic",
+      "authors": [],
+      "published": "2026-05-11T20:00:00.000Z",
+      "hf_upvotes": 42,
+      "sources": [
+        "huggingface"
+      ],
+      "classify": {
+        "series": "mtbm",
+        "verdict": "spark-feasible",
+        "stage": "agentic",
+        "relevance_score": 0.58,
+        "rationale": "Predicting AI-agent decisions through text-tabular modeling. Spark-feasible classifier-shape; agentic-adjacent.",
+        "classified_at": "2026-05-14T17:50:00Z"
+      },
+      "popularity_score": 42.0
     },
     {
       "arxiv_id": "2604.27351",
@@ -136,7 +186,7 @@
           10
         ],
         "mtbm_station": "forge",
-        "one_line_rationale": "Single policy co-evolving skill selection + utilization + distillation from one task-outcome reward — clean MTBM forge case at sub-70B.",
+        "one_line_rationale": "Single policy co-evolving skill selection + utilization + distillation from one task-outcome reward \u2014 clean MTBM forge case at sub-70B.",
         "classified_at": "2026-05-08T14:48:23.336Z"
       },
       "popularity_score": 30
@@ -216,7 +266,7 @@
         ],
         "relevance_score": 0.6,
         "fast_verdict": "spark-feasible",
-        "one_line_rationale": "Compressed activation-signature conditioning approximates global context for long-context LLMs — drop-in inference technique that exercises KV economics.",
+        "one_line_rationale": "Compressed activation-signature conditioning approximates global context for long-context LLMs \u2014 drop-in inference technique that exercises KV economics.",
         "classified_at": "2026-05-08T14:48:23.336Z"
       },
       "popularity_score": 28
@@ -259,7 +309,7 @@
         ],
         "relevance_score": 0.7,
         "fast_verdict": "spark-feasible",
-        "one_line_rationale": "Judge-orchestrated 7-LLM ensemble for multi-turn RAG (SemEval-2026 T8 winner) — every member except gpt-oss-120b fits a single Spark.",
+        "one_line_rationale": "Judge-orchestrated 7-LLM ensemble for multi-turn RAG (SemEval-2026 T8 winner) \u2014 every member except gpt-oss-120b fits a single Spark.",
         "classified_at": "2026-05-08T14:48:23.336Z"
       },
       "popularity_score": 28,
@@ -351,10 +401,30 @@
         ],
         "relevance_score": 0.6,
         "fast_verdict": "spark-feasible",
-        "one_line_rationale": "Open small omni-modal model with full-duplex streaming inference — sub-10B, fits 128 GB envelope and surfaces real-time inference techniques.",
+        "one_line_rationale": "Open small omni-modal model with full-duplex streaming inference \u2014 sub-10B, fits 128 GB envelope and surfaces real-time inference techniques.",
         "classified_at": "2026-05-08T14:48:23.336Z"
       },
       "popularity_score": 27
+    },
+    {
+      "arxiv_id": "2605.13511",
+      "title": "Many-Shot CoT-ICL: Making In-Context Learning Truly Learn",
+      "abstract": "In-context learning (ICL) adapts large language models (LLMs) to new tasks by conditioning on demonstrations in the prompt without parameter updates. With long-context models, many-shot ICL can use dozens to hundreds of examples and achieve performance comparable to fine-tuning, yet current understanding of its scaling behavior is largely derived from non-reasoning tasks. We study many-shot chain-of-thought in-context learning (CoT-ICL) for reasoning and show that standard many-shot rules do not transfer. Across non-reasoning and reasoning-oriented LLMs and across non-reasoning and reasoning t",
+      "authors": [],
+      "published": "2026-05-12T20:00:00.000Z",
+      "hf_upvotes": 26,
+      "sources": [
+        "huggingface"
+      ],
+      "classify": {
+        "series": "foundations",
+        "verdict": "borderline",
+        "stage": "foundations",
+        "relevance_score": 0.7,
+        "rationale": "Many-shot CoT-ICL \u2014 in-context learning with hundreds of examples in long-context. Spark fits up to ~128K context on 8B class; performance comparable to fine-tuning is a strong claim.",
+        "classified_at": "2026-05-14T17:50:00Z"
+      },
+      "popularity_score": 26.0
     },
     {
       "arxiv_id": "2604.25256",
@@ -498,7 +568,7 @@
           10
         ],
         "mtbm_station": "forge",
-        "one_line_rationale": "LoPE breaks the GRPO zero-advantage trap with prompt-space perturbations — a one-line tweak applicable to any sub-70B GRPO loop on the Spark.",
+        "one_line_rationale": "LoPE breaks the GRPO zero-advantage trap with prompt-space perturbations \u2014 a one-line tweak applicable to any sub-70B GRPO loop on the Spark.",
         "classified_at": "2026-05-08T14:48:23.336Z"
       },
       "popularity_score": 23
@@ -526,7 +596,7 @@
         ],
         "relevance_score": 0.65,
         "fast_verdict": "spark-feasible",
-        "one_line_rationale": "CreativityBench — affordance-grounded creativity benchmark with 14K tasks evaluating 10 LLMs; eval-pipeline-on-Spark territory.",
+        "one_line_rationale": "CreativityBench \u2014 affordance-grounded creativity benchmark with 14K tasks evaluating 10 LLMs; eval-pipeline-on-Spark territory.",
         "classified_at": "2026-05-08T14:48:23.336Z"
       },
       "popularity_score": 23
@@ -575,7 +645,7 @@
         ],
         "relevance_score": 0.8,
         "fast_verdict": "spark-feasible",
-        "one_line_rationale": "Uncertainty-guided exploration for multi-turn agentic RL — direct sequel to the GRPO-on-ClawGym arc."
+        "one_line_rationale": "Uncertainty-guided exploration for multi-turn agentic RL \u2014 direct sequel to the GRPO-on-ClawGym arc."
       },
       "popularity_score": 21,
       "deep_eval": {
@@ -618,7 +688,7 @@
           11
         ],
         "mtbm_station": "planner",
-        "one_line_rationale": "Closed empirical-loop auto-research with specialist agents and lineage feedback — the literal MTBM picture, fully autonomous over 1,197 trials.",
+        "one_line_rationale": "Closed empirical-loop auto-research with specialist agents and lineage feedback \u2014 the literal MTBM picture, fully autonomous over 1,197 trials.",
         "classified_at": "2026-05-08T14:48:23.336Z"
       },
       "popularity_score": 18,
@@ -661,7 +731,7 @@
           10
         ],
         "mtbm_station": "forge",
-        "one_line_rationale": "Turn-level adaptive clipping fixes credit-assignment in agentic GRPO without external process reward models — directly applicable on a Spark.",
+        "one_line_rationale": "Turn-level adaptive clipping fixes credit-assignment in agentic GRPO without external process reward models \u2014 directly applicable on a Spark.",
         "classified_at": "2026-05-08T14:48:23.336Z"
       },
       "popularity_score": 16,
@@ -674,6 +744,26 @@
         "article_slug": "a2tgpo-turn-clipping-on-spark",
         "status": "upcoming"
       }
+    },
+    {
+      "arxiv_id": "2605.12978",
+      "title": "Useful Memories Become Faulty When Continuously Updated by LLMs",
+      "abstract": "Learning from past experience benefits from two complementary forms of memory: episodic traces -- raw trajectories of what happened -- and consolidated abstractions distilled across many episodes into reusable, schema-like lessons. Recent agentic-memory systems pursue the consolidated form: an LLM rewrites past trajectories into a textual memory bank that it continuously updates with new interactions, promising self-improving agents without parameter updates. Yet we find that such consolidated memories produced by today's LLMs are often faulty even when derived from useful experiences. As cons",
+      "authors": [],
+      "published": "2026-05-12T20:00:00.000Z",
+      "hf_upvotes": 16,
+      "sources": [
+        "huggingface"
+      ],
+      "classify": {
+        "series": "second-brain",
+        "verdict": "spark-feasible",
+        "stage": "agentic",
+        "relevance_score": 0.85,
+        "rationale": "\"Useful memories become faulty when continuously updated by LLMs.\" Episodic vs consolidated memory in LLM agents \u2014 counter-narrative to the standard memory-system recipe. Highly publishable.",
+        "classified_at": "2026-05-14T17:50:00Z"
+      },
+      "popularity_score": 16.0
     },
     {
       "arxiv_id": "2605.06614",
@@ -726,7 +816,7 @@
           10
         ],
         "mtbm_station": "forge",
-        "one_line_rationale": "RL-trained skill curator over an external SkillRepo with frozen executor — clean self-evolving-agent shape that fits sub-70B on a Spark.",
+        "one_line_rationale": "RL-trained skill curator over an external SkillRepo with frozen executor \u2014 clean self-evolving-agent shape that fits sub-70B on a Spark.",
         "classified_at": "2026-05-08T14:48:23.336Z"
       },
       "popularity_score": 15,
@@ -766,7 +856,7 @@
         ],
         "relevance_score": 0.8,
         "fast_verdict": "spark-feasible",
-        "one_line_rationale": "Agents searching the raw corpus directly via general operators (lexical, conjunctive, multi-step) instead of fixed top-k retrieval — Second Brain extension.",
+        "one_line_rationale": "Agents searching the raw corpus directly via general operators (lexical, conjunctive, multi-step) instead of fixed top-k retrieval \u2014 Second Brain extension.",
         "classified_at": "2026-05-08T14:48:23.336Z"
       },
       "popularity_score": 15,
@@ -779,6 +869,26 @@
         "article_slug": "dci-corpus-operators-on-spark",
         "status": "upcoming"
       }
+    },
+    {
+      "arxiv_id": "2605.12501",
+      "title": "Covering Human Action Space for Computer Use: Data Synthesis and Benchmark",
+      "abstract": "Computer-use agents (CUAs) automate on-screen work, as illustrated by GPT-5.4 and Claude. Yet their reliability on complex, low-frequency interactions is still poor, limiting user trust. Our analysis of failure cases from advanced models suggests a long-tail pattern in GUI operations, where a relatively small fraction of complex and diverse interactions accounts for a disproportionate share of task failures. We hypothesize that this issue largely stems from the scarcity of data for complex interactions. To address this problem, we propose a new benchmark CUActSpot for evaluating models' capabi",
+      "authors": [],
+      "published": "2026-05-11T20:00:00.000Z",
+      "hf_upvotes": 13,
+      "sources": [
+        "huggingface"
+      ],
+      "classify": {
+        "series": "mtbm",
+        "verdict": "spark-feasible",
+        "stage": "agentic",
+        "relevance_score": 0.8,
+        "rationale": "Computer-use agents (CUAs) \u2014 covering human action space via data synthesis + benchmark. Adjacent to ClawGym/clawnav work; agentic + benchmark.",
+        "classified_at": "2026-05-14T17:50:00Z"
+      },
+      "popularity_score": 13.0
     },
     {
       "arxiv_id": "2605.06651",
@@ -833,7 +943,7 @@
           10
         ],
         "mtbm_station": "planner",
-        "one_line_rationale": "Stateful asynchronous AI co-mathematician workbench — agentic framework around an LLM, runs as inference + tools on a single Spark.",
+        "one_line_rationale": "Stateful asynchronous AI co-mathematician workbench \u2014 agentic framework around an LLM, runs as inference + tools on a single Spark.",
         "classified_at": "2026-05-08T14:48:23.336Z"
       },
       "popularity_score": 11
@@ -863,10 +973,150 @@
         ],
         "relevance_score": 0.55,
         "fast_verdict": "spark-feasible",
-        "one_line_rationale": "XL-SafetyBench — 5,500 country-grounded safety + cultural-sensitivity test cases evaluating LLMs; runs as a judge-pipeline against any Spark-resident model.",
+        "one_line_rationale": "XL-SafetyBench \u2014 5,500 country-grounded safety + cultural-sensitivity test cases evaluating LLMs; runs as a judge-pipeline against any Spark-resident model.",
         "classified_at": "2026-05-08T14:48:23.336Z"
       },
       "popularity_score": 11
+    },
+    {
+      "arxiv_id": "2605.12004",
+      "title": "Learning Agentic Policy from Action Guidance",
+      "abstract": "Agentic reinforcement learning (RL) for Large Language Models (LLMs) critically depends on the exploration capability of the base policy, as training signals emerge only within its in-capability region. For tasks where the base policy cannot reach reward states, additional training or external guidance is needed to recover effective learning signals. Rather than relying on costly iterative supervised fine tuning (SFT), we exploit the abundant action data generated in everyday human interactions. We propose ActGuide-RL, which injects action data as plan-style reference guidance, enabling the ag",
+      "authors": [],
+      "published": "2026-05-11T20:00:00.000Z",
+      "hf_upvotes": 11,
+      "sources": [
+        "huggingface"
+      ],
+      "classify": {
+        "series": "mtbm",
+        "verdict": "borderline",
+        "stage": "training",
+        "relevance_score": 0.68,
+        "rationale": "Agentic RL policy from action guidance. Spark-feasibility depends on base policy scale; A\u00b2TGPO precedent suggests training will be borderline.",
+        "classified_at": "2026-05-14T17:50:00Z"
+      },
+      "popularity_score": 11.0
+    },
+    {
+      "arxiv_id": "2605.09942",
+      "title": "HAGE: Harnessing Agentic Memory via RL-Driven Weighted Graph Evolution",
+      "abstract": "Memory retrieval in agentic large language model (LLM) systems is often treated as a static lookup problem, relying on flat vector search or fixed binary relational graphs. However, fixed graph structures cannot capture the varying strength, confidence, and query-dependent relevance of relationships between events. In this paper, we propose HAGE, a weighted multi-relational memory framework that reconceptualizes retrieval as sequential, query-conditioned traversal over a unified relational memory graph. Memory is organized as relation-specific graph views over shared memory nodes, where each e",
+      "authors": [],
+      "published": "2026-05-10T20:00:00.000Z",
+      "hf_upvotes": 10,
+      "sources": [
+        "huggingface"
+      ],
+      "classify": {
+        "series": "second-brain",
+        "verdict": "spark-feasible",
+        "stage": "agentic",
+        "relevance_score": 0.88,
+        "rationale": "RL-driven weighted graph evolution for agentic memory. Direct fit for the Second-Brain arc \u2014 memory retrieval as evolving graph vs. flat vector search. Spark-feasible if base policy is \u22648B class.",
+        "classified_at": "2026-05-14T17:50:00Z"
+      },
+      "popularity_score": 10.0
+    },
+    {
+      "arxiv_id": "2605.11136",
+      "title": "EVOCHAMBER: Test-Time Co-evolution of Multi-Agent System at Individual, Team, and Population Scales",
+      "abstract": "We argue that multi-agent test-time evolution is not single-agent evolution replicated N times. A single-agent learner can only evolve its own context and memory. A multi-agent system additionally evolves who collaborates, how they collaborate, and how knowledge flows across the population. These components have no single-agent counterpart and can produce phenomena such as emergent specialization. Yet prior test-time methods either confine experiences to individual agents, forfeiting cross-agent learning, or broadcast symmetrically to all agents, erasing the specialization that makes collabora",
+      "authors": [],
+      "published": "2026-05-10T20:00:00.000Z",
+      "hf_upvotes": 8,
+      "sources": [
+        "huggingface"
+      ],
+      "classify": {
+        "series": "mtbm",
+        "verdict": "borderline",
+        "stage": "agentic",
+        "relevance_score": 0.62,
+        "rationale": "Multi-agent test-time co-evolution. Probably fits multiple 7-8B agents on Spark if scaled carefully.",
+        "classified_at": "2026-05-14T17:50:00Z"
+      },
+      "popularity_score": 8.0
+    },
+    {
+      "arxiv_id": "2605.12975",
+      "title": "Retrieval is Cheap, Show Me the Code: Executable Multi-Hop Reasoning for Retrieval-Augmented Generation",
+      "abstract": "Retrieval-Augmented Generation (RAG) has become a standard approach for knowledge-intensive question answering, but existing systems remain brittle on multi-hop questions, where solving the task requires chaining multiple retrieval and reasoning steps. Key challenges are that current methods represent reasoning through free-form natural language, where intermediate states are implicit, retrieval queries can drift from intended entities, and errors are detected by the same model that produces them making self-reflection an unreliable, ungrounded signal.\n  We observe that multi-hop question answ",
+      "authors": [],
+      "published": "2026-05-12T20:00:00.000Z",
+      "hf_upvotes": 7,
+      "sources": [
+        "huggingface"
+      ],
+      "classify": {
+        "series": "llm-wiki",
+        "verdict": "spark-feasible",
+        "stage": "inference",
+        "relevance_score": 0.83,
+        "rationale": "Executable multi-hop reasoning for RAG. Code-generation in the retrieval loop. Maps to LLM-Wiki + fieldkit.rag composition.",
+        "classified_at": "2026-05-14T17:50:00Z"
+      },
+      "popularity_score": 7.0
+    },
+    {
+      "arxiv_id": "2605.12825",
+      "title": "Orthrus: Memory-Efficient Parallel Token Generation via Dual-View Diffusion",
+      "abstract": "We introduce Orthrus, a simple and efficient dual-architecture framework that unifies the exact generation fidelity of autoregressive Large Language Models (LLMs) with the high-speed parallel token generation of diffusion models. The sequential nature of standard autoregressive decoding represents a fundamental bottleneck for high-throughput inference. While diffusion language models attempt to break this barrier via parallel generation, they suffer from significant performance degradation, high training costs, and a lack of rigorous convergence guarantees. Orthrus resolves this dichotomy nati",
+      "authors": [],
+      "published": "2026-05-11T20:00:00.000Z",
+      "hf_upvotes": 7,
+      "sources": [
+        "huggingface"
+      ],
+      "classify": {
+        "series": "looking-beyond",
+        "verdict": "borderline",
+        "stage": "inference",
+        "relevance_score": 0.6,
+        "rationale": "Dual-view diffusion for parallel token generation. Inference speedup story; could fit Looking Beyond Spark series.",
+        "classified_at": "2026-05-14T17:50:00Z"
+      },
+      "popularity_score": 7.0
+    },
+    {
+      "arxiv_id": "2605.12913",
+      "title": "Revisiting DAgger in the Era of LLM-Agents",
+      "abstract": "Long-horizon LM agents learn from multi-turn interaction, where a single early mistake can alter the subsequent state distribution and derail the whole trajectory. Existing recipes fall short in complementary ways: supervised fine-tuning provides dense teacher supervision but suffers from covariate shift because it is trained on off-policy teacher trajectories; while reinforcement learning with verifiable rewards avoids this off-policy mismatch by learning from on-policy rollouts but with only sparse outcome feedback. We address this dilemma by revisiting Dataset Aggregation (DAgger) for multi",
+      "authors": [],
+      "published": "2026-05-12T20:00:00.000Z",
+      "hf_upvotes": 5,
+      "sources": [
+        "huggingface"
+      ],
+      "classify": {
+        "series": "mtbm",
+        "verdict": "spark-feasible",
+        "stage": "agentic",
+        "relevance_score": 0.62,
+        "rationale": "DAgger in the era of LLM-agents \u2014 revisiting imitation learning for agentic policies.",
+        "classified_at": "2026-05-14T17:50:00Z"
+      },
+      "popularity_score": 5.0
+    },
+    {
+      "arxiv_id": "2605.08518",
+      "title": "Results and Retrospective Analysis of the CODS 2025 AssetOpsBench Challenge",
+      "abstract": "Competition retrospectives are useful when they explain what a leaderboard measured, how hidden evaluation changed conclusions, and which design patterns were rewarded. We revisit the CODS 2025  challenge, a privacy-aware Codabench competition on industrial multi-agent orchestration built on . We combine final rank sheets, a 300-submission server log, 149-team registrations, best-submission exports, the organizer winners report, the companion  system paper, and verified planning-track source trees. Five results stand out. First, the public planning leaderboard saturates at 72.73\\%, and richer ",
+      "authors": [],
+      "published": "2026-05-07T20:00:00.000Z",
+      "hf_upvotes": 5,
+      "sources": [
+        "huggingface"
+      ],
+      "classify": {
+        "series": "mtbm",
+        "verdict": "spark-feasible",
+        "stage": "observability",
+        "relevance_score": 0.55,
+        "rationale": "AssetOpsBench challenge retrospective. Operations-side benchmark.",
+        "classified_at": "2026-05-14T17:50:00Z"
+      },
+      "popularity_score": 5.0
     }
   ]
 }
