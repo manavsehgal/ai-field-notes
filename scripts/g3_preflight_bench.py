@@ -62,66 +62,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_ROOT / "fieldkit" / "src"))
 
-from fieldkit.eval import numeric_match  # noqa: E402
-
-
-# --- FinanceBench loader (evidence-aware) ---------------------------------
-# `VerticalBench.from_jsonl` drops the `evidence` field; FinanceBench is an
-# open-book benchmark — the right answer can only be derived from the 10-K
-# excerpt in `evidence[*].evidence_text`. Inline a thin loader that returns
-# (question_with_evidence, expected) tuples so the preflight gate scores
-# against the same context the real eval uses.
-
-
-def _load_finbench_open_book(
-    path: Path, subset: str, limit: int
-) -> list[tuple[str, str, str]]:
-    """Return [(qid, prompt_question, expected_answer), ...].
-
-    `prompt_question` includes the evidence text — the answer to the
-    quantitative FinanceBench questions is literally in the cited 10-K row.
-    Without it the model is guessing, which masks the chat-vs-base-model
-    signal V0 is designed to surface.
-    """
-    out: list[tuple[str, str, str]] = []
-    with path.open() as f:
-        for line in f:
-            line = line.strip()
-            if not line:
-                continue
-            try:
-                row = json.loads(line)
-            except json.JSONDecodeError:
-                continue
-            if subset != "all" and row.get("question_type") != subset:
-                continue
-            q = row.get("question") or ""
-            ans = row.get("answer") or row.get("gold_standard") or ""
-            if not q or not ans:
-                continue
-            evidence_chunks: list[str] = []
-            for e in row.get("evidence") or []:
-                if isinstance(e, dict):
-                    txt = e.get("evidence_text") or ""
-                    if txt:
-                        evidence_chunks.append(str(txt))
-                elif isinstance(e, str):
-                    evidence_chunks.append(e)
-            evidence_text = "\n\n".join(evidence_chunks)
-            qid = str(row.get("financebench_id") or f"fb-{len(out)}")
-            if evidence_text:
-                prompt_q = (
-                    f"Context from {row.get('doc_name', 'the filing')}:\n\n"
-                    f"{evidence_text}\n\n"
-                    f"Question: {q}\n\n"
-                    f"Answer with just the numeric value."
-                )
-            else:
-                prompt_q = q
-            out.append((qid, prompt_q, str(ans)))
-            if len(out) >= limit:
-                break
-    return out
+from fieldkit.eval import VerticalBench, numeric_match  # noqa: E402
 
 
 def _log(msg: str) -> None:
@@ -345,10 +286,16 @@ def main() -> int:
         _log("WARN: no chat-format signal found — likely continued-pretrain trap")
         _log("      proceeding anyway; numeric_match will score 0 if outputs aren't formatted")
 
-    items = _load_finbench_open_book(finbench_jsonl, subset=subset, limit=n)
-    if not items:
+    vb = VerticalBench.from_jsonl(
+        finbench_jsonl,
+        format="financebench",
+        open_book=True,
+        subset=None if subset == "all" else subset,
+        limit=n,
+    )
+    if not vb.questions:
         _die(f"no questions match subset={subset!r} in {finbench_jsonl}")
-    _log(f"scoring {len(items)} open-book questions from FinanceBench subset={subset}")
+    _log(f"scoring {len(vb.questions)} open-book questions from FinanceBench subset={subset}")
 
     correct = 0
     with LlamaServerSession(
@@ -358,19 +305,19 @@ def main() -> int:
         ctx_size=ctx_size,
         n_predict=n_predict,
     ) as server:
-        for i, (qid, prompt_q, expected) in enumerate(items, start=1):
-            prompt = _format_prompt(prompt_q, fmt)
+        for i, q in enumerate(vb.questions, start=1):
+            prompt = _format_prompt(q.question, fmt)
             t_q = time.perf_counter()
             predicted = server.complete(prompt)
             elapsed = time.perf_counter() - t_q
-            score = numeric_match(predicted, expected, rel_tolerance=0.01)
+            score = numeric_match(predicted, q.expected, rel_tolerance=0.01)
             correct += int(score)
             _log(
-                f"  Q{i}/{len(items)} [{elapsed:.1f}s] qid={qid} "
-                f"expected={expected[:80]!r} predicted={predicted[:200]!r} score={score:.0f}"
+                f"  Q{i}/{len(vb.questions)} [{elapsed:.1f}s] qid={q.qid} "
+                f"expected={q.expected[:80]!r} predicted={predicted[:200]!r} score={score:.0f}"
             )
 
-    _log(f"score: {correct}/{len(items)} (threshold ≥ {min_correct})")
+    _log(f"score: {correct}/{len(vb.questions)} (threshold ≥ {min_correct})")
     if correct >= min_correct:
         _log("PASS — proceed with quantize+measure")
         return 0

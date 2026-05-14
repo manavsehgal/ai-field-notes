@@ -217,6 +217,114 @@ class TestFromJsonl:
         assert vb.name == "financebench-mini"
 
 
+# --- Open-book mode (v0.4.1+) -----------------------------------------------
+
+
+def _fb_row(qid: str, question: str, gold: str, evidence_text: str, **extra) -> dict:
+    return {
+        "financebench_id": qid,
+        "question": question,
+        "gold_standard": gold,
+        "doc_name": extra.get("doc_name", "ACME_2024_10-K"),
+        "company": extra.get("company", "ACME"),
+        "doc_period": extra.get("doc_period", "FY2024"),
+        "question_type": extra.get("question_type", "metrics-generated"),
+        "evidence": [{"evidence_text": evidence_text}] if evidence_text else [],
+    }
+
+
+class TestOpenBook:
+    def test_financebench_auto_open_book(self, tmp_path: Path) -> None:
+        # No explicit open_book — default for financebench is True.
+        rows = [_fb_row("fb-1", "What was revenue?", "1234", "Revenue: $1,234M")]
+        p = _write_jsonl(tmp_path, "fb.jsonl", rows)
+        vb = VerticalBench.from_jsonl(p)
+        assert len(vb.questions) == 1
+        q = vb.questions[0]
+        # Evidence is now in the question prompt.
+        assert "Revenue: $1,234M" in q.question
+        assert "Question: What was revenue?" in q.question
+        assert "ACME_2024_10-K" in q.question
+        # Expected is unchanged.
+        assert q.expected == "1234"
+
+    def test_explicit_open_book_false_keeps_closed(self, tmp_path: Path) -> None:
+        rows = [_fb_row("fb-1", "What was revenue?", "1234", "Revenue: $1,234M")]
+        p = _write_jsonl(tmp_path, "fb.jsonl", rows)
+        vb = VerticalBench.from_jsonl(p, open_book=False)
+        assert vb.questions[0].question == "What was revenue?"
+
+    def test_open_book_no_evidence_falls_back(self, tmp_path: Path) -> None:
+        # A financebench row missing evidence — open_book=True is a no-op.
+        rows = [_fb_row("fb-1", "What was revenue?", "1234", "")]
+        p = _write_jsonl(tmp_path, "fb.jsonl", rows)
+        vb = VerticalBench.from_jsonl(p)
+        assert vb.questions[0].question == "What was revenue?"
+
+    def test_legalbench_open_book_is_noop(self, tmp_path: Path) -> None:
+        # No standard evidence field — open_book=True doesn't change the question.
+        rows = [{"id": "lb-1", "text": "Is X enforceable?", "answer": "yes"}]
+        p = _write_jsonl(tmp_path, "lb.jsonl", rows)
+        vb = VerticalBench.from_jsonl(p, open_book=True)
+        assert vb.questions[0].question == "Is X enforceable?"
+
+    def test_open_book_default_off_for_legalbench(self, tmp_path: Path) -> None:
+        # Auto-default for non-financebench is False, even if a stray evidence
+        # field is present.
+        rows = [
+            {
+                "id": "lb-1",
+                "text": "Is X enforceable?",
+                "answer": "yes",
+                "evidence": [{"evidence_text": "Section 3.1 prohibits X."}],
+            }
+        ]
+        p = _write_jsonl(tmp_path, "lb.jsonl", rows)
+        vb = VerticalBench.from_jsonl(p)
+        # No prepending — only financebench triggers open-book by default.
+        assert vb.questions[0].question == "Is X enforceable?"
+
+    def test_evidence_text_as_strings(self, tmp_path: Path) -> None:
+        # Some pre-flattened dumps put evidence as list-of-strings.
+        rows = [
+            {
+                "financebench_id": "fb-1",
+                "question": "q",
+                "gold_standard": "g",
+                "evidence": ["chunk-1", "chunk-2"],
+            }
+        ]
+        p = _write_jsonl(tmp_path, "fb.jsonl", rows)
+        vb = VerticalBench.from_jsonl(p)
+        assert "chunk-1" in vb.questions[0].question
+        assert "chunk-2" in vb.questions[0].question
+
+    def test_subset_filter_financebench(self, tmp_path: Path) -> None:
+        rows = [
+            _fb_row("fb-1", "q1", "1", "ev-1", question_type="metrics-generated"),
+            _fb_row("fb-2", "q2", "2", "ev-2", question_type="domain-relevant"),
+            _fb_row("fb-3", "q3", "3", "ev-3", question_type="metrics-generated"),
+        ]
+        p = _write_jsonl(tmp_path, "fb.jsonl", rows)
+        vb = VerticalBench.from_jsonl(p, subset="metrics-generated")
+        assert len(vb.questions) == 2
+        assert {q.qid for q in vb.questions} == {"fb-1", "fb-3"}
+
+    def test_subset_limit_compose(self, tmp_path: Path) -> None:
+        # subset filters before limit applies.
+        rows = [
+            _fb_row(f"fb-{i}", f"q{i}", str(i), f"ev-{i}", question_type="metrics-generated")
+            for i in range(5)
+        ] + [
+            _fb_row(f"fbx-{i}", f"qx{i}", str(i), f"ev-{i}", question_type="other")
+            for i in range(5)
+        ]
+        p = _write_jsonl(tmp_path, "fb.jsonl", rows)
+        vb = VerticalBench.from_jsonl(p, subset="metrics-generated", limit=3)
+        assert len(vb.questions) == 3
+        assert all(q.qid.startswith("fb-") for q in vb.questions)
+
+
 # --- VerticalBench.run -------------------------------------------------------
 
 

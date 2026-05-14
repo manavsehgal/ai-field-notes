@@ -47,60 +47,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_ROOT / "fieldkit" / "src"))
 
-from fieldkit.eval import VerticalBench, numeric_match  # noqa: E402  (VerticalBench kept for other subsets)
-
-
-# --- FinanceBench open-book loader (evidence-aware) -----------------------
-# VerticalBench.from_jsonl drops the `evidence` field; FinanceBench is an
-# open-book benchmark — the answer can only be derived from the 10-K excerpt
-# in evidence[*].evidence_text. Mirrors the same loader in
-# scripts/g3_preflight_bench.py so V0 gate score and B4 per-variant score are
-# computed against the same prompt shape.
-
-
-def _load_finbench_open_book(
-    path: Path, subset: str, limit: int
-) -> list[tuple[str, str, str]]:
-    """Return [(qid, prompt_question_with_evidence, expected_answer), ...]."""
-    out: list[tuple[str, str, str]] = []
-    with Path(path).open() as f:
-        for line in f:
-            line = line.strip()
-            if not line:
-                continue
-            try:
-                row = json.loads(line)
-            except json.JSONDecodeError:
-                continue
-            if subset != "all" and row.get("question_type") != subset:
-                continue
-            q = row.get("question") or ""
-            ans = row.get("answer") or row.get("gold_standard") or ""
-            if not q or not ans:
-                continue
-            evidence_chunks: list[str] = []
-            for e in row.get("evidence") or []:
-                if isinstance(e, dict):
-                    txt = e.get("evidence_text") or ""
-                    if txt:
-                        evidence_chunks.append(str(txt))
-                elif isinstance(e, str):
-                    evidence_chunks.append(e)
-            evidence_text = "\n\n".join(evidence_chunks)
-            qid = str(row.get("financebench_id") or f"fb-{len(out)}")
-            if evidence_text:
-                prompt_q = (
-                    f"Context from {row.get('doc_name', 'the filing')}:\n\n"
-                    f"{evidence_text}\n\n"
-                    f"Question: {q}\n\n"
-                    f"Answer with just the numeric value."
-                )
-            else:
-                prompt_q = q
-            out.append((qid, prompt_q, str(ans)))
-            if len(out) >= limit:
-                break
-    return out
+from fieldkit.eval import VerticalBench, numeric_match  # noqa: E402
 
 
 def _wrap_inst(question: str) -> str:
@@ -432,8 +379,12 @@ def measure_variant(
                 f"open-book via llama-server (load once per variant) …",
                 flush=True,
             )
-            qa_items = _load_finbench_open_book(
-                FINBENCH_JSONL, subset=FINBENCH_SUBSET, limit=FINBENCH_LIMIT
+            vb = VerticalBench.from_jsonl(
+                FINBENCH_JSONL,
+                format="financebench",
+                open_book=True,
+                subset=None if FINBENCH_SUBSET == "all" else FINBENCH_SUBSET,
+                limit=FINBENCH_LIMIT,
             )
             t0 = time.perf_counter()
             scores: list[float] = []
@@ -444,10 +395,10 @@ def measure_variant(
                 ctx_size=int(os.environ.get("LLAMA_SERVER_CTX", "4096")),
                 threads=8,
             ) as server:
-                for qid, prompt_q, expected in qa_items:
-                    prompt = _wrap_inst(prompt_q)
+                for q in vb.questions:
+                    prompt = _wrap_inst(q.question)
                     predicted = server.model_fn(prompt)
-                    score = numeric_match(predicted, expected, rel_tolerance=0.01)
+                    score = numeric_match(predicted, q.expected, rel_tolerance=0.01)
                     scores.append(score)
             fb_n = len(scores)
             fb_acc = (sum(scores) / fb_n) if fb_n else None

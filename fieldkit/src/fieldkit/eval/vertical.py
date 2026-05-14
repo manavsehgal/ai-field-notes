@@ -29,6 +29,15 @@ for custom scoring. ``exact_match`` and ``contains`` are deterministic;
 ``numeric_match`` extracts the first number from the prediction and compares
 to the reference under a relative tolerance — the right default for
 FinanceBench's quantitative questions.
+
+**Open-book mode (v0.4.1+).** FinanceBench is an *open-book* benchmark — the
+right answer is in the 10-K excerpt cited under ``evidence[*].evidence_text``.
+``VerticalBench.from_jsonl(..., open_book=True)`` rewrites the
+``VerticalQA.question`` to include the evidence text + a numeric-answer prompt
+before the model sees it. Default is auto: ``True`` for `financebench`,
+``False`` for everything else (LegalBench/generic). The 2026-05-13 V1 attempt
+on AdaptLLM/finance-chat scored 0/50 closed-book and 14–18%/50 open-book on
+the same JSONL — open-book is the load-bearing flag for FinanceBench scoring.
 """
 
 from __future__ import annotations
@@ -143,8 +152,20 @@ def _detect_format(row: dict[str, Any]) -> str:
     return "generic"
 
 
-def _row_to_qa(row: dict[str, Any], fmt: str, fallback_idx: int) -> VerticalQA | None:
-    """Map a JSONL row to `VerticalQA`. Returns None if required fields missing."""
+def _row_to_qa(
+    row: dict[str, Any],
+    fmt: str,
+    fallback_idx: int,
+    *,
+    open_book: bool = False,
+) -> VerticalQA | None:
+    """Map a JSONL row to `VerticalQA`. Returns None if required fields missing.
+
+    When `open_book=True` and `fmt == "financebench"`, prepends the row's
+    ``evidence[*].evidence_text`` to the question so the model sees the
+    10-K excerpt the gold answer was derived from. No-op for other formats —
+    LegalBench / generic JSONLs don't have a standard evidence field.
+    """
     if fmt == "financebench":
         qid = str(row.get("financebench_id") or f"fb-{fallback_idx}")
         question = row.get("question") or ""
@@ -159,6 +180,16 @@ def _row_to_qa(row: dict[str, Any], fmt: str, fallback_idx: int) -> VerticalQA |
             for k in ("company", "doc_period", "doc_type", "question_type")
             if k in row
         }
+        if open_book and question:
+            evidence_text = _extract_evidence_text(row)
+            if evidence_text:
+                doc_name = row.get("doc_name") or "the filing"
+                question = (
+                    f"Context from {doc_name}:\n\n"
+                    f"{evidence_text}\n\n"
+                    f"Question: {question}\n\n"
+                    f"Answer with just the numeric value."
+                )
     elif fmt == "legalbench":
         qid = str(row.get("id") or row.get("index") or f"lb-{fallback_idx}")
         question = row.get("text") or row.get("input") or row.get("question") or ""
@@ -178,6 +209,23 @@ def _row_to_qa(row: dict[str, Any], fmt: str, fallback_idx: int) -> VerticalQA |
     if not question or not expected:
         return None
     return VerticalQA(qid=qid, question=str(question), expected=str(expected), tags=tags)
+
+
+def _extract_evidence_text(row: dict[str, Any]) -> str:
+    """Flatten FinanceBench's `evidence: [{evidence_text: ...}, ...]` into a
+    blank-line-joined string. Accepts either list-of-dicts (canonical shape)
+    or list-of-strings (some pre-flattened dumps). Returns ``""`` when no
+    evidence field is present — caller falls back to closed-book.
+    """
+    chunks: list[str] = []
+    for e in row.get("evidence") or []:
+        if isinstance(e, dict):
+            txt = e.get("evidence_text") or ""
+            if txt:
+                chunks.append(str(txt))
+        elif isinstance(e, str):
+            chunks.append(e)
+    return "\n\n".join(chunks)
 
 
 # --- VerticalBench -------------------------------------------------------
@@ -224,6 +272,8 @@ class VerticalBench:
         limit: int | None = None,
         scorer: Callable[..., float] | None = None,
         scorer_kwargs: dict[str, Any] | None = None,
+        open_book: bool | None = None,
+        subset: str | None = None,
     ) -> VerticalBench:
         """Load a JSONL test set from disk and return a configured bench.
 
@@ -232,6 +282,18 @@ class VerticalBench:
         first row, so a partially-corrupt JSONL still triggers
         format-specific behavior. Rows missing question or expected are
         silently dropped (they show up as a row-count delta vs the JSONL).
+
+        `open_book` controls whether per-row evidence text is prepended to the
+        question. Default ``None`` resolves to ``True`` for `financebench`
+        (where the gold answer lives in the cited 10-K excerpt) and ``False``
+        for everything else. Pass ``True`` / ``False`` to override. Currently
+        only `financebench` rows have a standard evidence field; the flag is
+        a no-op for the other formats.
+
+        `subset` is a FinanceBench-only convenience filter that drops rows
+        whose ``question_type`` doesn't match. Useful for scoring only the
+        ``metrics-generated`` subset (quantitative questions) without
+        pre-filtering the JSONL.
         """
         p = Path(path)
         questions: list[VerticalQA] = []
@@ -247,11 +309,19 @@ class VerticalBench:
                     continue
                 if fmt is None:
                     fmt = _detect_format(row)
-                qa = _row_to_qa(row, fmt, fallback_idx=i)
+                # Resolve open_book on the first row once fmt is known.
+                if open_book is None:
+                    open_book = fmt == "financebench"
+                if subset is not None and row.get("question_type") != subset:
+                    continue
+                qa = _row_to_qa(row, fmt, fallback_idx=i, open_book=open_book)
                 if qa is not None:
                     questions.append(qa)
                 if limit is not None and len(questions) >= limit:
                     break
+        # If the file was empty, open_book may still be None — collapse to False.
+        if open_book is None:
+            open_book = False
         # Pick a sensible default scorer per format if caller didn't override.
         if scorer is None:
             scorer = numeric_match if fmt == "financebench" else exact_match

@@ -6,6 +6,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+### Added — `fieldkit.eval.VerticalBench` open-book mode (v0.4.1)
+
+- **`VerticalBench.from_jsonl(..., open_book=...)`** — new kwarg. When `True`, FinanceBench rows have their `evidence[*].evidence_text` prepended to the question (templated as "Context from <doc>: …\n\nQuestion: …\n\nAnswer with just the numeric value.") so the model sees the 10-K excerpt the gold answer was derived from. Default `None` auto-resolves to `True` for `financebench` and `False` for `legalbench` / `generic` — the right defaults per benchmark convention. Lifts inline `_load_finbench_open_book` helpers from `scripts/g3_preflight_bench.py` and `scripts/g3_measure_variants.py` into the package surface; both scripts now call `VerticalBench.from_jsonl(open_book=True, subset=…)` instead of carrying duplicated loaders. The 2026-05-13 V1 attempt on AdaptLLM/finance-chat scored 0/50 closed-book and 14–18%/50 open-book on the same JSONL — open-book is the load-bearing flag for FinanceBench scoring.
+- **`VerticalBench.from_jsonl(..., subset=...)`** — new kwarg. FinanceBench-only convenience filter on the `question_type` column. Drops non-matching rows before the loader hits the `limit` cap, so callers can score the `metrics-generated` subset with `limit=50` and get 50 metrics-generated questions (not 50 mixed rows of which N are metrics-generated).
+- **+8 tests** on `TestOpenBook` covering: auto-default for financebench, explicit False keeps closed-book, missing-evidence falls back to closed-book, legalbench / generic are no-ops, list-of-strings evidence shape, subset filter, subset × limit composition.
+
 ## [0.4.0] — 2026-05-14
 
 Fourth public release. Two new top-level modules (`fieldkit.publish` + `fieldkit.quant`) for the G3 GGUF / Quantization Publisher pick (MTBM Pick #1 per `ideas/mtbm-use-cases.md` §6), the v0.4.x **vertical-curator overlay** on `fieldkit.eval` (`VerticalBench`), and post-dry-run card-rendering fixes that landed the first live HF push (`Orionfold/finance-chat-GGUF`). The two new modules together unlock most of Cluster G; this cut implements the GGUF critical path and stubs the other quant formats with named entry points pointing at the v0.5+ roadmap.
