@@ -2,7 +2,12 @@
   🆕 STATUS: NEW — pending Mac sweep.
   This file is one feature/release at a time, not a running log.
   At the next release prompt, **clear this entire file and start fresh** (do NOT append to existing sections).
-  Last reset: 2026-05-14 (prior content covered the `Orionfold/Saul-7B-Instruct-v1-GGUF` push + the bundled v0.4.0 cycle — sweep status NEW awaiting Mac CC. THIS release supersedes that scope; the Saul card commit e0e599e and the v0.4.0 PyPI cycle commits e322af2..2190824 are bundled here under the v0.4.1 umbrella.).
+  Last reset: 2026-05-14 (this rotation supersedes the v0.4.0 cycle scope; the v0.4.0 PyPI release commits e322af2..2190824 are bundled here under the v0.4.1 umbrella).
+
+  Prior Mac sweep receipts (preserved here since SYNC-HANDOFF is per-release-not-running-log; Mac will sweep this v0.4.1 cycle next):
+  - 2026-05-14 v0.4.0 cycle: swept at destination commit manavsehgal/ainative-business.github.io@f7ea7aa (Mac PR #4 against this repo — conflicted on rotation; safe to close, receipt captured here).
+  - 2026-05-14 Orionfold/finance-chat-GGUF cycle: swept at destination commit manavsehgal/ainative-business.github.io@85f9307 (Mac PR #3, merged).
+  - 2026-05-12 Autoresearch→MTBM rename: swept at destination commit manavsehgal/ainative-business.github.io@71293af (Mac PR #2, merged).
 -->
 ---
 release_slug: 2026-05-14-fieldkit-v0.4.1
@@ -10,12 +15,20 @@ status: NEW
 source_range: 7f1159e..HEAD
 articles_added:
   - becoming-a-legal-curator-on-spark      # new long-form deep-dive; status: published; customer-link audited; signature SVG reused from VerticalCuratorRetry (no new SVG this cycle)
-articles_updated: []
+articles_updated:
+  - becoming-a-gguf-publisher-on-spark    # evidence/lineage TSV gained Q5_K_M + Q6_K re-run rows for audit-trail completeness (commit 8ae42e4 — published article body unchanged)
 artifacts_added:
   - src/content/artifacts/saul-7b-instruct-v1-gguf.yaml   # second real-world Phase-2 manifest (after finance-chat-gguf.yaml from prior cycle) — license.tier=free, license.model=mit, vertical_eval populated from LegalBench n=50
 artifacts_updated: []
 fieldkit_modules_changed:
   - eval                                   # VerticalBench.from_jsonl gains open_book + subset kwargs (v0.4.1 lift, additive only, no breaking changes)
+papers_added:
+  - 2605.13779                             # MinT — Managed Infrastructure for LoRA Training + Serving Millions of LLMs (MTBM Pick #1 analog, 137 HF upvotes)
+  - 2605.09942                             # HAGE — RL-Driven Weighted Graph Evolution for Agentic Memory (Second Brain)
+  - 2605.12978                             # Useful Memories Become Faulty When Continuously Updated (Second Brain counter-narrative)
+  - 2605.12975                             # Retrieval is Cheap, Show Me the Code — Executable Multi-Hop Reasoning for RAG (LLM Wiki)
+  - 2605.12501                             # Covering Human Action Space for Computer Use (MTBM/clawnav-adjacent)
+papers_classify_count: 13                  # total new in papers.json after relevance≥0.5 filter (5 marked dive-deep, 8 catalog-only)
 renames_to_replay: []
 removes: []
 new_top_level_pages: []
@@ -30,6 +43,9 @@ fieldkit_release:
   pypi_url: https://pypi.org/project/fieldkit/0.4.1/
   release_commit: 0b6986e
   stats_commit: b90de2c
+post_rotation_commits:                     # appended after SYNC-HANDOFF rotation, still in same NEW window
+  - 8ae42e4                                # lineage(gguf-publisher): TSV audit-trail rows
+  - 08f3d72                                # frontier-scout: refresh 2026-05-14
 ---
 
 ## Headline
@@ -66,6 +82,13 @@ Straight mirror across both bundled cycles — no destination-side rewrites. Con
 
 - **`src/data/project-stats.json`** + **`README.md`** — 36 articles (+1 from prior sweep), 121,613 words (+1,520), 24,185 LOC (+159 from the v0.4.1 lift). Deployment stage gains an entry; Observability count nudges from 7 to 8.
 
+### Post-rotation adds (also in this sweep window)
+
+Two commits landed after the SYNC-HANDOFF was rotated but still belong to the same Mac-sweep window. Both touch Spark-authoritative globs per `SYNC-CONTRACT.md`; Mac mirrors them as-is.
+
+- **`articles/becoming-a-gguf-publisher-on-spark/evidence/lineage/results.tsv`** (commit `8ae42e4`) — two re-run rows added (exp_id 003 Q5_K_M, exp_id 004 Q6_K) from a session-4 measurement re-cycle. The published article's variant table is unchanged; rows ship purely for audit-trail completeness.
+- **`papers/**`** (commit `08f3d72`) — `frontier-scout refresh 2026-05-14`. New files: `papers/2605.{13779,09942,12978,12975,12501}/paper.md`, `papers/runs/2026-05-14/refresh-summary.md`. Updated: `papers/README.md`, `papers/papers.json`, `papers/runs/index.md`. Top dive-deep picks (in order): MinT (LoRA infra, MTBM), HAGE (RL graph memory, Second Brain), Useful-Memories-Faulty (Second Brain counter-narrative), Retrieval-is-Cheap (executable RAG, LLM Wiki), CUA-Action-Space (MTBM agentic).
+
 ## What Mac CC does NOT need to do
 
 - **No rename replays.** No new entries in `SYNC-RENAMES.log` this cycle. Existing entries remain fully `complete` after the prior `orionfoldllc → Orionfold` and `Autoresearch → Machine that Builds Machines` sweeps.
@@ -80,11 +103,13 @@ The Saul card and the v0.4.1 release are causally linked: the kwargs that landed
 
 ## Source range
 
-`7f1159e..HEAD` — three commits beyond the prior SYNC-HANDOFF reset:
+`7f1159e..HEAD` — five commits beyond the prior SYNC-HANDOFF reset:
 
 1. `e0e599e` — Saul-7B-Instruct-v1-GGUF + LegalBench mini-eval (article + manifest + scripts + stats).
 2. `0b6986e` — fieldkit v0.4.1 release commit (version bump + CHANGELOG finalization).
 3. `b90de2c` — stats + README refresh post-v0.4.1 (LOC bump + missed Saul Deployment-stage entry).
+4. `8ae42e4` — lineage TSV audit-trail rows for the gguf-publisher article (post-rotation add, same sweep window).
+5. `08f3d72` — frontier-scout refresh 2026-05-14 (+13 papers, top 5 dive-deep — post-rotation add).
 
 ## Spark-side gates that ran
 
