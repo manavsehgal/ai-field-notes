@@ -107,6 +107,10 @@ const articles = defineCollection({
     // reference pages. Conservative — only set on articles that actually
     // import the module, not articles that merely mention it.
     fieldkit_modules: z.array(z.enum(FIELDKIT_MODULES)).optional(),
+    // If the article is the publishing receipt for a Hugging Face artifact
+    // (typically an Orionfold GGUF / LoRA / adapter), the canonical HF repo
+    // URL. Lets cards and stage pages link straight to the live artifact.
+    hf_url: z.string().url().optional(),
   }),
 });
 
