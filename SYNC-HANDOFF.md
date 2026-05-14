@@ -2,86 +2,77 @@
   🆕 STATUS: NEW — pending Mac sweep.
   This file is one feature/release at a time, not a running log.
   At the next release prompt, **clear this entire file and start fresh** (do NOT append to existing sections).
-  Last reset: 2026-05-14 (prior content covered the Orionfold/finance-chat-GGUF release + customer-link audit + ORIONFOLD_HF_ORG → HANDLE brand rename, consumed by Mac CC on 2026-05-14 — sweep commit `manavsehgal/ainative-business.github.io@85f9307`).
+  Last reset: 2026-05-14 (prior content covered the fieldkit v0.4.0 PyPI cut + landing-page drift fix — sweep status NEW awaiting Mac CC. THIS release supersedes that scope for the Mac sweep; the v0.4.0 PyPI cut work landed in commits e322af2..2190824 and is bundled here.).
 -->
 ---
-release_slug: 2026-05-14-fieldkit-v0.4.0
+release_slug: 2026-05-14-orionfold-saul-7b-instruct-v1-gguf
 status: NEW
-source_range: e322af2..HEAD
-articles_added: []
-articles_updated:
-  - becoming-a-gguf-publisher-on-spark   # frontmatter gains `hf_url: https://huggingface.co/Orionfold/finance-chat-GGUF` — first article to use the new optional field
-artifacts_added: []
+source_range: 7f1159e..HEAD
+articles_added:
+  - becoming-a-legal-curator-on-spark      # new long-form deep-dive; status: published; customer-link audited; signature SVG reused from VerticalCuratorRetry (no new SVG this cycle)
+articles_updated: []
+artifacts_added:
+  - src/content/artifacts/saul-7b-instruct-v1-gguf.yaml   # second real-world Phase-2 manifest (after finance-chat-gguf.yaml from prior cycle) — license.tier=free, license.model=mit, vertical_eval populated from LegalBench n=50
 artifacts_updated: []
-fieldkit_modules_changed:
-  - publish                              # license/chat_format/recommended_variant/hf_repo plumbing + auto-rendered ## How to run (v0.4.x fix); first public release of the module
-  - quant                                # first public release of the module
-  - eval                                 # v0.4.x VerticalBench + VerticalQA + exact_match/contains/numeric_match scorers
-  - capabilities                         # docs gain Supporting types subsection (Hardware, MemoryBudgetRulesOfThumb, StackEntry — already public, prior docs page didn't mention them)
-  - nim                                  # docs gain ChatMessage type-alias section
-  - rag                                  # docs gain Tunable constants table (DEFAULT_EMBED_BATCH, CHUNKS_PER_DOC_MAX, DEFAULT_RERANK_MODEL)
-  - cli                                  # docs `order:` 7 → 9 (was colliding with the new quant.md at canonical order 7); example version 0.2.0 → 0.4.0
+fieldkit_modules_changed: []               # no fieldkit source changes this cycle; the v0.4.1 lift (open_book/subset on VerticalBench.from_jsonl) landed in commit 7f1159e at the prior session end — already in [Unreleased], no new code here
 renames_to_replay: []
 removes: []
 new_top_level_pages: []
-breaking_changes: []                     # v0.x SemVer; v0.4 adds modules + extends eval surface, no public removals
+breaking_changes: []
 destination_overrides_to_preserve: []
-hf_repos_added: []                       # finance-chat-GGUF shipped in the prior release window; nothing new on HF this cycle
+hf_repos_added:
+  - Orionfold/Saul-7B-Instruct-v1-GGUF     # 5 GGUF variants of Equall/Saul-7B-Instruct-v1, mistral chat_format, MIT license, LegalBench-scored (n=50, contains)
 civitai_artifacts_added: []
 ---
 
 ## Headline
 
-`fieldkit v0.4.0` shipped to PyPI at <https://pypi.org/project/fieldkit/0.4.0/> with the git tag `fieldkit/v0.4.0` on `origin/main` (commit `d9efb2f`). Two new top-level modules (`fieldkit.publish` + `fieldkit.quant`) plus the v0.4.x `fieldkit.eval.VerticalBench` overlay — the same surface that produced the `Orionfold/finance-chat-GGUF` card live-pushed in the previous sync window. Pre-release work also closed four `audit-docs` drift gaps in pre-existing modules and added an optional `hf_url:` field to the articles content-collection schema.
+Second Orionfold quant card ships: [`Orionfold/Saul-7B-Instruct-v1-GGUF`](https://huggingface.co/Orionfold/Saul-7B-Instruct-v1-GGUF). Same five-variant Spark-tested shape as `finance-chat-GGUF` from the prior cycle, swapping FinanceBench for a curated 5-task LegalBench subset (overruling, abercrombie, proa, contract_nli_confidentiality_of_agreement, diversity_1 — 10 questions each, scored with `fieldkit.eval.contains`). Saul is a Mistral-7B-Instruct SFT (MIT license) from Equall, paper at arXiv:2403.03883.
 
-A second commit-cluster fixed the Spark-side fieldkit landing page (`/fieldkit/`) — the stats / modules / CLI demo sections had hardcoded values that drifted with each release. They now derive from `FIELDKIT_MODULES` (`src/content.config.ts`) and `__version__` (`fieldkit/src/fieldkit/_version.py`); a new sibling audit script in the `fieldkit-curator` skill (`audit_landing.py`) gates the drift before tag-push. The Mac mirror, which renders `/fieldkit/` from the same `src/components/sections/fieldkit/*.astro` + `src/pages/fieldkit/index.astro`, will pick up the dynamic behavior automatically once the sweep lands.
+The release validates that the v0.4.0 publishing surface generalizes across verticals: no `fieldkit.publish` changes were needed. Two measurement-script extensions did land, both in `scripts/` (not `fieldkit/`): a new `VERTICAL_BENCH={financebench,legalbench}` env knob in `g3_measure_variants.py` that dispatches between numeric_match (finance) and contains (legal) scorers, and a per-model case in `g3_build_first_quant.sh` that auto-resolves `MODEL_LICENSE`, `CHAT_FORMAT`, and `ARTICLE_SLUG` for Saul. A new helper at `scripts/legalbench_merge.py` produces the merged 50-question JSONL from the upstream `nguha/legalbench` 162-task dataset.
 
 ## What Mac CC sweeps
 
-The Mac sweep is a straight mirror — no destination-side rewrites needed this cycle. Concrete files / paths:
+Straight mirror — no destination-side rewrites. Concrete files / paths:
 
-- **`fieldkit/docs/api/*.md`** — six pages touched: `publish.md` (new, 1,279 words), `quant.md` (new, 1,090 words), `capabilities.md` / `nim.md` / `rag.md` / `eval.md` (drift fixes), and `cli.md` (frontmatter `order: 7 → 9` + example version bump). The Astro nav for `/fieldkit/api/<module>/` sorts by `order:`; the cli.md collision was the v0.4 trap — without the bump, `cli` would silently swap card position with `quant` on the modules grid.
-- **`fieldkit/CHANGELOG.md`** — `[Unreleased]` → `[0.4.0] — 2026-05-14`, with four bundled storylines (publish + quant modules, VerticalBench overlay, model_license + How-to-run defaults fix, the live HF-push verification). Test count corrected from the prior session's stale `356/3` to actual `379/2`. New **Verified on Spark** sub-section.
-- **`fieldkit/src/fieldkit/_version.py`** — `0.3.0 → 0.4.0`. `FieldkitHero`, `FieldkitCli`, and `FieldkitCTAFooter` all read this at build time on both sides.
-- **`src/content.config.ts`** — `articles` schema gains optional `hf_url: z.string().url().optional()`. Backwards-compatible; existing articles render identically.
-- **`src/components/sections/fieldkit/FieldkitProblem.astro`** — stat value + module-list source now derive from `FIELDKIT_MODULES.length` / `FIELDKIT_MODULES.join(', ')`. Source string gains spaces after commas + `break-words` + `leading-snug` + `text-[11px]` so the 9-module list wraps cleanly inside the 1/3-grid card at every viewport.
-- **`src/components/sections/fieldkit/FieldkitModules.astro`** — headline "fieldkit in N imports" now reads `docs.length` via a number-word map. Tagline map gains entries for `quant` and `publish`.
-- **`src/components/sections/fieldkit/FieldkitCli.astro`** — accepts a `version` prop; CLI demo output reads it instead of hardcoding `0.2.0`. `src/pages/fieldkit/index.astro` threads `fieldkitVersion` through.
-- **`articles/becoming-a-gguf-publisher-on-spark/article.md`** — frontmatter gains `hf_url: https://huggingface.co/Orionfold/finance-chat-GGUF`. The article body is unchanged.
-- **`src/data/project-stats.json`** + **`README.md`** — auto-refreshed by `nvidia-learn-stats` and `tech-writer/refresh_readme.py` post-release. New numbers: 35 articles, 120,093 words, 24,026 LOC (was 23,728 — fieldkit gained the `publish` + `quant` modules + tests).
+- **`articles/becoming-a-legal-curator-on-spark/article.md`** — new long-form. ~1,700 words, customer-link audited (no V1 retry narrative, no strategy leak, no competitor punches; voice stays Manav-deep-dive). Frontmatter: `status: published`, `series: Machine that Builds Machines`, `book_chapters: [10, 11]`, `fieldkit_modules: [quant, publish, eval, lineage]`, `also_stages: [observability]`, `hf_url: https://huggingface.co/Orionfold/Saul-7B-Instruct-v1-GGUF`. Same Methods-link convention as the finance article.
+- **`articles/becoming-a-legal-curator-on-spark/evidence/lineage-Saul-7B-Instruct-v1/results.tsv`** — 5 variant rows (one per GGUF), each with the four-axis measurement: F16 = 0.68 / 5.917 / 10.9 tg / 5.2 sustain; Q5_K_M = 0.72 (best on bench) / 5.938 / 20.2 tg / 2.4 sustain; Q4_K_M = 0.62 / 5.986 / 29.4 tg / 1.7 sustain (throughput pick); Q6_K = 0.68 / 5.925 / 22.4 tg / 2.5 sustain; Q8_0 = 0.66 / 5.914 / 7.3 tg / 7.2 sustain (anomalously slow — same pattern as finance-chat Q8_0).
+- **`src/content/artifacts/saul-7b-instruct-v1-gguf.yaml`** — second Phase-2 artifact manifest. The catalog page templates (Mac-side editorial) can render it alongside `finance-chat-gguf.yaml` as the second vertical card. Fields populated: 5 variants, perplexity per variant, spark_tokens_per_sec per variant, sustained_load_minutes (worst-case across variants, per Q9 convention), vertical_eval as `{variant: legalbench_accuracy}`, vertical_eval_name `"LegalBench (n=50, contains)"`, license `{tier: free, model: mit}`.
+- **`scripts/g3_measure_variants.py`** — `VERTICAL_BENCH` dispatch + scorer selection + lineage label generalization. Drives both finance + legal pipelines from one script. Mac doesn't need to mirror, but the source path may show up in cross-link audits.
+- **`scripts/g3_build_first_quant.sh`** — Saul case in the model-id switch + thread-through of `VERTICAL_BENCH` and `LEGALBENCH_JSONL` to the measure step.
+- **`scripts/legalbench_merge.py`** — new helper. Merges 5 task TSVs from `nguha/legalbench/data/<task>/test.tsv` into one JSONL the v0.4.1 `VerticalBench.from_jsonl(format="legalbench")` consumes directly. Mac doesn't need to mirror; lives in source-side scripts/ only.
+- **`src/data/project-stats.json`** + **`README.md`** — auto-refreshed: 36 articles (+1), 121,613 words (+1,520), 24,185 LOC (+159).
 
 ## What Mac CC does NOT need to do
 
-- **No destination-prose rewrites.** The `hf_url:` field is optional; only one article uses it. The page templates can read it where useful or ignore it.
-- **No HF-repo replays.** The `Orionfold/finance-chat-GGUF` push landed in the prior sync window and was swept at `85f9307`. Nothing new on HF this cycle.
-- **No rename replays.** `SYNC-RENAMES.log` is fully `complete` after the prior `orionfoldllc → Orionfold` sweep. No entries flipped to `destination-needs-replay`.
-- **No Phase-2 artifact-manifest catalog work.** `src/content/artifacts/` got no new entries (`finance-chat-gguf.yaml` from the prior window is the only one); the catalog page templates remain Mac-side editorial.
-- **No skill mirroring.** The new `audit_landing.py` lives in `~/.claude/skills/fieldkit-curator/scripts/` (Spark CC user config), not in the source repo. The Phase 2 cross-vendor `/skills/` IA is still deferred; nothing for Mac to render.
+- **No fieldkit source mirroring this cycle.** No changes under `fieldkit/src/` since the prior `7f1159e` commit. The v0.4.1 release stays in `[Unreleased]` — bundling decision (cut now vs cut with next vertical) is queued.
+- **No destination-prose rewrites.** New article slots into the existing Astro article collection without schema or template changes. The `hf_url` field, introduced in the prior cycle, is reused here.
+- **No rename replays.** No new entries in `SYNC-RENAMES.log` this cycle. Existing entries remain fully `complete` after the prior `orionfoldllc → Orionfold` and `Autoresearch → Machine that Builds Machines` sweeps.
+- **No new skill IA.** `hf-publisher` was used to push (sibling to `fieldkit-curator`), but it lives in `~/.claude/skills/` (Spark CC user config), not in the source repo. Same protocol as the prior `hf-publisher` and `audit_landing.py` introductions.
+- **No new top-level pages.** Article lives at `/field-notes/becoming-a-legal-curator-on-spark/`; sorted by ordinal-desc per the existing convention. Manifest renders via the catalog template (already in place from prior cycle).
 
-## Spark-side gates that ran
+## Why a second vertical card matters
 
-- `fieldkit-curator audit-docs` — 8/9 PASS, 1 skip (`cli` has no explicit `__all__`).
-- `fieldkit-curator audit-landing` — 4/4 PASS (module_count_dynamic, no_hardcoded_versions, module_taglines, docs_order_matches_modules). This is the new gate; it caught the four drift points above + the cli.md `order:` collision before tagging.
-- `pytest tests/` — 379 passed, 2 skipped offline (the 2 skips are `--spark`-gated live integration tests for `fieldkit.nim` + `fieldkit.rag`). No `--spark` paths touched in v0.4.0; live re-run deferred to a release that needs it.
-- `python -m build` + `twine check` — both wheels clean; PyPI upload succeeded.
-- Fresh-venv install verifies: ✅ from git tag, ✅ from PyPI (one ~60s CDN-propagation retry needed before the PyPI mirror caught up).
+The publishing-surface hypothesis from the prior cycle was: "the four-axis card shape generalizes across verticals". This release tests that. Two signals support the generalization:
 
-## Why a new `audit-landing` gate
+1. **No `fieldkit.publish` changes were needed.** The `ModelCard`, `ArtifactManifest`, `publish_quant`, and verify_stage gate all worked unmodified. The `vertical_eval` + `vertical_eval_name` kwargs were already public.
+2. **The script-side work was small + structured.** Adding `VERTICAL_BENCH=legalbench` is one switch statement and one scorer-selection branch; no plumbing was added that wasn't already implied by the existing FinanceBench path.
 
-The v0.4.0 release process surfaced a class of drift that nothing in `astro build` or `pytest` catches: hardcoded numbers and version strings in landing-page copy. The pre-release page kept saying "**7** modules / fieldkit in **seven** imports / `fieldkit.{capabilities,nim,rag,eval,training,lineage,cli}`" after `quant` + `publish` had already shipped — because the page copy is plain TSX literals, not derived. The new `audit_landing.py` codifies the four checks (`module_count_dynamic`, `no_hardcoded_versions`, `module_taglines`, `docs_order_matches_modules`) and the `fieldkit-curator release` flow now hard-stops on FAIL at step 2c (parallel to the existing 2b `audit-docs` gate). Source: `/home/nvidia/.claude/skills/fieldkit-curator/SKILL.md` "Mode: audit-landing".
-
-Mac side has no parallel gate today; if Mac develops its own landing-page chrome that displays the same dynamic surface (module count, version, module list), the equivalent guardrail belongs in the `sync-field-notes` skill.
+The remaining vertical-curator scaling question — "can we add a third vertical (cyber, medical) without further script changes?" — is the next test. The shape of `legalbench_merge.py` suggests yes (any bench with `text + answer` rows + an instruction template can use the existing path).
 
 ## Source range
 
-`e322af2..2190824` — five commits since the prior Mac sweep:
+`7f1159e..HEAD` — pending the post-push commit cluster. Expected commit shape: one bundled commit covering the article + manifest + lineage + scripts + stats refresh, with the live HF push URL in the body.
 
-```
-2190824  fix(fieldkit landing): unstale module count, version, taglines, cli order
-f8775ea  Refresh stats + README post-fieldkit-v0.4.0
-d9efb2f  fieldkit v0.4.0: publish + quant modules, VerticalBench overlay, first live HF push
-86bde6d  docs(fieldkit): close audit-docs gaps + article hf_url — v0.4.0 release prep
-ab6e385  fix(fieldkit.publish): model_license plumbing + auto-rendered ## How to run defaults
-```
+## Spark-side gates that ran
 
-Note: `ab6e385` predates this session and was the model_license + How-to-run fix that landed alongside the Orionfold push, but it shipped *after* the previous SYNC-HANDOFF was written and consumed. It rides along here for the Mac sweep's benefit; the diff is small and self-contained.
+- `g3_preflight_bench.py` — 1/5 on FinanceBench (threshold ≥1). Confirms Saul does open-book Q&A (not a continued-pretrain trap). LegalBench-shaped preflight extension still queued.
+- `verify_stage.sh` — 5/5 PASS after article scaffold landed (initial run failed on the Methods-link check; resolved by drafting the article before the live push, per the customer-link audit convention).
+- `g3_build_first_quant.sh all` — preflight → download (cached, 5/6 shards from a prior partial; one resume) → preflight-bench → probe → quantize (5 variants in ~3 min each) → measure (4 axes × 5 variants in ~13 min each) → publish-dryrun. ~5 hours wall-time end-to-end.
+- `hf-publisher` skill (full-auto mode) — 5/5 verify_stage, then detached `hf_push.py` upload. ETA 1.5–2 hours for the 36 GB push.
+
+## What Mac CC should look for after sweep
+
+- The second vertical card on a hypothetical Mac catalog page (artifacts/quants/) should render side-by-side with `finance-chat-gguf` as proof the shape generalizes. Suggested ordering: chronological-desc (newest first) so legal sits above finance.
+- The article should appear in the Machine that Builds Machines series at `/series/machine-that-builds-machines/` (or whatever the Mac-side IA names the listing page). It's a peer to `becoming-a-gguf-publisher-on-spark` in series + book_chapters.
+- The home-page "At a glance" infographic now reads 36 articles. The `pgvector` / Spark / NIM counts shift; check the model-list panel includes Mistral / Saul if the regex caught either (currently the MODELS list in `compute_stats.py` covers Llama and Qwen families; Mistral/Saul-7B-Instruct may not be counted as a separate model entry — minor cosmetic miss, not blocking).

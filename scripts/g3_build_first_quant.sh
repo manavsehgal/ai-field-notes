@@ -63,6 +63,12 @@ case "$MODEL_ID" in
     MODEL_LICENSE="${MODEL_LICENSE_OVERRIDE:-llama2}"
     CHAT_FORMAT="${CHAT_FORMAT_OVERRIDE:-llama-2}"
     ;;
+  Equall/Saul-7B-Instruct-v1)
+    MODEL_LICENSE="${MODEL_LICENSE_OVERRIDE:-mit}"
+    CHAT_FORMAT="${CHAT_FORMAT_OVERRIDE:-mistral}"
+    export VERTICAL_BENCH="${VERTICAL_BENCH:-legalbench}"
+    ARTICLE_SLUG="${ARTICLE_SLUG_OVERRIDE:-becoming-a-legal-curator-on-spark}"
+    ;;
 esac
 
 # HF cache redirect — system /home/nvidia/.cache/huggingface is root-owned
@@ -186,14 +192,21 @@ step_measure() {
     log "      download via: hf download Salesforce/wikitext --repo-type dataset --local-dir /home/nvidia/data/calibration --include 'wikitext-2-raw-v1/*'"
     return
   fi
-  if [[ ! -f "$FINBENCH_JSONL" ]]; then
+  local _vbench="${VERTICAL_BENCH:-financebench}"
+  if [[ "$_vbench" == "financebench" && ! -f "$FINBENCH_JSONL" ]]; then
     log "warn: FinanceBench corpus not at $FINBENCH_JSONL — vertical-eval will be skipped"
     log "      download via: hf download PatronusAI/financebench --repo-type dataset --local-dir /home/nvidia/data/eval-benches/financebench"
     export SKIP_VERTICAL=1
   fi
-  log "measuring 4 axes per variant (perplexity / tok-s / thermal / FinanceBench)"
+  if [[ "$_vbench" == "legalbench" && ! -f "${LEGALBENCH_JSONL:-/home/nvidia/data/eval-benches/legalbench/legalbench_merged.jsonl}" ]]; then
+    log "warn: LegalBench merged JSONL not at \${LEGALBENCH_JSONL} — vertical-eval will be skipped"
+    log "      build via: ./scripts/legalbench_merge.py (after hf download nguha/legalbench --repo-type=dataset)"
+    export SKIP_VERTICAL=1
+  fi
+  log "measuring 4 axes per variant (perplexity / tok-s / thermal / ${_vbench})"
   MODEL_SLUG="$MODEL_SLUG" QUANTS_DIR="$QUANTS_DIR" QUANT_VARIANTS="$QUANT_VARIANTS" \
   WIKITEXT_CORPUS="$WIKITEXT_CORPUS" FINBENCH_JSONL="$FINBENCH_JSONL" \
+  VERTICAL_BENCH="$_vbench" LEGALBENCH_JSONL="${LEGALBENCH_JSONL:-/home/nvidia/data/eval-benches/legalbench/legalbench_merged.jsonl}" \
   LLAMA_CPP_BIN="$LLAMA_CPP_BIN" LINEAGE_DIR="$LINEAGE_DIR" \
   BASELINE_HF_REPO="$BASE_MODEL_ARG" \
     "${HF_VENV}/bin/python" "$(dirname "$0")/g3_measure_variants.py"
@@ -247,12 +260,15 @@ sustained_per_var = measurements.get("sustained_load_minutes", {}) or {}
 sustained_floats = [v for v in sustained_per_var.values() if isinstance(v, (int, float))]
 sustained = min(sustained_floats) if sustained_floats else None
 
-# Vertical eval — FinanceBench accuracy per variant; name encodes n + scorer.
+# Vertical eval — accuracy per variant; name encodes bench + n + scorer. The
+# measure script writes `vertical_eval_name` directly into measurements.json
+# (e.g. "FinanceBench (n=50, numeric_match)" or "LegalBench (n=50, contains)").
+# Fall back to a derived FinanceBench label for older measurements.json shapes.
 fb_acc = measurements.get("financebench_accuracy", {}) or {}
 fb_n_per_var = measurements.get("financebench_n", {}) or {}
 fb_n = next((n for n in fb_n_per_var.values() if isinstance(n, int) and n > 0), 0)
 vertical_eval = {v: fb_acc[v] for v in variants if isinstance(fb_acc.get(v), (int, float))}
-vertical_eval_name = (
+vertical_eval_name = measurements.get("vertical_eval_name") or (
     f"FinanceBench (n={fb_n}, numeric_match)" if vertical_eval else None
 )
 
@@ -269,6 +285,10 @@ model_license_arg = "${MODEL_LICENSE}".strip() or None
 chat_format_arg = "${CHAT_FORMAT}".strip() or None
 recommended_variant_arg = "${RECOMMENDED_VARIANT}".strip() or None
 
+# Derive a short bench label for the article title.
+_bench_short = (vertical_eval_name or "vertical mini-eval").split(" (")[0]
+article_title_str = "Vertical-curator quants on Spark — ${REPO_NAME} + " + _bench_short + " mini-eval"
+
 result = publish_quant(
     quant_report=report,
     base_model="${BASE_MODEL_ARG}",
@@ -276,7 +296,7 @@ result = publish_quant(
     staging_dir="${STAGE_DIR}/${MODEL_SLUG}",
     artifacts_dir="${ARTIFACTS_DIR}",
     article_slug="${ARTICLE_SLUG}",
-    article_title="Vertical-curator quants on Spark — ${REPO_NAME} + FinanceBench mini-eval",
+    article_title=article_title_str,
     vertical_eval=vertical_eval,
     vertical_eval_name=vertical_eval_name,
     model_license=model_license_arg,

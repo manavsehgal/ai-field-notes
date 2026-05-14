@@ -4,9 +4,13 @@
 """B4 — Spark-overlay measurement sweep for the Orionfold vertical-curator quant.
 
 Runs four axes per GGUF variant — wikitext-2 perplexity, llama-bench tok/s,
-sustained-load minutes, and FinanceBench accuracy via VerticalBench — and
+sustained-load minutes, and vertical-eval accuracy via VerticalBench — and
 writes `measurements.json` for the dry-run publish step plus appends one
 `fieldkit.lineage.Trial` row per variant to the article's lineage TSV.
+
+The vertical eval is selected by `VERTICAL_BENCH`:
+    financebench (default)  open-book PatronusAI/financebench, numeric_match scorer
+    legalbench              5-task subset of nguha/legalbench, contains scorer
 
 Driven by env vars (matching `scripts/g3_build_first_quant.sh`):
 
@@ -14,13 +18,16 @@ Driven by env vars (matching `scripts/g3_build_first_quant.sh`):
     QUANTS_DIR          /home/nvidia/data/quants
     QUANT_VARIANTS      Q4_K_M,Q5_K_M,Q6_K,Q8_0,F16   (comma-separated)
     WIKITEXT_CORPUS     /home/nvidia/data/calibration/wikitext-2-raw-v1/wiki.test.raw
+    VERTICAL_BENCH      financebench | legalbench (default financebench)
     FINBENCH_JSONL      /home/nvidia/data/eval-benches/financebench/financebench_merged.jsonl
     FINBENCH_SUBSET     metrics-generated  (FinanceBench question_type filter; "all" for all 150)
     FINBENCH_LIMIT      50                  (cap rows after filter)
+    LEGALBENCH_JSONL    /home/nvidia/data/eval-benches/legalbench/legalbench_merged.jsonl
+    LEGALBENCH_LIMIT    50                  (cap rows; default = use all merged rows)
     LLAMA_CLI_NGL       99                  (GPU layers)
     LLAMA_CLI_NPREDICT  256                 (max tokens generated per Q)
     LINEAGE_DIR         articles/becoming-a-gguf-publisher-on-spark/evidence/lineage
-    SKIP_VERTICAL       set non-empty to skip FinanceBench scoring (faster smoke)
+    SKIP_VERTICAL       set non-empty to skip vertical-eval scoring (faster smoke)
     SKIP_THERMAL        set non-empty to skip the sustained-load sweep (faster smoke)
 
 Each variant's row carries:
@@ -47,13 +54,15 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_ROOT / "fieldkit" / "src"))
 
-from fieldkit.eval import VerticalBench, numeric_match  # noqa: E402
+from fieldkit.eval import VerticalBench, contains, numeric_match  # noqa: E402
 
 
 def _wrap_inst(question: str) -> str:
-    """Llama-2 chat format. AdaptLLM/finance-chat doesn't ship a chat_template
-    but the README confirms Llama-2-chat lineage — apply [INST]...[/INST] here
-    so per-variant scoring uses the same prompt shape as V0's preflight gate."""
+    """`<s>[INST] {q} [/INST]` — Llama-2-chat AND Mistral-Instruct (Saul) share
+    this shape. AdaptLLM/finance-chat doesn't ship a chat_template but the
+    README confirms Llama-2-chat lineage; Mistral-7B-Instruct's official format
+    is identical. Per-variant scoring uses the same prompt shape as V0's
+    preflight gate."""
     return f"<s>[INST] {question.strip()} [/INST]"
 from fieldkit.lineage import FailureLabel, LineageStore, Trial  # noqa: E402
 from fieldkit.quant import (  # noqa: E402
@@ -64,11 +73,31 @@ from fieldkit.quant import (  # noqa: E402
 )
 
 
+# --- Vertical-bench selection ----------------------------------------------
+
+VERTICAL_BENCH = os.environ.get("VERTICAL_BENCH", "financebench").lower()
+if VERTICAL_BENCH not in ("financebench", "legalbench"):
+    raise SystemExit(f"VERTICAL_BENCH must be 'financebench' or 'legalbench', got {VERTICAL_BENCH!r}")
+
+
 # --- Variant-trial builder (mirrors articles/.../lineage-demo.py) ---------
 
-DOMAIN = os.environ.get("LINEAGE_DOMAIN", "vertical-curator-finance")
-BASELINE_HF_REPO = os.environ.get("BASELINE_HF_REPO", "AdaptLLM/finance-chat")
-BENCH_HF_DATASET = "PatronusAI/financebench"
+_DEFAULT_DOMAIN = {
+    "financebench": "vertical-curator-finance",
+    "legalbench": "vertical-curator-legal",
+}[VERTICAL_BENCH]
+_DEFAULT_BASELINE = {
+    "financebench": "AdaptLLM/finance-chat",
+    "legalbench": "Equall/Saul-7B-Instruct-v1",
+}[VERTICAL_BENCH]
+_DEFAULT_BENCH_DATASET = {
+    "financebench": "PatronusAI/financebench",
+    "legalbench": "nguha/legalbench",
+}[VERTICAL_BENCH]
+
+DOMAIN = os.environ.get("LINEAGE_DOMAIN", _DEFAULT_DOMAIN)
+BASELINE_HF_REPO = os.environ.get("BASELINE_HF_REPO", _DEFAULT_BASELINE)
+BENCH_HF_DATASET = os.environ.get("BENCH_HF_DATASET", _DEFAULT_BENCH_DATASET)
 
 
 def make_variant_trial(
@@ -98,6 +127,7 @@ def make_variant_trial(
         notes_bits.append(f"gguf_size_bytes={gguf_size_bytes}")
     notes_bits.append(f"bench={BENCH_HF_DATASET}")
     notes_bits.append("corpus=wikitext-2-raw-v1/wiki.test.raw")
+    _bench_label = "FinanceBench" if VERTICAL_BENCH == "financebench" else "LegalBench"
     return Trial(
         exp_id=exp_id,
         timestamp=timestamp,
@@ -106,7 +136,7 @@ def make_variant_trial(
         baseline_exp="000",
         domain=DOMAIN,
         hypothesis=f"{variant} quant of {BASELINE_HF_REPO} — Spark-tested measurement layer",
-        expected_delta="FinanceBench accuracy delta vs F16 baseline",
+        expected_delta=f"{_bench_label} accuracy delta vs F16 baseline",
         status=status,
         core_metric=finance_accuracy,
         val_bpb=wikitext_perplexity,
@@ -134,6 +164,13 @@ FINBENCH_JSONL = Path(
 )
 FINBENCH_SUBSET = os.environ.get("FINBENCH_SUBSET", "metrics-generated")
 FINBENCH_LIMIT = int(os.environ.get("FINBENCH_LIMIT", "50"))
+LEGALBENCH_JSONL = Path(
+    os.environ.get(
+        "LEGALBENCH_JSONL",
+        "/home/nvidia/data/eval-benches/legalbench/legalbench_merged.jsonl",
+    )
+)
+LEGALBENCH_LIMIT = int(os.environ.get("LEGALBENCH_LIMIT", "50"))
 LLAMA_CLI_NGL = int(os.environ.get("LLAMA_CLI_NGL", "99"))
 LLAMA_CLI_NPREDICT = int(os.environ.get("LLAMA_CLI_NPREDICT", "256"))
 LINEAGE_DIR = Path(
@@ -368,23 +405,33 @@ def measure_variant(
         pp = tps.get("pp")
         print(f"        tg={tg} pp={pp}", flush=True)
 
-        # --- 3. FinanceBench accuracy — open-book, [INST]-wrapped
+        # --- 3. Vertical-bench accuracy — [INST]-wrapped, llama-server once per variant
         fb_acc: float | None = None
         fb_n = 0
         if SKIP_VERTICAL:
-            print(f"  [3/4] FinanceBench [skipped — SKIP_VERTICAL set]", flush=True)
+            print(f"  [3/4] vertical-eval [skipped — SKIP_VERTICAL set]", flush=True)
         else:
+            if VERTICAL_BENCH == "financebench":
+                bench_label = f"FinanceBench (subset={FINBENCH_SUBSET}, limit={FINBENCH_LIMIT})"
+                vb = VerticalBench.from_jsonl(
+                    FINBENCH_JSONL,
+                    format="financebench",
+                    open_book=True,
+                    subset=None if FINBENCH_SUBSET == "all" else FINBENCH_SUBSET,
+                    limit=FINBENCH_LIMIT,
+                )
+                scorer = lambda pred, exp: numeric_match(pred, exp, rel_tolerance=0.01)
+            else:  # legalbench
+                bench_label = f"LegalBench (limit={LEGALBENCH_LIMIT})"
+                vb = VerticalBench.from_jsonl(
+                    LEGALBENCH_JSONL,
+                    format="legalbench",
+                    limit=LEGALBENCH_LIMIT,
+                )
+                scorer = contains
             print(
-                f"  [3/4] FinanceBench (subset={FINBENCH_SUBSET}, limit={FINBENCH_LIMIT}) "
-                f"open-book via llama-server (load once per variant) …",
+                f"  [3/4] {bench_label} via llama-server (load once per variant) …",
                 flush=True,
-            )
-            vb = VerticalBench.from_jsonl(
-                FINBENCH_JSONL,
-                format="financebench",
-                open_book=True,
-                subset=None if FINBENCH_SUBSET == "all" else FINBENCH_SUBSET,
-                limit=FINBENCH_LIMIT,
             )
             t0 = time.perf_counter()
             scores: list[float] = []
@@ -398,13 +445,12 @@ def measure_variant(
                 for q in vb.questions:
                     prompt = _wrap_inst(q.question)
                     predicted = server.model_fn(prompt)
-                    score = numeric_match(predicted, q.expected, rel_tolerance=0.01)
-                    scores.append(score)
+                    scores.append(scorer(predicted, q.expected))
             fb_n = len(scores)
             fb_acc = (sum(scores) / fb_n) if fb_n else None
             elapsed = time.perf_counter() - t0
             print(
-                f"        FinanceBench accuracy = {fb_acc} (n={fb_n}, {elapsed:.0f}s)",
+                f"        {VERTICAL_BENCH} accuracy = {fb_acc} (n={fb_n}, {elapsed:.0f}s)",
                 flush=True,
             )
 
@@ -478,6 +524,18 @@ def main() -> int:
     # existing publish-dryrun step expects (perplexity dict + tok/s dict).
     measurements_path = QUANTS_DIR / "measurements.json"
     QUANTS_DIR.mkdir(parents=True, exist_ok=True)
+    fb_n_first = next(
+        (r.get("financebench_n", 0) for r in results if r.get("financebench_n")),
+        0,
+    )
+    if VERTICAL_BENCH == "financebench":
+        vertical_eval_name = (
+            f"FinanceBench (n={fb_n_first}, numeric_match)" if fb_n_first else None
+        )
+    else:
+        vertical_eval_name = (
+            f"LegalBench (n={fb_n_first}, contains)" if fb_n_first else None
+        )
     payload = {
         "perplexity": {r["variant"]: r["perplexity"] for r in results if r.get("perplexity") is not None},
         "tokens_per_sec": {
@@ -491,6 +549,7 @@ def main() -> int:
             r["variant"]: r.get("financebench_accuracy") for r in results
         },
         "financebench_n": {r["variant"]: r.get("financebench_n", 0) for r in results},
+        "vertical_eval_name": vertical_eval_name,
         "gguf_bytes": {r["variant"]: r.get("gguf_bytes", 0) for r in results},
     }
     measurements_path.write_text(json.dumps(payload, indent=2))
