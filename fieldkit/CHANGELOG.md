@@ -6,11 +6,26 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
-### Added — `fieldkit.eval.VerticalBench` open-book mode (v0.4.1)
+## [0.4.1] — 2026-05-14
+
+Patch release. The `fieldkit.eval.VerticalBench` overlay introduced in v0.4.0 needed two kwargs to score FinanceBench correctly (open-book context-prepend) and to bound a JSONL slice (subset filter on `question_type`). Both lifts came out of the 2026-05-13 V1 attempt on `AdaptLLM/finance-chat` (0/50 closed-book vs. 14–18%/50 open-book on the same JSONL) and the 2026-05-14 legal-curator scoring run on `Equall/Saul-7B-Instruct-v1`. The two scripts under `scripts/g3_*` that carried duplicated loaders now call into the package surface. No new modules, no new public classes — additive kwargs only.
+
+### Added — `fieldkit.eval.VerticalBench` open-book mode
 
 - **`VerticalBench.from_jsonl(..., open_book=...)`** — new kwarg. When `True`, FinanceBench rows have their `evidence[*].evidence_text` prepended to the question (templated as "Context from <doc>: …\n\nQuestion: …\n\nAnswer with just the numeric value.") so the model sees the 10-K excerpt the gold answer was derived from. Default `None` auto-resolves to `True` for `financebench` and `False` for `legalbench` / `generic` — the right defaults per benchmark convention. Lifts inline `_load_finbench_open_book` helpers from `scripts/g3_preflight_bench.py` and `scripts/g3_measure_variants.py` into the package surface; both scripts now call `VerticalBench.from_jsonl(open_book=True, subset=…)` instead of carrying duplicated loaders. The 2026-05-13 V1 attempt on AdaptLLM/finance-chat scored 0/50 closed-book and 14–18%/50 open-book on the same JSONL — open-book is the load-bearing flag for FinanceBench scoring.
 - **`VerticalBench.from_jsonl(..., subset=...)`** — new kwarg. FinanceBench-only convenience filter on the `question_type` column. Drops non-matching rows before the loader hits the `limit` cap, so callers can score the `metrics-generated` subset with `limit=50` and get 50 metrics-generated questions (not 50 mixed rows of which N are metrics-generated).
-- **+8 tests** on `TestOpenBook` covering: auto-default for financebench, explicit False keeps closed-book, missing-evidence falls back to closed-book, legalbench / generic are no-ops, list-of-strings evidence shape, subset filter, subset × limit composition.
+
+### Test suite
+
+**+8 new tests** on `TestOpenBook` in `tests/test_vertical_bench.py` covering: auto-default for financebench, explicit `False` keeps closed-book, missing-evidence falls back to closed-book, legalbench / generic are no-ops, list-of-strings evidence shape, subset filter, subset × limit composition. Total: **375 passed, 3 skipped** offline (`pytest -q`). The 3 skips are the two `--spark`-gated live-integration tests + the `torch`-import skip in `test_training.py` (CPU-only venv).
+
+### Articles in this release
+
+- [`becoming-a-legal-curator-on-spark`](https://ainative.business/field-notes/becoming-a-legal-curator-on-spark/) — second Orionfold quant card, swaps FinanceBench for a curated 5-task LegalBench subset. Drives the `subset` kwarg's first non-finance use (LegalBench tasks via `legalbench` format) and validates that the `open_book` default-off branch is correct for LegalBench JSONLs.
+
+### Verified on Spark
+
+- **Live HF push:** `Orionfold/Saul-7B-Instruct-v1-GGUF` (5 GGUF variants + README, ~37 GB) shipped 2026-05-14 via the same `publish_quant(dry_run=False)` path the finance-chat card used a week earlier. Zero source changes in `fieldkit.publish` between the two pushes — the v0.4.0 surface generalized as designed.
 
 ## [0.4.0] — 2026-05-14
 
