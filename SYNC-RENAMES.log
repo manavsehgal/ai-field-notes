@@ -47,7 +47,9 @@
   old: orionfoldllc
   new: Orionfold
   affected: [prose_mentions, hf_repo_urls, frontmatter.product, model_card_attribution]
-  status: destination-needs-replay
+  status: complete
+  swept_at: 2026-05-14
+  swept_by: manavsehgal/ainative-business.github.io@85f9307
   notes: |
     HF publishing surface moved from fallback org `orionfoldllc` (registered
     2026-05-13 when the short slug `orionfold` was unavailable) to the existing
@@ -56,3 +58,6 @@
     The LLC parent brand survives off-HF (legal entity, billing, footer
     attribution); the HF surface is the user. Mac side: replay across
     destination prose + tag pages + model-card attribution.
+    Mac sweep 2026-05-14: zero destination footprint to rewrite — the incoming
+    article (becoming-a-gguf-publisher-on-spark) already shipped with the new
+    name in frontmatter, tags, and HF repo URLs. Status flipped to complete.

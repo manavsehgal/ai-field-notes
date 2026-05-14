@@ -1,12 +1,14 @@
 <!--
-  ⚠️ STATUS: NEW — not yet consumed.
+  ✅ STATUS: SHIPPED — consumed by Mac CC on 2026-05-14, sweep commit `manavsehgal/ainative-business.github.io@85f9307`.
   This file is one feature/release at a time, not a running log.
   At the next release prompt, **clear this entire file and start fresh** (do NOT append to existing sections).
   Last reset: 2026-05-14 (prior content covered the a2tgpo article publish + sync-contract bootstrap pull cycle, consumed by Mac CC on 2026-05-12 — sweep commit `manavsehgal/ainative-business.github.io@71293af`).
 -->
 ---
 release_slug: 2026-05-14-orionfold-finance-chat-gguf
-status: NEW
+status: SHIPPED
+swept_at: 2026-05-14
+swept_by: manavsehgal/ainative-business.github.io@85f9307
 source_range: f32cd1f..HEAD
 articles_added: []
 articles_updated:
