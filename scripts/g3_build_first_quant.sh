@@ -27,9 +27,15 @@ set -euo pipefail
 
 # --- Config (env-overridable) -----------------------------------------------
 
-MODEL_ID="${MODEL_ID:-instruction-pretrain/finance-Llama3-8B}"
+MODEL_ID="${MODEL_ID:-AdaptLLM/finance-chat}"
 MODEL_SLUG="${MODEL_SLUG:-$(basename "$MODEL_ID")}"
 BASE_MODEL_ARG="${BASE_MODEL_ARG:-$MODEL_ID}"
+# Lineage dir isolates this run from prior model attempts (e.g. the archived
+# finance-Llama3-8B audit trail at evidence/lineage/). The measure script
+# honors LINEAGE_DIR; the dry-run step reads from the model-slug-specific
+# quants path so each retry gets its own measurements.json + lineage.
+LINEAGE_DIR_DEFAULT="/home/nvidia/ai-field-notes/articles/becoming-a-gguf-publisher-on-spark/evidence/lineage-${MODEL_SLUG}"
+export LINEAGE_DIR="${LINEAGE_DIR:-$LINEAGE_DIR_DEFAULT}"
 LLAMA_CPP_DIR="${LLAMA_CPP_DIR:-/home/nvidia/llama.cpp}"
 LLAMA_CPP_BIN="${LLAMA_CPP_BIN:-${LLAMA_CPP_DIR}/build/bin}"
 LLAMA_CPP_CONVERT="${LLAMA_CPP_CONVERT:-${LLAMA_CPP_DIR}/convert_hf_to_gguf.py}"
@@ -100,6 +106,20 @@ step_download() {
     --local-dir "$model_dir"
 }
 
+# --- Step 2.5: preflight bench (V0 gate) -----------------------------------
+# Score 5 FinanceBench questions on the FP source weights via transformers
+# before sinking multi-hour quant+measure cycles. Per memory
+# `feedback_preflight_bench_before_quant` + `feedback_chat_vs_continued_pretrain_trap`.
+
+step_preflight_bench() {
+  log "preflight-bench — converting to F16 GGUF + scoring 5 FinanceBench questions on GPU"
+  MODELS_DIR="$MODELS_DIR" MODEL_SLUG="$MODEL_SLUG" QUANTS_DIR="$QUANTS_DIR" \
+  FINBENCH_JSONL="$FINBENCH_JSONL" \
+  LLAMA_CPP_BIN="$LLAMA_CPP_BIN" LLAMA_CPP_CONVERT="$LLAMA_CPP_CONVERT" \
+  BASE_MODEL_ARG="$BASE_MODEL_ARG" \
+    "${HF_VENV}/bin/python" "$(dirname "$0")/g3_preflight_bench.py"
+}
+
 # --- Step 3: probe convert support (cheap — config.json only) --------------
 
 step_probe_convert() {
@@ -159,7 +179,8 @@ step_measure() {
   log "measuring 4 axes per variant (perplexity / tok-s / thermal / FinanceBench)"
   MODEL_SLUG="$MODEL_SLUG" QUANTS_DIR="$QUANTS_DIR" QUANT_VARIANTS="$QUANT_VARIANTS" \
   WIKITEXT_CORPUS="$WIKITEXT_CORPUS" FINBENCH_JSONL="$FINBENCH_JSONL" \
-  LLAMA_CPP_BIN="$LLAMA_CPP_BIN" \
+  LLAMA_CPP_BIN="$LLAMA_CPP_BIN" LINEAGE_DIR="$LINEAGE_DIR" \
+  BASELINE_HF_REPO="$BASE_MODEL_ARG" \
     "${HF_VENV}/bin/python" "$(dirname "$0")/g3_measure_variants.py"
 }
 
@@ -236,7 +257,7 @@ result = publish_quant(
     staging_dir="${STAGE_DIR}/${MODEL_SLUG}",
     artifacts_dir="${ARTIFACTS_DIR}",
     article_slug="${ARTICLE_SLUG}",
-    article_title="Vertical-curator quants on Spark — finance-Llama3-8B-GGUF + FinanceBench mini-eval",
+    article_title="Vertical-curator quants on Spark — ${REPO_NAME} + FinanceBench mini-eval",
     vertical_eval=vertical_eval,
     vertical_eval_name=vertical_eval_name,
     dry_run=True,
@@ -257,6 +278,7 @@ PYEOF
 case "${1:-all}" in
   preflight)          step_preflight ;;
   download)           step_preflight && step_download ;;
+  preflight-bench)    step_preflight && step_preflight_bench ;;
   probe)              step_preflight && step_probe_convert ;;
   quantize)           step_preflight && step_quantize ;;
   measure)            step_preflight && step_measure ;;
@@ -264,6 +286,7 @@ case "${1:-all}" in
   all)
     step_preflight
     step_download
+    step_preflight_bench
     step_probe_convert
     step_quantize
     step_measure
@@ -276,13 +299,14 @@ case "${1:-all}" in
 Usage: $0 <step>
 
 Steps:
-  preflight       — verify llama.cpp + venv + disk
-  download        — pull source model from HF
-  probe           — check convert script accepts the architecture
-  quantize        — produce GGUF variants via fieldkit.quant
-  measure         — perplexity + tok/s per variant (needs wikitext)
-  publish-dryrun  — stage card + manifest via fieldkit.publish (dry_run=True)
-  all             — run every step in order (default)
+  preflight        — verify llama.cpp + venv + disk
+  download         — pull source model from HF
+  preflight-bench  — V0 gate: 5 FinanceBench questions on FP source via transformers
+  probe            — check convert script accepts the architecture
+  quantize         — produce GGUF variants via fieldkit.quant
+  measure          — perplexity + tok/s per variant (needs wikitext)
+  publish-dryrun   — stage card + manifest via fieldkit.publish (dry_run=True)
+  all              — run every step in order (default)
 
 Env overrides:
   MODEL_ID, MODEL_SLUG, LLAMA_CPP_DIR, MODELS_DIR, QUANTS_DIR, STAGE_DIR,

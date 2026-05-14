@@ -63,6 +63,7 @@ __all__ = [
     "publish_quant",
     "write_artifact_manifest",
     "ORIONFOLD_BRAND",
+    "ORIONFOLD_HF_HANDLE",
     "ORIONFOLD_HF_ORG",
     "ARTIFACT_KINDS",
 ]
@@ -78,15 +79,20 @@ footer always says `Published by Orionfold LLC` with a link back to
 `orionfold.com` and a cross-reference to the methods article.
 """
 
-ORIONFOLD_HF_ORG: str = "orionfoldllc"
-"""Default HuggingFace organization handle.
+ORIONFOLD_HF_HANDLE: str = "Orionfold"
+"""Default HuggingFace handle for Orionfold publishing surfaces.
 
-Bartowski-shape: one org, repo names carry the format suffix
-(`orionfoldllc/<model>-GGUF`, `orionfoldllc/<model>-LoRA`). Registered
-2026-05-13 (the short form `orionfold` was unavailable; personal HF user is
-`Orionfold`). Decided in HANDOFF Q3 on 2026-05-12 over the multi-sub-org
-alternative.
+Bartowski-shape: a single handle, repo names carry the format suffix
+(`Orionfold/<model>-GGUF`, `Orionfold/<model>-LoRA`). The handle is the
+existing personal user account `Orionfold` (the short org slug `orionfold`
+was unavailable, and the fallback org `orionfoldllc` was abandoned on
+2026-05-14 in favor of publishing under the user — Bartowski precedent).
+The LLC parent brand survives off-HF; the HF surface is the user.
 """
+
+# Back-compat alias — keep `ORIONFOLD_HF_ORG` callable as a deprecation shim
+# in case any out-of-tree caller imports it. Drop on the next fieldkit cut.
+ORIONFOLD_HF_ORG: str = ORIONFOLD_HF_HANDLE
 
 ARTIFACT_KINDS: tuple[str, ...] = (
     "quant",
@@ -549,7 +555,7 @@ class HFHubAdapter:
         staging_dir: Union[str, Path],
         dry_run: bool = True,
         token: Optional[str] = None,
-        org: str = ORIONFOLD_HF_ORG,
+        org: str = ORIONFOLD_HF_HANDLE,
     ) -> None:
         self.staging_dir = Path(staging_dir)
         self.dry_run = dry_run
@@ -690,7 +696,7 @@ def publish_quant(
     lineage_run_id: Optional[str] = None,
     dry_run: bool = True,
     token: Optional[str] = None,
-    org: str = ORIONFOLD_HF_ORG,
+    org: str = ORIONFOLD_HF_HANDLE,
     extra_tags: Sequence[str] = (),
     ollama_pull_handle: Optional[str] = None,
     transformers_snippet: Optional[str] = None,

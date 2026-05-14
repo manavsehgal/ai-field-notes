@@ -32,7 +32,7 @@ from fieldkit.publish import (
     HFHubNotAvailable,
     ModelCard,
     ORIONFOLD_BRAND,
-    ORIONFOLD_HF_ORG,
+    ORIONFOLD_HF_HANDLE,
     PublishError,
     PublishResult,
     publish_quant,
@@ -46,7 +46,7 @@ from fieldkit.publish import _default_variant_recommendation, _render_yaml_scala
 
 def test_constants_are_locked_in() -> None:
     assert ORIONFOLD_BRAND == "Orionfold LLC"
-    assert ORIONFOLD_HF_ORG == "orionfoldllc"
+    assert ORIONFOLD_HF_HANDLE == "Orionfold"
 
 
 def test_artifact_kinds_are_the_canonical_eight() -> None:
@@ -180,12 +180,12 @@ def test_model_card_renders_run_instructions() -> None:
         title="x",
         one_liner="y",
         base_model="z",
-        ollama_pull_handle="orionfoldllc/foo",
-        transformers_snippet="from transformers import AutoModel\nmodel = AutoModel.from_pretrained('orionfoldllc/foo')",
+        ollama_pull_handle="Orionfold/foo",
+        transformers_snippet="from transformers import AutoModel\nmodel = AutoModel.from_pretrained('Orionfold/foo')",
     )
     out = card.render()
     assert "## How to run" in out
-    assert "ollama pull orionfoldllc/foo" in out
+    assert "ollama pull Orionfold/foo" in out
     assert "from transformers import AutoModel" in out
 
 
@@ -265,7 +265,7 @@ def test_artifact_manifest_dict_renames_class_field() -> None:
         kind="quant",
         artifact_class="gguf",
         base_model="nvidia/Foo-30B",
-        hf_repo="orionfoldllc/Foo-30B-GGUF",
+        hf_repo="Orionfold/Foo-30B-GGUF",
         variants=("Q4_K_M", "Q8_0"),
     )
     d = m.to_dict()
@@ -281,7 +281,7 @@ def test_artifact_manifest_elides_optional_fields_when_unset() -> None:
         kind="quant",
         artifact_class="gguf",
         base_model="b",
-        hf_repo="orionfoldllc/x",
+        hf_repo="Orionfold/x",
     )
     d = m.to_dict()
     assert "civitai_id" not in d
@@ -299,7 +299,7 @@ def test_artifact_manifest_includes_optional_fields_when_set() -> None:
         kind="quant",
         artifact_class="gguf",
         base_model="b",
-        hf_repo="orionfoldllc/x",
+        hf_repo="Orionfold/x",
         perplexity={"Q4_K_M": 7.0},
         spark_tokens_per_sec={"Q4_K_M": 24.0},
         sustained_load_minutes=40.0,
@@ -322,7 +322,7 @@ def test_artifact_manifest_carries_vertical_eval_when_set() -> None:
         kind="quant",
         artifact_class="gguf",
         base_model="instruction-pretrain/finance-Llama3-8B",
-        hf_repo="orionfoldllc/finance-Llama3-8B-GGUF",
+        hf_repo="Orionfold/finance-Llama3-8B-GGUF",
         variants=("Q4_K_M", "Q8_0"),
         vertical_eval={"Q4_K_M": 0.62, "Q8_0": 0.66},
         vertical_eval_name="FinanceBench (n=50, numeric_match)",
@@ -342,7 +342,7 @@ def test_artifact_manifest_yaml_is_parseable_round_trip() -> None:
         kind="quant",
         artifact_class="gguf",
         base_model="nvidia/Foo-30B",
-        hf_repo="orionfoldllc/Foo-GGUF",
+        hf_repo="Orionfold/Foo-GGUF",
         variants=("Q4_K_M",),
         perplexity={"Q4_K_M": 7.0},
     ).to_yaml()
@@ -350,7 +350,7 @@ def test_artifact_manifest_yaml_is_parseable_round_trip() -> None:
     assert "slug: s" in yaml_text
     assert "kind: quant" in yaml_text
     assert "class: gguf" in yaml_text
-    assert "hf_repo: orionfoldllc/Foo-GGUF" in yaml_text
+    assert "hf_repo: Orionfold/Foo-GGUF" in yaml_text
     assert "- Q4_K_M" in yaml_text
     assert "  Q4_K_M: 7.0" in yaml_text  # nested under perplexity
 
@@ -361,7 +361,7 @@ def test_write_artifact_manifest_creates_dir_and_writes_file(tmp_path: Path) -> 
         kind="quant",
         artifact_class="gguf",
         base_model="nvidia/Foo",
-        hf_repo="orionfoldllc/Foo-GGUF",
+        hf_repo="Orionfold/Foo-GGUF",
     )
     out = write_artifact_manifest(m, artifacts_dir=tmp_path / "src" / "content" / "artifacts")
     assert out.exists()
@@ -374,7 +374,7 @@ def test_write_artifact_manifest_creates_dir_and_writes_file(tmp_path: Path) -> 
 
 def test_hf_adapter_repo_id_qualifies_bare_names(tmp_path: Path) -> None:
     a = HFHubAdapter(staging_dir=tmp_path)
-    assert a.repo_id("Foo-GGUF") == "orionfoldllc/Foo-GGUF"
+    assert a.repo_id("Foo-GGUF") == "Orionfold/Foo-GGUF"
     assert a.repo_id("custom-org/Foo-GGUF") == "custom-org/Foo-GGUF"
 
 
@@ -394,13 +394,13 @@ def test_hf_adapter_push_folder_dry_run_logs_call(tmp_path: Path) -> None:
     a.stage_text("x", "subdir/file.gguf")
     result = a.push_folder(repo_name="Foo-GGUF")
     assert result.dry_run is True
-    assert result.hf_repo == "orionfoldllc/Foo-GGUF"
+    assert result.hf_repo == "Orionfold/Foo-GGUF"
     assert "README.md" in result.files_uploaded
     assert "subdir/file.gguf" in result.files_uploaded
     assert len(a.logged_calls) == 1
     call = a.logged_calls[0]
     assert call["method"] == "upload_folder"
-    assert call["repo_id"] == "orionfoldllc/Foo-GGUF"
+    assert call["repo_id"] == "Orionfold/Foo-GGUF"
     assert call["private"] is False
 
 
@@ -469,7 +469,7 @@ def test_publish_quant_dry_run_end_to_end(tmp_path: Path) -> None:
         dry_run=True,
     )
     assert result.dry_run is True
-    assert result.hf_repo == "orionfoldllc/Foo-30B-GGUF"
+    assert result.hf_repo == "Orionfold/Foo-30B-GGUF"
     assert result.card_path is not None
     assert result.card_path.exists()
     assert result.manifest_path is not None
@@ -483,7 +483,7 @@ def test_publish_quant_dry_run_end_to_end(tmp_path: Path) -> None:
     # Manifest contains the right slug/hf_repo
     manifest = result.manifest_path.read_text()
     assert "slug: foo-30b-gguf" in manifest
-    assert "hf_repo: orionfoldllc/Foo-30B-GGUF" in manifest
+    assert "hf_repo: Orionfold/Foo-30B-GGUF" in manifest
 
 
 def test_publish_quant_threads_vertical_eval_into_card_and_manifest(

@@ -47,7 +47,67 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_ROOT / "fieldkit" / "src"))
 
-from fieldkit.eval import VerticalBench, numeric_match  # noqa: E402
+from fieldkit.eval import VerticalBench, numeric_match  # noqa: E402  (VerticalBench kept for other subsets)
+
+
+# --- FinanceBench open-book loader (evidence-aware) -----------------------
+# VerticalBench.from_jsonl drops the `evidence` field; FinanceBench is an
+# open-book benchmark — the answer can only be derived from the 10-K excerpt
+# in evidence[*].evidence_text. Mirrors the same loader in
+# scripts/g3_preflight_bench.py so V0 gate score and B4 per-variant score are
+# computed against the same prompt shape.
+
+
+def _load_finbench_open_book(
+    path: Path, subset: str, limit: int
+) -> list[tuple[str, str, str]]:
+    """Return [(qid, prompt_question_with_evidence, expected_answer), ...]."""
+    out: list[tuple[str, str, str]] = []
+    with Path(path).open() as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                row = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if subset != "all" and row.get("question_type") != subset:
+                continue
+            q = row.get("question") or ""
+            ans = row.get("answer") or row.get("gold_standard") or ""
+            if not q or not ans:
+                continue
+            evidence_chunks: list[str] = []
+            for e in row.get("evidence") or []:
+                if isinstance(e, dict):
+                    txt = e.get("evidence_text") or ""
+                    if txt:
+                        evidence_chunks.append(str(txt))
+                elif isinstance(e, str):
+                    evidence_chunks.append(e)
+            evidence_text = "\n\n".join(evidence_chunks)
+            qid = str(row.get("financebench_id") or f"fb-{len(out)}")
+            if evidence_text:
+                prompt_q = (
+                    f"Context from {row.get('doc_name', 'the filing')}:\n\n"
+                    f"{evidence_text}\n\n"
+                    f"Question: {q}\n\n"
+                    f"Answer with just the numeric value."
+                )
+            else:
+                prompt_q = q
+            out.append((qid, prompt_q, str(ans)))
+            if len(out) >= limit:
+                break
+    return out
+
+
+def _wrap_inst(question: str) -> str:
+    """Llama-2 chat format. AdaptLLM/finance-chat doesn't ship a chat_template
+    but the README confirms Llama-2-chat lineage — apply [INST]...[/INST] here
+    so per-variant scoring uses the same prompt shape as V0's preflight gate."""
+    return f"<s>[INST] {question.strip()} [/INST]"
 from fieldkit.lineage import FailureLabel, LineageStore, Trial  # noqa: E402
 from fieldkit.quant import (  # noqa: E402
     LlamaCppPaths,
@@ -59,8 +119,8 @@ from fieldkit.quant import (  # noqa: E402
 
 # --- Variant-trial builder (mirrors articles/.../lineage-demo.py) ---------
 
-DOMAIN = "vertical-curator-finance"
-BASELINE_HF_REPO = "instruction-pretrain/finance-Llama3-8B"
+DOMAIN = os.environ.get("LINEAGE_DOMAIN", "vertical-curator-finance")
+BASELINE_HF_REPO = os.environ.get("BASELINE_HF_REPO", "AdaptLLM/finance-chat")
 BENCH_HF_DATASET = "PatronusAI/financebench"
 
 
@@ -106,15 +166,15 @@ def make_variant_trial(
         delta_vs_best=delta_vs_best_acc,
         train_s=quantize_seconds,
         total_s=total_seconds,
-        job_name=f"orionfold-finance-llama3-8b-{variant.lower()}",
-        snapshot_path=f"/home/nvidia/data/quants/finance-Llama3-8B/model-{variant}.gguf",
+        job_name=f"orionfold-{MODEL_SLUG.lower()}-{variant.lower()}",
+        snapshot_path=str(QUANTS_DIR / f"model-{variant}.gguf"),
         notes=" ; ".join(notes_bits),
     )
 
 
 # --- Config ----------------------------------------------------------------
 
-MODEL_SLUG = os.environ.get("MODEL_SLUG", "finance-Llama3-8B")
+MODEL_SLUG = os.environ.get("MODEL_SLUG", "finance-chat")
 QUANTS_DIR = Path(os.environ.get("QUANTS_DIR", "/home/nvidia/data/quants")) / MODEL_SLUG
 WIKITEXT_CORPUS = Path(
     os.environ.get("WIKITEXT_CORPUS", "/home/nvidia/data/calibration/wikitext-2-raw-v1/wiki.test.raw")
@@ -132,7 +192,13 @@ LLAMA_CLI_NPREDICT = int(os.environ.get("LLAMA_CLI_NPREDICT", "256"))
 LINEAGE_DIR = Path(
     os.environ.get(
         "LINEAGE_DIR",
-        str(REPO_ROOT / "articles" / "becoming-a-gguf-publisher-on-spark" / "evidence" / "lineage"),
+        str(
+            REPO_ROOT
+            / "articles"
+            / "becoming-a-gguf-publisher-on-spark"
+            / "evidence"
+            / f"lineage-{MODEL_SLUG}"
+        ),
     )
 )
 QUANT_VARIANTS = tuple(os.environ.get("QUANT_VARIANTS", "Q4_K_M,Q5_K_M,Q6_K,Q8_0,F16").split(","))
@@ -355,7 +421,7 @@ def measure_variant(
         pp = tps.get("pp")
         print(f"        tg={tg} pp={pp}", flush=True)
 
-        # --- 3. FinanceBench accuracy via VerticalBench
+        # --- 3. FinanceBench accuracy — open-book, [INST]-wrapped
         fb_acc: float | None = None
         fb_n = 0
         if SKIP_VERTICAL:
@@ -363,25 +429,14 @@ def measure_variant(
         else:
             print(
                 f"  [3/4] FinanceBench (subset={FINBENCH_SUBSET}, limit={FINBENCH_LIMIT}) "
-                f"via llama-server (load once per variant) …",
+                f"open-book via llama-server (load once per variant) …",
                 flush=True,
             )
-            vb_all = VerticalBench.from_jsonl(FINBENCH_JSONL)
-            if FINBENCH_SUBSET == "all":
-                filtered = vb_all.questions
-            else:
-                filtered = [
-                    q
-                    for q in vb_all.questions
-                    if q.tags.get("question_type") == FINBENCH_SUBSET
-                ]
-            vb = VerticalBench(
-                name=f"financebench-{FINBENCH_SUBSET}",
-                questions=filtered[:FINBENCH_LIMIT],
-                scorer=numeric_match,
-                scorer_kwargs={"rel_tolerance": 0.01},
+            qa_items = _load_finbench_open_book(
+                FINBENCH_JSONL, subset=FINBENCH_SUBSET, limit=FINBENCH_LIMIT
             )
             t0 = time.perf_counter()
+            scores: list[float] = []
             with LlamaServerSession(
                 gguf,
                 n_gpu_layers=LLAMA_CLI_NGL,
@@ -389,11 +444,13 @@ def measure_variant(
                 ctx_size=int(os.environ.get("LLAMA_SERVER_CTX", "4096")),
                 threads=8,
             ) as server:
-                bench = vb.run(server.model_fn, extra_tags={"variant": variant})
-            s = bench.summary()
-            fb_n = s.get("n", 0)
-            acc_summary = s.get("accuracy") or {}
-            fb_acc = acc_summary.get("mean")
+                for qid, prompt_q, expected in qa_items:
+                    prompt = _wrap_inst(prompt_q)
+                    predicted = server.model_fn(prompt)
+                    score = numeric_match(predicted, expected, rel_tolerance=0.01)
+                    scores.append(score)
+            fb_n = len(scores)
+            fb_acc = (sum(scores) / fb_n) if fb_n else None
             elapsed = time.perf_counter() - t0
             print(
                 f"        FinanceBench accuracy = {fb_acc} (n={fb_n}, {elapsed:.0f}s)",

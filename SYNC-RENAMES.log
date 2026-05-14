@@ -41,3 +41,18 @@
   status: complete
   swept_at: 2026-05-12
   swept_by: manavsehgal/ainative-business.github.io@71293af
+
+- date: 2026-05-14
+  kind: brand
+  old: orionfoldllc
+  new: Orionfold
+  affected: [prose_mentions, hf_repo_urls, frontmatter.product, model_card_attribution]
+  status: destination-needs-replay
+  notes: |
+    HF publishing surface moved from fallback org `orionfoldllc` (registered
+    2026-05-13 when the short slug `orionfold` was unavailable) to the existing
+    personal user handle `Orionfold` — Bartowski-precedent. fieldkit constant
+    ORIONFOLD_HF_ORG → ORIONFOLD_HF_HANDLE (old name kept as back-compat alias).
+    The LLC parent brand survives off-HF (legal entity, billing, footer
+    attribution); the HF surface is the user. Mac side: replay across
+    destination prose + tag pages + model-card attribution.

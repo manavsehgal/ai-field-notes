@@ -18,7 +18,7 @@ HuggingFace Hub adapter + auto model card builder from `fieldkit.lineage`. Three
 
 Plus an orchestrator: **`fieldkit.publish.publish_quant(...)`** — one-line caller that ingests a `QuantReport`-shaped object (duck-typed; produced by `fieldkit.quant.quantize_gguf`), renders the card, writes the manifest, stages the variant files, and pushes (or dry-runs) the HF commit.
 
-Branded constants: `ORIONFOLD_BRAND = "Orionfold LLC"`, `ORIONFOLD_HF_ORG = "orionfoldllc"`. Per the 2026-05-12 HANDOFF Q3 decision: Orionfold LLC is the parent brand for all AI-artifact publishing surfaces; repo names follow the Bartowski shape (`orionfoldllc/<model>-GGUF`, `orionfoldllc/<model>-LoRA`).
+Branded constants: `ORIONFOLD_BRAND = "Orionfold LLC"`, `ORIONFOLD_HF_HANDLE = "Orionfold"` (was `ORIONFOLD_HF_ORG = "orionfoldllc"` until 2026-05-14, when publishing moved to the existing user-account handle — Bartowski-shape personal handle precedent). Per the 2026-05-12 HANDOFF Q3 decision: Orionfold LLC is the parent brand for all AI-artifact publishing surfaces; repo names follow the Bartowski shape (`Orionfold/<model>-GGUF`, `Orionfold/<model>-LoRA`). `ORIONFOLD_HF_ORG` is retained as a back-compat alias pointing at the new constant; will be dropped at the next major cut.
 
 ### Added — `fieldkit.quant` (new module)
 
