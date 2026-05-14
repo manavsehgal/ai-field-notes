@@ -6,7 +6,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
-Fourth release in flight. Two new top-level modules (`fieldkit.publish` + `fieldkit.quant`) scaffolded for the G3 GGUF / Quantization Publisher pick (MTBM Pick #1 per `ideas/mtbm-use-cases.md` §6). The two modules together unlock most of Cluster G; this cut implements the GGUF critical path and stubs the other quant formats with named entry points pointing at the v0.5+ roadmap.
+## [0.4.0] — 2026-05-14
+
+Fourth public release. Two new top-level modules (`fieldkit.publish` + `fieldkit.quant`) for the G3 GGUF / Quantization Publisher pick (MTBM Pick #1 per `ideas/mtbm-use-cases.md` §6), the v0.4.x **vertical-curator overlay** on `fieldkit.eval` (`VerticalBench`), and post-dry-run card-rendering fixes that landed the first live HF push (`Orionfold/finance-chat-GGUF`). The two new modules together unlock most of Cluster G; this cut implements the GGUF critical path and stubs the other quant formats with named entry points pointing at the v0.5+ roadmap.
 
 ### Added — `fieldkit.publish` (new module)
 
@@ -66,11 +68,16 @@ Lightweight JSONL-loader wrapper around `fieldkit.eval.Bench` for vertical-domai
 
 ### Test suite
 
-**102 new tests** across `tests/test_publish.py` (31, +5 from v0.4 scaffold), `tests/test_quant.py` (37), and `tests/test_vertical_bench.py` (39, new file). Total: **356 passed, 3 skipped** offline (`pytest -q`). The 3 skips are unchanged from v0.3.0 (1 module-level torch importorskip + 2 `--spark`-gated live integration tests). All new tests run offline — `dry_run=True` paths for `HFHubAdapter`, `publish_quant`, and `quantize_gguf` exercise the full code path without `huggingface_hub`, llama.cpp binaries, or `nvidia-smi` available. `VerticalBench` tests run without a model — `model_fn` is a callable, so a plain `lambda` exercises the full scoring + bench-aggregation path.
+**130 new tests** across `tests/test_publish.py` (42, +16 from v0.4 scaffold incl. +11 for the model_license + How-to-run defaults fix), `tests/test_quant.py` (37), and `tests/test_vertical_bench.py` (39, new file), plus targeted regression coverage. Total: **379 passed, 2 skipped** offline (`pytest -q`). The 2 skips are `--spark`-gated live integration tests (chat NIM + pgvector); the v0.3 torch module-level skip has been resolved by lazy-importing torch only inside the training entry points. All new tests run offline — `dry_run=True` paths for `HFHubAdapter`, `publish_quant`, and `quantize_gguf` exercise the full code path without `huggingface_hub`, llama.cpp binaries, or `nvidia-smi` available. `VerticalBench` tests run without a model — `model_fn` is a callable, so a plain `lambda` exercises the full scoring + bench-aggregation path.
 
 ### Articles in this release
 
-- `articles/becoming-a-gguf-publisher-on-spark/` — placeholder (`status: upcoming`) scaffolded for the G3 v0 anchor article. Will be promoted to `status: published` after the first 5 Orionfold GGUF quants ship and the 14-day milestone in HANDOFF §2 is met.
+- [`becoming-a-gguf-publisher-on-spark`](https://ainative.business/field-notes/becoming-a-gguf-publisher-on-spark/) — G3 v0 anchor article. 3,388 words; documents the five-variant `Orionfold/finance-chat-GGUF` release end-to-end (Spark-tested perplexity / tok/s / sustained-load minutes / FinanceBench accuracy across F16, Q8_0, Q6_K, Q5_K_M, Q4_K_M) plus the V0 preflight-bench gate and the V1 chat-vs-continued-pretrain lesson. `hf_url:` frontmatter threads the live HF receipt onto the article.
+
+### Verified on Spark
+
+- **Live HF push:** `Orionfold/finance-chat-GGUF` shipped 2026-05-14 at <https://huggingface.co/Orionfold/finance-chat-GGUF> — 5 GGUF variants + auto-rendered README in 1h 57min. Repo returns HTTP 200, all 6 files present. `publish_quant(dry_run=False)` path exercised end-to-end.
+- **Five-variant measurement card** (F16 / Q8_0 / Q6_K / Q5_K_M / Q4_K_M) with the four Spark-tested axes — perplexity (wikitext-2), tg + pp tok/s (`llama-bench`), sustained-load minutes (`ThermalProbe` via `nvidia-smi`), and FinanceBench accuracy (n=50, `numeric_match`, open-book) — all produced via `fieldkit.quant.measure_*` + `fieldkit.eval.VerticalBench.run(...)` on GB10.
 
 ### Deferred to v0.5
 
