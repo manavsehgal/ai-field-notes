@@ -46,6 +46,7 @@ fieldkit_release:
 post_rotation_commits:                     # appended after SYNC-HANDOFF rotation, still in same NEW window
   - 8ae42e4                                # lineage(gguf-publisher): TSV audit-trail rows
   - 08f3d72                                # frontier-scout: refresh 2026-05-14
+  - 82d95ed                                # docs(fieldkit.eval): v0.4.1 open_book + subset kwargs catch-up
 ---
 
 ## Headline
@@ -88,6 +89,7 @@ Two commits landed after the SYNC-HANDOFF was rotated but still belong to the sa
 
 - **`articles/becoming-a-gguf-publisher-on-spark/evidence/lineage/results.tsv`** (commit `8ae42e4`) — two re-run rows added (exp_id 003 Q5_K_M, exp_id 004 Q6_K) from a session-4 measurement re-cycle. The published article's variant table is unchanged; rows ship purely for audit-trail completeness.
 - **`papers/**`** (commit `08f3d72`) — `frontier-scout refresh 2026-05-14`. New files: `papers/2605.{13779,09942,12978,12975,12501}/paper.md`, `papers/runs/2026-05-14/refresh-summary.md`. Updated: `papers/README.md`, `papers/papers.json`, `papers/runs/index.md`. Top dive-deep picks (in order): MinT (LoRA infra, MTBM), HAGE (RL graph memory, Second Brain), Useful-Memories-Faulty (Second Brain counter-narrative), Retrieval-is-Cheap (executable RAG, LLM Wiki), CUA-Action-Space (MTBM agentic).
+- **`fieldkit/docs/api/eval.md`** (commit `82d95ed`) — v0.4.1 kwarg catch-up. Adds `open_book` + `subset` to the `VerticalBench.from_jsonl` signature line + example block + the v0.4.x-additions overview. The audit-docs script's symbol-coverage check passed at release time because `VerticalBench` itself is mentioned — kwarg drift on existing methods slipped through. A new `--strict-kwargs` flag on `audit_docs.py` (skill-local, in `~/.claude/skills/fieldkit-curator/scripts/`) catches this class going forward.
 
 ## What Mac CC does NOT need to do
 
@@ -103,13 +105,14 @@ The Saul card and the v0.4.1 release are causally linked: the kwargs that landed
 
 ## Source range
 
-`7f1159e..HEAD` — five commits beyond the prior SYNC-HANDOFF reset:
+`7f1159e..HEAD` — six commits beyond the prior SYNC-HANDOFF reset:
 
 1. `e0e599e` — Saul-7B-Instruct-v1-GGUF + LegalBench mini-eval (article + manifest + scripts + stats).
 2. `0b6986e` — fieldkit v0.4.1 release commit (version bump + CHANGELOG finalization).
 3. `b90de2c` — stats + README refresh post-v0.4.1 (LOC bump + missed Saul Deployment-stage entry).
-4. `8ae42e4` — lineage TSV audit-trail rows for the gguf-publisher article (post-rotation add, same sweep window).
+4. `8ae42e4` — lineage TSV audit-trail rows for the gguf-publisher article (post-rotation add).
 5. `08f3d72` — frontier-scout refresh 2026-05-14 (+13 papers, top 5 dive-deep — post-rotation add).
+6. `82d95ed` — fieldkit/docs/api/eval.md catch-up: documents the v0.4.1 `open_book` + `subset` kwargs on `VerticalBench.from_jsonl` that shipped undocumented for ~30 min after the v0.4.1 PyPI release. Spawned the new `audit_docs.py --strict-kwargs` mode in the fieldkit-curator skill (skill-local, not in this repo).
 
 ## Spark-side gates that ran
 
