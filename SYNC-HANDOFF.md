@@ -1,5 +1,5 @@
 <!--
-  🆕 STATUS: NEW — awaiting Mac sweep.
+  ✅ STATUS: SHIPPED — Mac sweep complete (destination commit manavsehgal/ainative-business.github.io@135bcad).
   This file is one feature/release at a time, not a running log.
   At the next release prompt, **clear this entire file and start fresh** (do NOT append to existing sections).
   Last reset: 2026-05-15 (this rotation supersedes the v0.4.1 cycle scope; the v0.4.1 PyPI release commits 7f1159e..82d95ed are wholly consumed by Mac PR #5).
@@ -12,7 +12,7 @@
 -->
 ---
 release_slug: 2026-05-15-cyber-vertical
-status: NEW
+status: SHIPPED
 source_range: 97e824d..dd81a29
 articles_added:
   - becoming-a-cyber-curator-on-spark      # third vertical-curator deep-dive; status: published; series: Machine that Builds Machines; book_chapters: [10, 11]; fieldkit_modules: [quant, publish, eval, lineage]; hf_url: https://huggingface.co/Orionfold/SecurityLLM-GGUF; inline fn-diagram (hub-and-spoke: fieldkit.publish at centre, three vertical chips); no signature SVG yet — Mac sweep can leave card without thumbnail or pick up VerticalCuratorRetry as a placeholder
