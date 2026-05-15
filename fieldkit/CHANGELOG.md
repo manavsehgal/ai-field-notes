@@ -6,6 +6,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+### Added — `fieldkit.publish` card-rendering polish (v0.4.2 candidates)
+
+- **`ModelCard.llama_cpp_example_prompt: Optional[str]`** — new field. Threads through `publish_quant(..., llama_cpp_example_prompt=...)` and from a duck-typed report's `.llama_cpp_example_prompt` attribute. The default `## How to run` body's `llama-cpp-python` snippet now uses this string for the user-message; when omitted it falls back to a neutral `"Summarize the key idea in one paragraph."` placeholder instead of the previously-hardcoded `"Explain working capital."` (which leaked into the legal + cyber vertical cards on first push). Multi-line MCQ-shaped prompts are JSON-escaped (`\n`) so the snippet stays single-line + valid Python — caller passes the raw prompt, the renderer handles escaping.
+- **Side fix:** the previous renderer rendered the hardcoded finance prompt on every vertical card; the cyber + legal cards on HF were patched out-of-band on 2026-05-15. Going forward, every `publish_quant` call should pass `llama_cpp_example_prompt=...` matching the article's "Using this release" section, per `[[feedback_customer_link_audit]]`.
+
 ## [0.4.1] — 2026-05-14
 
 Patch release. The `fieldkit.eval.VerticalBench` overlay introduced in v0.4.0 needed two kwargs to score FinanceBench correctly (open-book context-prepend) and to bound a JSONL slice (subset filter on `question_type`). Both lifts came out of the 2026-05-13 V1 attempt on `AdaptLLM/finance-chat` (0/50 closed-book vs. 14–18%/50 open-book on the same JSONL) and the 2026-05-14 legal-curator scoring run on `Equall/Saul-7B-Instruct-v1`. The two scripts under `scripts/g3_*` that carried duplicated loaders now call into the package surface. No new modules, no new public classes — additive kwargs only.

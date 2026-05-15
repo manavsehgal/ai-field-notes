@@ -201,6 +201,12 @@ class ModelCard:
     """Variant to feature in the default How-to-run snippets (e.g. `Q5_K_M`).
     Falls back to `Q5_K_M` if present in `variants`, else the first listed
     variant."""
+    llama_cpp_example_prompt: Optional[str] = None
+    """User-message string for the templated `llama-cpp-python` snippet.
+    Mirrors what the article's "Using this release" section asks the model —
+    keep article + HF card in lockstep. When omitted, falls back to a
+    neutral placeholder. Multi-line strings (e.g. MCQ-shaped prompts) render
+    via JSON-escaped `\\n` so the snippet stays single-line + valid Python."""
     ollama_pull_handle: Optional[str] = None
     transformers_snippet: Optional[str] = None
     lineage_prompt: Optional[str] = None
@@ -329,7 +335,12 @@ def _render_how_to_run(card: ModelCard) -> list[str]:
             out.append(f"    n_ctx=4096, n_gpu_layers=99{chat_format_kw},")
             out.append(")")
             out.append("out = llm.create_chat_completion(")
-            out.append('    messages=[{"role": "user", "content": "Explain working capital."}],')
+            example_prompt = (
+                card.llama_cpp_example_prompt
+                or "Summarize the key idea in one paragraph."
+            )
+            escaped_prompt = json.dumps(example_prompt, ensure_ascii=False)
+            out.append(f'    messages=[{{"role": "user", "content": {escaped_prompt}}}],')
             out.append("    temperature=0.0,")
             out.append(")")
             out.append('print(out["choices"][0]["message"]["content"])')
@@ -813,6 +824,7 @@ def publish_quant(
     model_license: Optional[str] = None,
     chat_format: Optional[str] = None,
     recommended_variant: Optional[str] = None,
+    llama_cpp_example_prompt: Optional[str] = None,
 ) -> PublishResult:
     """Orchestrate model-card render + manifest write + HF push.
 
@@ -860,6 +872,8 @@ def publish_quant(
         chat_format = getattr(quant_report, "chat_format", None)
     if recommended_variant is None:
         recommended_variant = getattr(quant_report, "recommended_variant", None)
+    if llama_cpp_example_prompt is None:
+        llama_cpp_example_prompt = getattr(quant_report, "llama_cpp_example_prompt", None)
 
     # Build the card.
     tag_set: list[str] = [
@@ -916,6 +930,7 @@ def publish_quant(
         hf_repo=hf_repo,
         chat_format=chat_format,
         recommended_variant=recommended_variant,
+        llama_cpp_example_prompt=llama_cpp_example_prompt,
         ollama_pull_handle=ollama_pull_handle,
         transformers_snippet=transformers_snippet,
         lineage_prompt=lineage_prompt,

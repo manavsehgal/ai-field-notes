@@ -70,6 +70,7 @@ ModelCard(
     hf_repo="Orionfold/finance-chat-GGUF",                    # drives default `## How to run` body
     chat_format="llama-2",                                     # → llama_cpp.Llama(chat_format=...)
     recommended_variant="Q5_K_M",                              # featured in default snippets
+    llama_cpp_example_prompt="Explain working capital.",       # user-message in the default `llama-cpp-python` snippet; falls back to a neutral placeholder when omitted
     ollama_pull_handle=None,                                   # opt-in override; default body wins otherwise
     transformers_snippet=None,
     lineage_prompt=None,                                       # injected by publish_quant if a LineageStore is supplied
@@ -134,7 +135,7 @@ Token resolution order: explicit `token=` arg → `HF_TOKEN` env → `HUGGING_FA
 
 ### `publish_quant(*, quant_report, base_model, repo_name, staging_dir, ...) → PublishResult`
 
-The one-line orchestrator. Reads the duck-typed `quant_report` fields (`.format`, `.variants`, `.perplexity`, `.tokens_per_sec`, `.sustained_load_minutes`, `.variant_files`, `.vertical_eval`, `.vertical_eval_name`, `.model_license`, `.chat_format`, `.recommended_variant`), builds a `ModelCard`, stages the README + variant files, writes the `ArtifactManifest` (if `artifacts_dir` supplied), and invokes `HFHubAdapter.push_folder()`. Explicit kwargs override duck-typed report attrs.
+The one-line orchestrator. Reads the duck-typed `quant_report` fields (`.format`, `.variants`, `.perplexity`, `.tokens_per_sec`, `.sustained_load_minutes`, `.variant_files`, `.vertical_eval`, `.vertical_eval_name`, `.model_license`, `.chat_format`, `.recommended_variant`, `.llama_cpp_example_prompt`), builds a `ModelCard`, stages the README + variant files, writes the `ArtifactManifest` (if `artifacts_dir` supplied), and invokes `HFHubAdapter.push_folder()`. Explicit kwargs override duck-typed report attrs.
 
 ```python
 result = publish_quant(
@@ -150,6 +151,7 @@ result = publish_quant(
     model_license="llama2",            # critical — never default silently to apache-2.0
     chat_format="llama-2",
     recommended_variant="Q5_K_M",
+    llama_cpp_example_prompt="Explain working capital.",  # mirror the article's example user-message
     lineage_store=store,                # optional; injects ## Lineage block
     dry_run=True,                       # flip to False for the actual push
 )
