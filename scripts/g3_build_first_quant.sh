@@ -48,6 +48,8 @@ ARTICLE_SLUG="${ARTICLE_SLUG:-becoming-a-gguf-publisher-on-spark}"
 QUANT_VARIANTS="${QUANT_VARIANTS:-Q4_K_M,Q5_K_M,Q6_K,Q8_0,F16}"
 WIKITEXT_CORPUS="${WIKITEXT_CORPUS:-/home/nvidia/data/calibration/wikitext-2-raw-v1/wiki.test.raw}"
 FINBENCH_JSONL="${FINBENCH_JSONL:-/home/nvidia/data/eval-benches/financebench/financebench_merged.jsonl}"
+LEGALBENCH_JSONL="${LEGALBENCH_JSONL:-/home/nvidia/data/eval-benches/legalbench/legalbench_merged.jsonl}"
+CYBERBENCH_JSONL="${CYBERBENCH_JSONL:-/home/nvidia/data/eval-benches/cybermetric/cybermetric_merged.jsonl}"
 REPO_NAME="${REPO_NAME:-${MODEL_SLUG}-GGUF}"
 # Upstream-model HF license tag — flows to README frontmatter `license:` and
 # Astro manifest `license.model:`. Default `apache-2.0` matches most NVIDIA-blessed
@@ -68,6 +70,12 @@ case "$MODEL_ID" in
     CHAT_FORMAT="${CHAT_FORMAT_OVERRIDE:-mistral}"
     export VERTICAL_BENCH="${VERTICAL_BENCH:-legalbench}"
     ARTICLE_SLUG="${ARTICLE_SLUG_OVERRIDE:-becoming-a-legal-curator-on-spark}"
+    ;;
+  ZySec-AI/SecurityLLM)
+    MODEL_LICENSE="${MODEL_LICENSE_OVERRIDE:-apache-2.0}"
+    CHAT_FORMAT="${CHAT_FORMAT_OVERRIDE:-zephyr}"
+    export VERTICAL_BENCH="${VERTICAL_BENCH:-cybermetric}"
+    ARTICLE_SLUG="${ARTICLE_SLUG_OVERRIDE:-becoming-a-cyber-curator-on-spark}"
     ;;
 esac
 
@@ -133,9 +141,13 @@ step_download() {
 # `feedback_preflight_bench_before_quant` + `feedback_chat_vs_continued_pretrain_trap`.
 
 step_preflight_bench() {
-  log "preflight-bench — converting to F16 GGUF + scoring 5 FinanceBench questions on GPU"
+  local _vbench="${VERTICAL_BENCH:-financebench}"
+  log "preflight-bench — converting to F16 GGUF + scoring 5 ${_vbench} questions on GPU"
   MODELS_DIR="$MODELS_DIR" MODEL_SLUG="$MODEL_SLUG" QUANTS_DIR="$QUANTS_DIR" \
+  VERTICAL_BENCH="$_vbench" \
   FINBENCH_JSONL="$FINBENCH_JSONL" \
+  LEGALBENCH_JSONL="$LEGALBENCH_JSONL" \
+  CYBERBENCH_JSONL="$CYBERBENCH_JSONL" \
   LLAMA_CPP_BIN="$LLAMA_CPP_BIN" LLAMA_CPP_CONVERT="$LLAMA_CPP_CONVERT" \
   BASE_MODEL_ARG="$BASE_MODEL_ARG" \
     "${HF_VENV}/bin/python" "$(dirname "$0")/g3_preflight_bench.py"
@@ -198,15 +210,22 @@ step_measure() {
     log "      download via: hf download PatronusAI/financebench --repo-type dataset --local-dir /home/nvidia/data/eval-benches/financebench"
     export SKIP_VERTICAL=1
   fi
-  if [[ "$_vbench" == "legalbench" && ! -f "${LEGALBENCH_JSONL:-/home/nvidia/data/eval-benches/legalbench/legalbench_merged.jsonl}" ]]; then
-    log "warn: LegalBench merged JSONL not at \${LEGALBENCH_JSONL} — vertical-eval will be skipped"
+  if [[ "$_vbench" == "legalbench" && ! -f "$LEGALBENCH_JSONL" ]]; then
+    log "warn: LegalBench merged JSONL not at $LEGALBENCH_JSONL — vertical-eval will be skipped"
     log "      build via: ./scripts/legalbench_merge.py (after hf download nguha/legalbench --repo-type=dataset)"
+    export SKIP_VERTICAL=1
+  fi
+  if [[ "$_vbench" == "cybermetric" && ! -f "$CYBERBENCH_JSONL" ]]; then
+    log "warn: CyberMetric merged JSONL not at $CYBERBENCH_JSONL — vertical-eval will be skipped"
+    log "      build via: ./scripts/cyber_merge.py (after curl from tihanyin/CyberMetric on HF)"
     export SKIP_VERTICAL=1
   fi
   log "measuring 4 axes per variant (perplexity / tok-s / thermal / ${_vbench})"
   MODEL_SLUG="$MODEL_SLUG" QUANTS_DIR="$QUANTS_DIR" QUANT_VARIANTS="$QUANT_VARIANTS" \
   WIKITEXT_CORPUS="$WIKITEXT_CORPUS" FINBENCH_JSONL="$FINBENCH_JSONL" \
-  VERTICAL_BENCH="$_vbench" LEGALBENCH_JSONL="${LEGALBENCH_JSONL:-/home/nvidia/data/eval-benches/legalbench/legalbench_merged.jsonl}" \
+  VERTICAL_BENCH="$_vbench" \
+  LEGALBENCH_JSONL="$LEGALBENCH_JSONL" \
+  CYBERBENCH_JSONL="$CYBERBENCH_JSONL" \
   LLAMA_CPP_BIN="$LLAMA_CPP_BIN" LINEAGE_DIR="$LINEAGE_DIR" \
   BASELINE_HF_REPO="$BASE_MODEL_ARG" \
     "${HF_VENV}/bin/python" "$(dirname "$0")/g3_measure_variants.py"

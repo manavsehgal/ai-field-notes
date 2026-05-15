@@ -44,6 +44,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import subprocess
 import sys
 import threading
@@ -64,6 +65,48 @@ def _wrap_inst(question: str) -> str:
     is identical. Per-variant scoring uses the same prompt shape as V0's
     preflight gate."""
     return f"<s>[INST] {question.strip()} [/INST]"
+
+
+def _wrap_zephyr(question: str) -> str:
+    """`<|user|>\\n{q}</s>\\n<|assistant|>\\n` — Zephyr DPO chat template.
+
+    ZySec-AI/SecurityLLM and other Zephyr-7B-beta descendants ship this template
+    in `tokenizer_config.json`. Mistral-arch eos_token is `</s>`; the trailing
+    `<|assistant|>` newline matches the `add_generation_prompt=True` jinja path
+    in the model card.
+    """
+    return f"<|user|>\n{question.strip()}</s>\n<|assistant|>\n"
+
+
+# --- MCQ-letter scorer (cybermetric) ---------------------------------------
+# Cyber gold is a single letter (A/B/C/D); `contains` over single letters is
+# too permissive (a stray "A" anywhere matches). Extract the decisive letter
+# from the response, preferring "Answer: X" markers, falling back to first
+# word-bounded [A-D].
+
+_MCQ_AFTER_ANSWER_RE = re.compile(
+    r"\b(?:answer|choice|option)\b[^A-Za-z0-9]{0,20}([A-D])\b",
+    re.IGNORECASE,
+)
+_MCQ_BOUNDED_RE = re.compile(r"\b([A-D])\b", re.IGNORECASE)
+
+
+def mcq_letter(predicted: str, expected: str) -> float:
+    """1.0 if the model's chosen letter == expected, else 0.0."""
+    pred = (predicted or "").strip()
+    exp = (expected or "").strip().upper()
+    if not pred or exp not in ("A", "B", "C", "D"):
+        return 0.0
+    stripped = pred.upper().strip(".,)!:- ")
+    if len(stripped) <= 1 and stripped in ("A", "B", "C", "D"):
+        return 1.0 if stripped == exp else 0.0
+    m = _MCQ_AFTER_ANSWER_RE.search(pred)
+    if m:
+        return 1.0 if m.group(1).upper() == exp else 0.0
+    m = _MCQ_BOUNDED_RE.search(pred)
+    if m:
+        return 1.0 if m.group(1).upper() == exp else 0.0
+    return 0.0
 from fieldkit.lineage import FailureLabel, LineageStore, Trial  # noqa: E402
 from fieldkit.quant import (  # noqa: E402
     LlamaCppPaths,
@@ -76,8 +119,11 @@ from fieldkit.quant import (  # noqa: E402
 # --- Vertical-bench selection ----------------------------------------------
 
 VERTICAL_BENCH = os.environ.get("VERTICAL_BENCH", "financebench").lower()
-if VERTICAL_BENCH not in ("financebench", "legalbench"):
-    raise SystemExit(f"VERTICAL_BENCH must be 'financebench' or 'legalbench', got {VERTICAL_BENCH!r}")
+if VERTICAL_BENCH not in ("financebench", "legalbench", "cybermetric"):
+    raise SystemExit(
+        f"VERTICAL_BENCH must be 'financebench' / 'legalbench' / 'cybermetric', "
+        f"got {VERTICAL_BENCH!r}"
+    )
 
 
 # --- Variant-trial builder (mirrors articles/.../lineage-demo.py) ---------
@@ -85,14 +131,17 @@ if VERTICAL_BENCH not in ("financebench", "legalbench"):
 _DEFAULT_DOMAIN = {
     "financebench": "vertical-curator-finance",
     "legalbench": "vertical-curator-legal",
+    "cybermetric": "vertical-curator-cyber",
 }[VERTICAL_BENCH]
 _DEFAULT_BASELINE = {
     "financebench": "AdaptLLM/finance-chat",
     "legalbench": "Equall/Saul-7B-Instruct-v1",
+    "cybermetric": "ZySec-AI/SecurityLLM",
 }[VERTICAL_BENCH]
 _DEFAULT_BENCH_DATASET = {
     "financebench": "PatronusAI/financebench",
     "legalbench": "nguha/legalbench",
+    "cybermetric": "tihanyin/CyberMetric",
 }[VERTICAL_BENCH]
 
 DOMAIN = os.environ.get("LINEAGE_DOMAIN", _DEFAULT_DOMAIN)
@@ -127,7 +176,11 @@ def make_variant_trial(
         notes_bits.append(f"gguf_size_bytes={gguf_size_bytes}")
     notes_bits.append(f"bench={BENCH_HF_DATASET}")
     notes_bits.append("corpus=wikitext-2-raw-v1/wiki.test.raw")
-    _bench_label = "FinanceBench" if VERTICAL_BENCH == "financebench" else "LegalBench"
+    _bench_label = {
+        "financebench": "FinanceBench",
+        "legalbench": "LegalBench",
+        "cybermetric": "CyberMetric",
+    }[VERTICAL_BENCH]
     return Trial(
         exp_id=exp_id,
         timestamp=timestamp,
@@ -171,6 +224,13 @@ LEGALBENCH_JSONL = Path(
     )
 )
 LEGALBENCH_LIMIT = int(os.environ.get("LEGALBENCH_LIMIT", "50"))
+CYBERBENCH_JSONL = Path(
+    os.environ.get(
+        "CYBERBENCH_JSONL",
+        "/home/nvidia/data/eval-benches/cybermetric/cybermetric_merged.jsonl",
+    )
+)
+CYBERBENCH_LIMIT = int(os.environ.get("CYBERBENCH_LIMIT", "50"))
 LLAMA_CLI_NGL = int(os.environ.get("LLAMA_CLI_NGL", "99"))
 LLAMA_CLI_NPREDICT = int(os.environ.get("LLAMA_CLI_NPREDICT", "256"))
 LINEAGE_DIR = Path(
@@ -421,7 +481,8 @@ def measure_variant(
                     limit=FINBENCH_LIMIT,
                 )
                 scorer = lambda pred, exp: numeric_match(pred, exp, rel_tolerance=0.01)
-            else:  # legalbench
+                wrapper = _wrap_inst
+            elif VERTICAL_BENCH == "legalbench":
                 bench_label = f"LegalBench (limit={LEGALBENCH_LIMIT})"
                 vb = VerticalBench.from_jsonl(
                     LEGALBENCH_JSONL,
@@ -429,6 +490,16 @@ def measure_variant(
                     limit=LEGALBENCH_LIMIT,
                 )
                 scorer = contains
+                wrapper = _wrap_inst
+            else:  # cybermetric
+                bench_label = f"CyberMetric (limit={CYBERBENCH_LIMIT})"
+                vb = VerticalBench.from_jsonl(
+                    CYBERBENCH_JSONL,
+                    format="legalbench",
+                    limit=CYBERBENCH_LIMIT,
+                )
+                scorer = mcq_letter
+                wrapper = _wrap_zephyr
             print(
                 f"  [3/4] {bench_label} via llama-server (load once per variant) …",
                 flush=True,
@@ -443,7 +514,7 @@ def measure_variant(
                 threads=8,
             ) as server:
                 for q in vb.questions:
-                    prompt = _wrap_inst(q.question)
+                    prompt = wrapper(q.question)
                     predicted = server.model_fn(prompt)
                     scores.append(scorer(predicted, q.expected))
             fb_n = len(scores)
@@ -532,9 +603,13 @@ def main() -> int:
         vertical_eval_name = (
             f"FinanceBench (n={fb_n_first}, numeric_match)" if fb_n_first else None
         )
-    else:
+    elif VERTICAL_BENCH == "legalbench":
         vertical_eval_name = (
             f"LegalBench (n={fb_n_first}, contains)" if fb_n_first else None
+        )
+    else:  # cybermetric
+        vertical_eval_name = (
+            f"CyberMetric (n={fb_n_first}, mcq_letter)" if fb_n_first else None
         )
     payload = {
         "perplexity": {r["variant"]: r["perplexity"] for r in results if r.get("perplexity") is not None},

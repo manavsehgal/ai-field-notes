@@ -8,9 +8,9 @@ chat-vs-continued-pretrain trap (per `feedback_chat_vs_continued_pretrain_trap`
 + `feedback_preflight_bench_before_quant`). Produces an F16 GGUF via
 `convert_hf_to_gguf.py` (which IS the FP source representation in the GGUF
 ecosystem — no quantization happens here), spins up llama-server on GPU, runs
-5 FinanceBench `metrics-generated` questions, scores with
-`fieldkit.eval.numeric_match`, exits 0 on ≥ PREFLIGHT_MIN/PREFLIGHT_N or 1 on
-fewer correct.
+5 vertical-bench questions, scores per-bench (`numeric_match` for finance,
+`contains` for legal, `mcq_letter` for cyber), exits 0 on
+≥ PREFLIGHT_MIN/PREFLIGHT_N or 1 on fewer correct.
 
 The F16 GGUF this step produces is the same file B4 emits for the `F16`
 variant — so V0 is a strict subset of B4 work, not extra overhead. On failure
@@ -32,8 +32,13 @@ Inputs (env, mirrors `g3_build_first_quant.sh` defaults):
     LLAMA_CPP_CONVERT
                     /home/nvidia/llama.cpp/convert_hf_to_gguf.py
     BASE_MODEL_ARG  HF repo id (for GGUF metadata only)
+    VERTICAL_BENCH  financebench (default) | legalbench | cybermetric
     FINBENCH_JSONL  /home/nvidia/data/eval-benches/financebench/financebench_merged.jsonl
     FINBENCH_SUBSET metrics-generated
+    LEGALBENCH_JSONL
+                    /home/nvidia/data/eval-benches/legalbench/legalbench_merged.jsonl
+    CYBERBENCH_JSONL
+                    /home/nvidia/data/eval-benches/cybermetric/cybermetric_merged.jsonl
     PREFLIGHT_N     5
     PREFLIGHT_MIN   1
     PREFLIGHT_N_PREDICT
@@ -51,6 +56,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import socket
 import subprocess
 import sys
@@ -62,7 +68,42 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_ROOT / "fieldkit" / "src"))
 
-from fieldkit.eval import VerticalBench, numeric_match  # noqa: E402
+from fieldkit.eval import VerticalBench, contains, numeric_match  # noqa: E402
+
+
+# --- MCQ-letter scorer (cybermetric, MCQ-shape verticals) ---------------
+# Cyber gold is a single letter (A/B/C/D); contains() over single letters is
+# too permissive (a stray "A" in any response would match). Extract the
+# decisive letter from the model output, preferring "Answer: X" markers,
+# falling back to bounded-letter first match.
+
+_MCQ_AFTER_ANSWER_RE = re.compile(
+    r"\b(?:answer|choice|option)\b[^A-Za-z0-9]{0,20}([A-D])\b",
+    re.IGNORECASE,
+)
+_MCQ_BOUNDED_RE = re.compile(r"\b([A-D])\b", re.IGNORECASE)
+
+
+def mcq_letter(predicted: str, expected: str) -> float:
+    """1.0 if the model's chosen letter == expected, else 0.0.
+
+    Decision order: (a) stripped one-letter output ("B"); (b) "answer: X" /
+    "answer is X" / "option X" / "choice X" with X in [A-D]; (c) first
+    word-bounded [A-D] in the response. Case-insensitive throughout.
+    """
+    pred = (predicted or "").strip()
+    exp = (expected or "").strip().upper()
+    if not pred or exp not in ("A", "B", "C", "D"):
+        return 0.0
+    if len(pred) <= 5 and pred.upper().strip(".,)!:- ") in ("A", "B", "C", "D"):
+        return 1.0 if pred.upper().strip(".,)!:- ") == exp else 0.0
+    m = _MCQ_AFTER_ANSWER_RE.search(pred)
+    if m:
+        return 1.0 if m.group(1).upper() == exp else 0.0
+    m = _MCQ_BOUNDED_RE.search(pred)
+    if m:
+        return 1.0 if m.group(1).upper() == exp else 0.0
+    return 0.0
 
 
 def _log(msg: str) -> None:
@@ -90,6 +131,11 @@ def _detect_prompt_format(model_dir: Path) -> str:
     tokenizer_config.json — the convention is `<s>[INST] X [/INST]`. The
     README is the most reliable signal that the upstream is Llama-2-chat
     (e.g. AdaptLLM's continued-pretrain-from-Llama-2-chat recipe).
+
+    Returns: `llama2_inst` (Llama-2-chat), `mistral_inst` (Mistral-Instruct /
+    Saul), `zephyr` (ZySec-AI/SecurityLLM and other Zephyr-DPO descendants),
+    `tokenizer_template` (chat_template present but format unrecognised), or
+    `raw` (no chat-format signal — continued-pretrain trap risk).
     """
     readme = model_dir / "README.md"
     if readme.exists():
@@ -100,7 +146,12 @@ def _detect_prompt_format(model_dir: Path) -> str:
     if tok_cfg.exists():
         try:
             cfg = json.loads(tok_cfg.read_text())
-            if cfg.get("chat_template"):
+            ct = cfg.get("chat_template")
+            if ct:
+                if "<|user|>" in ct and "<|assistant|>" in ct:
+                    return "zephyr"
+                if "[INST]" in ct:
+                    return "mistral_inst"
                 return "tokenizer_template"
         except Exception:
             pass
@@ -108,8 +159,10 @@ def _detect_prompt_format(model_dir: Path) -> str:
 
 
 def _format_prompt(question: str, fmt: str) -> str:
-    if fmt == "llama2_inst":
+    if fmt in ("llama2_inst", "mistral_inst"):
         return f"<s>[INST] {question.strip()} [/INST]"
+    if fmt == "zephyr":
+        return f"<|user|>\n{question.strip()}</s>\n<|assistant|>\n"
     return question.strip()
 
 
@@ -247,10 +300,28 @@ def main() -> int:
     llama_convert = Path(
         os.environ.get("LLAMA_CPP_CONVERT", "/home/nvidia/llama.cpp/convert_hf_to_gguf.py")
     )
+    vertical = os.environ.get("VERTICAL_BENCH", "financebench").lower()
+    if vertical not in ("financebench", "legalbench", "cybermetric"):
+        _die(
+            f"VERTICAL_BENCH must be 'financebench' / 'legalbench' / 'cybermetric', "
+            f"got {vertical!r}"
+        )
     finbench_jsonl = Path(
         os.environ.get(
             "FINBENCH_JSONL",
             "/home/nvidia/data/eval-benches/financebench/financebench_merged.jsonl",
+        )
+    )
+    legalbench_jsonl = Path(
+        os.environ.get(
+            "LEGALBENCH_JSONL",
+            "/home/nvidia/data/eval-benches/legalbench/legalbench_merged.jsonl",
+        )
+    )
+    cyberbench_jsonl = Path(
+        os.environ.get(
+            "CYBERBENCH_JSONL",
+            "/home/nvidia/data/eval-benches/cybermetric/cybermetric_merged.jsonl",
         )
     )
     subset = os.environ.get("FINBENCH_SUBSET", "metrics-generated")
@@ -266,8 +337,12 @@ def main() -> int:
 
     if not (model_dir / "config.json").exists():
         _die(f"model weights not found at {model_dir} (run `g3_build_first_quant.sh download` first)")
-    if not finbench_jsonl.exists():
+    if vertical == "financebench" and not finbench_jsonl.exists():
         _die(f"FinanceBench JSONL not found at {finbench_jsonl}")
+    if vertical == "legalbench" and not legalbench_jsonl.exists():
+        _die(f"LegalBench JSONL not found at {legalbench_jsonl} (run `python3 scripts/legalbench_merge.py` first)")
+    if vertical == "cybermetric" and not cyberbench_jsonl.exists():
+        _die(f"CyberMetric JSONL not found at {cyberbench_jsonl} (run `python3 scripts/cyber_merge.py` first)")
     if not llama_server_bin.exists():
         _die(f"llama-server not found at {llama_server_bin} (build llama.cpp first)")
     if not llama_convert.exists():
@@ -284,18 +359,29 @@ def main() -> int:
     _log(f"prompt format: {fmt}")
     if fmt == "raw":
         _log("WARN: no chat-format signal found — likely continued-pretrain trap")
-        _log("      proceeding anyway; numeric_match will score 0 if outputs aren't formatted")
+        _log("      proceeding anyway; scorer will return 0 if outputs aren't formatted")
 
-    vb = VerticalBench.from_jsonl(
-        finbench_jsonl,
-        format="financebench",
-        open_book=True,
-        subset=None if subset == "all" else subset,
-        limit=n,
-    )
+    if vertical == "financebench":
+        vb = VerticalBench.from_jsonl(
+            finbench_jsonl,
+            format="financebench",
+            open_book=True,
+            subset=None if subset == "all" else subset,
+            limit=n,
+        )
+        scorer = lambda pred, exp: numeric_match(pred, exp, rel_tolerance=0.01)
+        bench_label = f"FinanceBench subset={subset}"
+    elif vertical == "legalbench":
+        vb = VerticalBench.from_jsonl(legalbench_jsonl, format="legalbench", limit=n)
+        scorer = contains
+        bench_label = "LegalBench"
+    else:  # cybermetric — shares legalbench's {id,text,answer,task} JSONL shape
+        vb = VerticalBench.from_jsonl(cyberbench_jsonl, format="legalbench", limit=n)
+        scorer = mcq_letter
+        bench_label = "CyberMetric MCQ"
     if not vb.questions:
-        _die(f"no questions match subset={subset!r} in {finbench_jsonl}")
-    _log(f"scoring {len(vb.questions)} open-book questions from FinanceBench subset={subset}")
+        _die(f"no questions loaded for {bench_label}")
+    _log(f"scoring {len(vb.questions)} questions from {bench_label}")
 
     correct = 0
     with LlamaServerSession(
@@ -310,7 +396,7 @@ def main() -> int:
             t_q = time.perf_counter()
             predicted = server.complete(prompt)
             elapsed = time.perf_counter() - t_q
-            score = numeric_match(predicted, q.expected, rel_tolerance=0.01)
+            score = scorer(predicted, q.expected)
             correct += int(score)
             _log(
                 f"  Q{i}/{len(vb.questions)} [{elapsed:.1f}s] qid={q.qid} "
