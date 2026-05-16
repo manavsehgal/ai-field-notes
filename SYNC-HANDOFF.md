@@ -17,8 +17,10 @@ release_slug: 2026-05-16-medical-vertical-II-Medical-8B
 status: NEW
 source_range: f23efb3..HEAD
 articles_added:
-  - slug: becoming-a-medical-curator-on-spark    # status: upcoming placeholder; full draft promotion pending (see Open question below)
+  - slug: becoming-a-medical-curator-on-spark    # status: published — full 8-section draft promoted in commit f005b52 with new MedicalQuad signature
 articles_updated: []
+signatures_added:
+  - component: src/components/svg/MedicalQuad.astro     # 300x200 bar chart, MedMCQA accuracy across 5 variants, Q5_K_M accent above F16 baseline
 artifacts_added:
   - manifest: src/content/artifacts/ii-medical-8b-gguf.yaml
     hf_repo: Orionfold/II-Medical-8B-GGUF
@@ -39,7 +41,8 @@ hf_repos_added:
   - Orionfold/II-Medical-8B-GGUF                 # 5 GGUFs + README + .gitattributes; live 2026-05-16 05:15 UTC after 2h32m push
 civitai_artifacts_added: []
 fieldkit_release: null                           # no fieldkit cut this cycle; current PyPI stays at 0.4.2
-post_rotation_commits: []                        # rotation happens at end-of-cycle; any post-rotation commits captured in next sweep
+post_rotation_commits:
+  - f005b52  # medical: promote becoming-a-medical-curator-on-spark — full 8-section body + MedicalQuad signature
 ---
 
 ## Headline
@@ -53,13 +56,14 @@ This cycle is the **second vertical in a row to ship with zero new code in `fiel
 Spark-authoritative files (per `[[reference_sync_contract]]`). No destination-side rewrites, no schema changes, no renames.
 
 - **`src/content/artifacts/ii-medical-8b-gguf.yaml`** — NEW artifact manifest (auto-emitted by `publish_quant(dry_run=True)`). Carries `recommended_variant: Q5_K_M` (the v0.4.2 field; this is its first cycle with a fresh push that uses it), `license.model: apache-2.0`, `chat_format: chatml`, `vertical_eval_name: "MedMCQA (n=50, mcq_letter)"`, 5 variants with full Spark-tested metrics. Destination catalog can render the "Sweet spot" badge directly from `recommended_variant:` — no hand-pin required (contrast with cyber's PR #6, where Mac had to hand-pin `Q4_K_M` because the manifest was on pre-v0.4.2 schema).
-- **`articles/becoming-a-medical-curator-on-spark/article.md`** — NEW article in `status: upcoming` placeholder shape. Frontmatter mirrors the sibling finance/legal/cyber-curator articles exactly (`product: llama.cpp`, `stage: deployment`, `series: Machine that Builds Machines`, `fieldkit_modules: [quant, publish, eval, lineage]`, `also_stages: [observability]`, `hf_url`). Body is a 3-paragraph stub (intent + footgun-of-the-cycle + pairs-with-gguf-publisher pointer). **Full draft promotion is pending** — see "Open question" below.
+- **`articles/becoming-a-medical-curator-on-spark/article.md`** — NEW article, **`status: published`** with the full 8-section draft (promoted in commit `f005b52`). Frontmatter mirrors the sibling finance/legal/cyber-curator articles exactly (`product: llama.cpp`, `stage: deployment`, `series: Machine that Builds Machines`, `fieldkit_modules: [quant, publish, eval, lineage]`, `also_stages: [observability]`, `hf_url`) plus `signature: MedicalQuad`. Body carries 4-vertical hub-and-spoke fn-diagram (medical as accent), the variant table, the variant picker, the use snippets (HF CLI + llama-server + llama-cpp-python with `chat_format="chatml"`), the per-vertical-delta walkthrough, the reasoning-recipe generation-budget section, the MedMCQA-subset note, the thermal-envelope note (with the 4-vertical Q8_0 split now reading as chat-tune-only vs continued-pretrain shape), and 9 explainers across the six directive types (3 `:::define` + 1 `:::why` + 2 `:::pitfall` + 1 `:::math` + 1 `:::deeper` + 1 `:::hardware`). `verify_article.sh` clean — frontmatter, image refs, secret scan, all SVG hard invariants pass.
+- **`src/components/svg/MedicalQuad.astro`** — NEW signature component (300×200) for the medical card. 5-bar MedMCQA chart with Q5_K_M as the accent (above the F16 reference line) and the four other variants as muted-green bars. Sibling cyber + legal cards omitted the signature field; medical chose to ship one because the recommended-variant-beats-F16 story is the card-thumbnail headline.
 - **`articles/becoming-a-gguf-publisher-on-spark/evidence/lineage-II-Medical-8B/results.tsv`** — NEW evidence directory under the gguf-publisher arc article (same shape the cyber + legal + finance verticals use). 5 lineage rows, exp_ids 001–005, status=keep.
 - **`scripts/medmcqa_merge.py`** — NEW; samples N=50 from `openlifescienceai/medmcqa` validation split into the cyber/legal `{id,text,answer,task}` JSONL shape. The `mcq_letter` scorer's second reuse.
 - **`scripts/g3_preflight_bench.py`** — EXTENDED with the medmcqa whitelist, `MEDMCQA_JSONL` env, **and** a new `chatml` branch in `_detect_prompt_format`/`_format_prompt` (the silent-failure fix for ChatML templates).
 - **`scripts/g3_measure_variants.py`** — EXTENDED with medmcqa whitelist, `_wrap_chatml` prompt wrapper, MEDMCQA env, and medical defaults (domain / baseline / bench dataset maps).
 - **`scripts/g3_build_first_quant.sh`** — EXTENDED with a new per-model case for `Intelligent-Internet/II-Medical-8B` (license, chat-format, vertical, article slug, MEDMCQA env threading).
-- **`README.md`** + **`src/data/project-stats.json`** — auto-refreshed via `nvidia-learn-stats` + `tech-writer refresh_readme.py` after the upcoming-placeholder commit. Article count now 37 (5 upcoming including this placeholder).
+- **`README.md`** + **`src/data/project-stats.json`** — auto-refreshed twice this cycle: first after the upcoming-placeholder commit (`4392ab6`), then again after the article promotion (`f005b52`). Article count now **38 published + 4 upcoming = 42 total** (the medical placeholder moved from `upcoming` → `published`); word total now 127,405.
 
 ### Auto-refreshed (no Mac-side action needed)
 
@@ -88,16 +92,17 @@ The stats infographic + README article index reflect the new article entry (with
   | Q6_K | 16.01 | 32.80 | 2332.2 | 0.46 | 6.26 GB |
   | Q8_0 | 16.30 | 28.42 | 2523.3 | 0.48 | 8.11 GB |
 
-- **`scripts/verify_article.sh`** — not run yet (article is still `status: upcoming`; the publish-gate checks apply after promotion).
+- **`scripts/verify_article.sh becoming-a-medical-curator-on-spark`** — PASS clean after promotion. Frontmatter valid + required keys present; all image refs resolve; slug matches folder; zero PII / secret patterns; all SVG hard invariants pass (z-order, stroke-width hierarchy ∈ {0.5, 1, 1.5, 2}, no hex literals, gradient defs present on both signature + fn-diagram, role="img" + aria-label correct on both SVGs, no `<title>` children, fn-diagram present in article body so the "must ship at least one inline architectural figure" rule is satisfied).
 - **`scripts/verify_stage.sh`** — 5/5 PASSED at push time (with `APACHE_VERIFIED=1` for the upstream license check).
 
 ## Release-commit chain (this cycle)
 
 - **`713a1d0`** — `medical: vertical 4 infra — Intelligent-Internet/II-Medical-8B (Q5_K_M recommended)` (6 files: 3 script extensions + new `scripts/medmcqa_merge.py` + auto-emitted manifest + new lineage directory).
 - **`4392ab6`** — `Upcoming: becoming-a-medical-curator-on-spark (vertical 4 placeholder)` (3 files: new article placeholder + stats refresh + README refresh).
-- *(SYNC-HANDOFF rotation commit will land at the end of this cycle; captured in next sweep's `post_rotation_commits` if any post-rotation work lands before Mac sweeps.)*
+- **`7ca0018`** — `sync: SYNC-HANDOFF rotated to 2026-05-16-medical-vertical (NEW)` (the rotation commit itself).
+- **`f005b52`** — `medical: promote becoming-a-medical-curator-on-spark — full 8-section body, MedicalQuad signature` (4 files: article promotion + new `src/components/svg/MedicalQuad.astro` + stats refresh + README refresh — post-rotation, captured in the YAML `post_rotation_commits` field above).
 
-Two commits this cycle (excluding the rotation itself + the v0.4.2 sweep-receipt merge `d332d28` which closed the prior cycle).
+Four commits this cycle (rotation + 3 editorial commits, excluding the v0.4.2 sweep-receipt merge `d332d28` which closed the prior cycle).
 
 ## Open question — answer to PR #7
 
@@ -120,6 +125,6 @@ Two options were on the table:
 ## What Mac CC should look for after sweep
 
 - The new artifact manifest at `src/content/artifacts/ii-medical-8b-gguf.yaml` arrives with `recommended_variant: Q5_K_M` populated from source — the destination catalog can render the "Sweet spot" badge directly without hand-pinning (this is the first push to fully exercise the v0.4.2 manifest field).
-- The new article `becoming-a-medical-curator-on-spark` arrives with `status: upcoming` — destination should show it as a placeholder on the `/stage/deployment/` and `/stage/observability/` filter pages with the muted-card + "Upcoming" badge. Excluded from the home index by default.
+- The new article `becoming-a-medical-curator-on-spark` arrives with `status: published` and `signature: MedicalQuad` — destination should render it as a normal card on the home index and on the `/stage/deployment/` + `/stage/observability/` filter pages, with the MedicalQuad bar-chart thumbnail on the right column. The article is customer-link-facing (HF README Methods line points at it), so any destination-side post-sync edits should preserve the customer-link voice (no strategy leak, no roadmap detail in the closing — already audited at source per `[[feedback_customer_link_audit]]`).
 - After the catalog-footer override rule lands on Mac side, the next cyber + gguf-publisher + legal sync diff should run clean (no article overwrites flagged).
 - HF catalog set grows from 3 → 4: `finance-chat-GGUF`, `Saul-7B-Instruct-v1-GGUF`, `SecurityLLM-GGUF`, **`II-Medical-8B-GGUF` (new)**.
