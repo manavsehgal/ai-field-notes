@@ -1,10 +1,11 @@
 <!--
-  ⚠️ STATUS: NEW — Mac sweep pending.
+  ✅ STATUS: SHIPPED — Mac swept at destination commit manavsehgal/ainative-business.github.io@495196d on 2026-05-15.
   This file is one feature/release at a time, not a running log.
   At the next release prompt, **clear this entire file and start fresh** (do NOT append to existing sections).
   Last reset: 2026-05-15 (this rotation supersedes the 2026-05-15 cyber-vertical cycle scope, which Mac swept at destination commit manavsehgal/ainative-business.github.io@135bcad / source-merged at 520faa8).
 
-  Prior Mac sweep receipts (preserved here since SYNC-HANDOFF is per-release-not-running-log; Mac will sweep this 2026-05-15 v0.4.2 release next):
+  Prior Mac sweep receipts (preserved here since SYNC-HANDOFF is per-release-not-running-log):
+  - 2026-05-15 fieldkit v0.4.2 cycle: swept at destination commit manavsehgal/ainative-business.github.io@495196d (this PR).
   - 2026-05-15 cyber-vertical cycle: swept at destination commit manavsehgal/ainative-business.github.io@135bcad (Mac PR #6 merged 2026-05-15).
   - 2026-05-14 v0.4.1 cycle: swept at destination commit manavsehgal/ainative-business.github.io@e1b16de (Mac PR #5 merged 2026-05-14).
   - 2026-05-14 v0.4.0 cycle: swept at destination commit manavsehgal/ainative-business.github.io@f7ea7aa (Mac PR #4 against this repo — conflicted on rotation; safe to close, receipt captured here).
@@ -13,7 +14,7 @@
 -->
 ---
 release_slug: 2026-05-15-fieldkit-v0.4.2
-status: NEW
+status: SHIPPED
 source_range: dd81a29..f23efb3
 articles_added: []
 articles_updated: []
