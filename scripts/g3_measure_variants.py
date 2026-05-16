@@ -18,7 +18,7 @@ Driven by env vars (matching `scripts/g3_build_first_quant.sh`):
     QUANTS_DIR          /home/nvidia/data/quants
     QUANT_VARIANTS      Q4_K_M,Q5_K_M,Q6_K,Q8_0,F16   (comma-separated)
     WIKITEXT_CORPUS     /home/nvidia/data/calibration/wikitext-2-raw-v1/wiki.test.raw
-    VERTICAL_BENCH      financebench | legalbench (default financebench)
+    VERTICAL_BENCH      financebench | legalbench | cybermetric | medmcqa (default financebench)
     FINBENCH_JSONL      /home/nvidia/data/eval-benches/financebench/financebench_merged.jsonl
     FINBENCH_SUBSET     metrics-generated  (FinanceBench question_type filter; "all" for all 150)
     FINBENCH_LIMIT      50                  (cap rows after filter)
@@ -78,6 +78,17 @@ def _wrap_zephyr(question: str) -> str:
     return f"<|user|>\n{question.strip()}</s>\n<|assistant|>\n"
 
 
+def _wrap_chatml(question: str) -> str:
+    """`<|im_start|>user\\n{q}<|im_end|>\\n<|im_start|>assistant\\n` — ChatML.
+
+    Qwen2/Qwen3 + Hermes/OpenChat/II-Medical-8B all ship this template in
+    `tokenizer_config.json`. The trailing `<|im_start|>assistant\\n` matches
+    the `add_generation_prompt=True` jinja path so the server starts emitting
+    the assistant turn directly.
+    """
+    return f"<|im_start|>user\n{question.strip()}<|im_end|>\n<|im_start|>assistant\n"
+
+
 # --- MCQ-letter scorer (cybermetric) ---------------------------------------
 # Cyber gold is a single letter (A/B/C/D); `contains` over single letters is
 # too permissive (a stray "A" anywhere matches). Extract the decisive letter
@@ -119,9 +130,9 @@ from fieldkit.quant import (  # noqa: E402
 # --- Vertical-bench selection ----------------------------------------------
 
 VERTICAL_BENCH = os.environ.get("VERTICAL_BENCH", "financebench").lower()
-if VERTICAL_BENCH not in ("financebench", "legalbench", "cybermetric"):
+if VERTICAL_BENCH not in ("financebench", "legalbench", "cybermetric", "medmcqa"):
     raise SystemExit(
-        f"VERTICAL_BENCH must be 'financebench' / 'legalbench' / 'cybermetric', "
+        f"VERTICAL_BENCH must be 'financebench' / 'legalbench' / 'cybermetric' / 'medmcqa', "
         f"got {VERTICAL_BENCH!r}"
     )
 
@@ -132,16 +143,19 @@ _DEFAULT_DOMAIN = {
     "financebench": "vertical-curator-finance",
     "legalbench": "vertical-curator-legal",
     "cybermetric": "vertical-curator-cyber",
+    "medmcqa": "vertical-curator-medical",
 }[VERTICAL_BENCH]
 _DEFAULT_BASELINE = {
     "financebench": "AdaptLLM/finance-chat",
     "legalbench": "Equall/Saul-7B-Instruct-v1",
     "cybermetric": "ZySec-AI/SecurityLLM",
+    "medmcqa": "Intelligent-Internet/II-Medical-8B",
 }[VERTICAL_BENCH]
 _DEFAULT_BENCH_DATASET = {
     "financebench": "PatronusAI/financebench",
     "legalbench": "nguha/legalbench",
     "cybermetric": "tihanyin/CyberMetric",
+    "medmcqa": "openlifescienceai/medmcqa",
 }[VERTICAL_BENCH]
 
 DOMAIN = os.environ.get("LINEAGE_DOMAIN", _DEFAULT_DOMAIN)
@@ -180,6 +194,7 @@ def make_variant_trial(
         "financebench": "FinanceBench",
         "legalbench": "LegalBench",
         "cybermetric": "CyberMetric",
+        "medmcqa": "MedMCQA",
     }[VERTICAL_BENCH]
     return Trial(
         exp_id=exp_id,
@@ -231,6 +246,13 @@ CYBERBENCH_JSONL = Path(
     )
 )
 CYBERBENCH_LIMIT = int(os.environ.get("CYBERBENCH_LIMIT", "50"))
+MEDMCQA_JSONL = Path(
+    os.environ.get(
+        "MEDMCQA_JSONL",
+        "/home/nvidia/data/eval-benches/medmcqa/medmcqa_merged.jsonl",
+    )
+)
+MEDMCQA_LIMIT = int(os.environ.get("MEDMCQA_LIMIT", "50"))
 LLAMA_CLI_NGL = int(os.environ.get("LLAMA_CLI_NGL", "99"))
 LLAMA_CLI_NPREDICT = int(os.environ.get("LLAMA_CLI_NPREDICT", "256"))
 LINEAGE_DIR = Path(
@@ -491,7 +513,7 @@ def measure_variant(
                 )
                 scorer = contains
                 wrapper = _wrap_inst
-            else:  # cybermetric
+            elif VERTICAL_BENCH == "cybermetric":
                 bench_label = f"CyberMetric (limit={CYBERBENCH_LIMIT})"
                 vb = VerticalBench.from_jsonl(
                     CYBERBENCH_JSONL,
@@ -500,6 +522,15 @@ def measure_variant(
                 )
                 scorer = mcq_letter
                 wrapper = _wrap_zephyr
+            else:  # medmcqa
+                bench_label = f"MedMCQA (limit={MEDMCQA_LIMIT})"
+                vb = VerticalBench.from_jsonl(
+                    MEDMCQA_JSONL,
+                    format="legalbench",
+                    limit=MEDMCQA_LIMIT,
+                )
+                scorer = mcq_letter
+                wrapper = _wrap_chatml
             print(
                 f"  [3/4] {bench_label} via llama-server (load once per variant) …",
                 flush=True,
@@ -607,9 +638,13 @@ def main() -> int:
         vertical_eval_name = (
             f"LegalBench (n={fb_n_first}, contains)" if fb_n_first else None
         )
-    else:  # cybermetric
+    elif VERTICAL_BENCH == "cybermetric":
         vertical_eval_name = (
             f"CyberMetric (n={fb_n_first}, mcq_letter)" if fb_n_first else None
+        )
+    else:  # medmcqa
+        vertical_eval_name = (
+            f"MedMCQA (n={fb_n_first}, mcq_letter)" if fb_n_first else None
         )
     payload = {
         "perplexity": {r["variant"]: r["perplexity"] for r in results if r.get("perplexity") is not None},

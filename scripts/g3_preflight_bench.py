@@ -32,13 +32,15 @@ Inputs (env, mirrors `g3_build_first_quant.sh` defaults):
     LLAMA_CPP_CONVERT
                     /home/nvidia/llama.cpp/convert_hf_to_gguf.py
     BASE_MODEL_ARG  HF repo id (for GGUF metadata only)
-    VERTICAL_BENCH  financebench (default) | legalbench | cybermetric
+    VERTICAL_BENCH  financebench (default) | legalbench | cybermetric | medmcqa
     FINBENCH_JSONL  /home/nvidia/data/eval-benches/financebench/financebench_merged.jsonl
     FINBENCH_SUBSET metrics-generated
     LEGALBENCH_JSONL
                     /home/nvidia/data/eval-benches/legalbench/legalbench_merged.jsonl
     CYBERBENCH_JSONL
                     /home/nvidia/data/eval-benches/cybermetric/cybermetric_merged.jsonl
+    MEDMCQA_JSONL
+                    /home/nvidia/data/eval-benches/medmcqa/medmcqa_merged.jsonl
     PREFLIGHT_N     5
     PREFLIGHT_MIN   1
     PREFLIGHT_N_PREDICT
@@ -148,6 +150,8 @@ def _detect_prompt_format(model_dir: Path) -> str:
             cfg = json.loads(tok_cfg.read_text())
             ct = cfg.get("chat_template")
             if ct:
+                if "<|im_start|>" in ct:
+                    return "chatml"
                 if "<|user|>" in ct and "<|assistant|>" in ct:
                     return "zephyr"
                 if "[INST]" in ct:
@@ -163,6 +167,8 @@ def _format_prompt(question: str, fmt: str) -> str:
         return f"<s>[INST] {question.strip()} [/INST]"
     if fmt == "zephyr":
         return f"<|user|>\n{question.strip()}</s>\n<|assistant|>\n"
+    if fmt == "chatml":
+        return f"<|im_start|>user\n{question.strip()}<|im_end|>\n<|im_start|>assistant\n"
     return question.strip()
 
 
@@ -301,9 +307,9 @@ def main() -> int:
         os.environ.get("LLAMA_CPP_CONVERT", "/home/nvidia/llama.cpp/convert_hf_to_gguf.py")
     )
     vertical = os.environ.get("VERTICAL_BENCH", "financebench").lower()
-    if vertical not in ("financebench", "legalbench", "cybermetric"):
+    if vertical not in ("financebench", "legalbench", "cybermetric", "medmcqa"):
         _die(
-            f"VERTICAL_BENCH must be 'financebench' / 'legalbench' / 'cybermetric', "
+            f"VERTICAL_BENCH must be 'financebench' / 'legalbench' / 'cybermetric' / 'medmcqa', "
             f"got {vertical!r}"
         )
     finbench_jsonl = Path(
@@ -322,6 +328,12 @@ def main() -> int:
         os.environ.get(
             "CYBERBENCH_JSONL",
             "/home/nvidia/data/eval-benches/cybermetric/cybermetric_merged.jsonl",
+        )
+    )
+    medmcqa_jsonl = Path(
+        os.environ.get(
+            "MEDMCQA_JSONL",
+            "/home/nvidia/data/eval-benches/medmcqa/medmcqa_merged.jsonl",
         )
     )
     subset = os.environ.get("FINBENCH_SUBSET", "metrics-generated")
@@ -343,6 +355,8 @@ def main() -> int:
         _die(f"LegalBench JSONL not found at {legalbench_jsonl} (run `python3 scripts/legalbench_merge.py` first)")
     if vertical == "cybermetric" and not cyberbench_jsonl.exists():
         _die(f"CyberMetric JSONL not found at {cyberbench_jsonl} (run `python3 scripts/cyber_merge.py` first)")
+    if vertical == "medmcqa" and not medmcqa_jsonl.exists():
+        _die(f"MedMCQA JSONL not found at {medmcqa_jsonl} (run `python3 scripts/medmcqa_merge.py` first)")
     if not llama_server_bin.exists():
         _die(f"llama-server not found at {llama_server_bin} (build llama.cpp first)")
     if not llama_convert.exists():
@@ -375,10 +389,14 @@ def main() -> int:
         vb = VerticalBench.from_jsonl(legalbench_jsonl, format="legalbench", limit=n)
         scorer = contains
         bench_label = "LegalBench"
-    else:  # cybermetric — shares legalbench's {id,text,answer,task} JSONL shape
+    elif vertical == "cybermetric":  # shares legalbench's {id,text,answer,task} JSONL shape
         vb = VerticalBench.from_jsonl(cyberbench_jsonl, format="legalbench", limit=n)
         scorer = mcq_letter
         bench_label = "CyberMetric MCQ"
+    else:  # medmcqa — same legalbench JSONL shape, mcq_letter scorer (second reuse)
+        vb = VerticalBench.from_jsonl(medmcqa_jsonl, format="legalbench", limit=n)
+        scorer = mcq_letter
+        bench_label = "MedMCQA"
     if not vb.questions:
         _die(f"no questions loaded for {bench_label}")
     _log(f"scoring {len(vb.questions)} questions from {bench_label}")

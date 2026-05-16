@@ -50,6 +50,7 @@ WIKITEXT_CORPUS="${WIKITEXT_CORPUS:-/home/nvidia/data/calibration/wikitext-2-raw
 FINBENCH_JSONL="${FINBENCH_JSONL:-/home/nvidia/data/eval-benches/financebench/financebench_merged.jsonl}"
 LEGALBENCH_JSONL="${LEGALBENCH_JSONL:-/home/nvidia/data/eval-benches/legalbench/legalbench_merged.jsonl}"
 CYBERBENCH_JSONL="${CYBERBENCH_JSONL:-/home/nvidia/data/eval-benches/cybermetric/cybermetric_merged.jsonl}"
+MEDMCQA_JSONL="${MEDMCQA_JSONL:-/home/nvidia/data/eval-benches/medmcqa/medmcqa_merged.jsonl}"
 REPO_NAME="${REPO_NAME:-${MODEL_SLUG}-GGUF}"
 # Upstream-model HF license tag — flows to README frontmatter `license:` and
 # Astro manifest `license.model:`. Default `apache-2.0` matches most NVIDIA-blessed
@@ -76,6 +77,12 @@ case "$MODEL_ID" in
     CHAT_FORMAT="${CHAT_FORMAT_OVERRIDE:-zephyr}"
     export VERTICAL_BENCH="${VERTICAL_BENCH:-cybermetric}"
     ARTICLE_SLUG="${ARTICLE_SLUG_OVERRIDE:-becoming-a-cyber-curator-on-spark}"
+    ;;
+  Intelligent-Internet/II-Medical-8B)
+    MODEL_LICENSE="${MODEL_LICENSE_OVERRIDE:-apache-2.0}"
+    CHAT_FORMAT="${CHAT_FORMAT_OVERRIDE:-chatml}"
+    export VERTICAL_BENCH="${VERTICAL_BENCH:-medmcqa}"
+    ARTICLE_SLUG="${ARTICLE_SLUG_OVERRIDE:-becoming-a-medical-curator-on-spark}"
     ;;
 esac
 
@@ -148,6 +155,7 @@ step_preflight_bench() {
   FINBENCH_JSONL="$FINBENCH_JSONL" \
   LEGALBENCH_JSONL="$LEGALBENCH_JSONL" \
   CYBERBENCH_JSONL="$CYBERBENCH_JSONL" \
+  MEDMCQA_JSONL="$MEDMCQA_JSONL" \
   LLAMA_CPP_BIN="$LLAMA_CPP_BIN" LLAMA_CPP_CONVERT="$LLAMA_CPP_CONVERT" \
   BASE_MODEL_ARG="$BASE_MODEL_ARG" \
     "${HF_VENV}/bin/python" "$(dirname "$0")/g3_preflight_bench.py"
@@ -220,12 +228,18 @@ step_measure() {
     log "      build via: ./scripts/cyber_merge.py (after curl from tihanyin/CyberMetric on HF)"
     export SKIP_VERTICAL=1
   fi
+  if [[ "$_vbench" == "medmcqa" && ! -f "$MEDMCQA_JSONL" ]]; then
+    log "warn: MedMCQA merged JSONL not at $MEDMCQA_JSONL — vertical-eval will be skipped"
+    log "      build via: ./scripts/medmcqa_merge.py (after hf download openlifescienceai/medmcqa --repo-type dataset)"
+    export SKIP_VERTICAL=1
+  fi
   log "measuring 4 axes per variant (perplexity / tok-s / thermal / ${_vbench})"
   MODEL_SLUG="$MODEL_SLUG" QUANTS_DIR="$QUANTS_DIR" QUANT_VARIANTS="$QUANT_VARIANTS" \
   WIKITEXT_CORPUS="$WIKITEXT_CORPUS" FINBENCH_JSONL="$FINBENCH_JSONL" \
   VERTICAL_BENCH="$_vbench" \
   LEGALBENCH_JSONL="$LEGALBENCH_JSONL" \
   CYBERBENCH_JSONL="$CYBERBENCH_JSONL" \
+  MEDMCQA_JSONL="$MEDMCQA_JSONL" \
   LLAMA_CPP_BIN="$LLAMA_CPP_BIN" LINEAGE_DIR="$LINEAGE_DIR" \
   BASELINE_HF_REPO="$BASE_MODEL_ARG" \
     "${HF_VENV}/bin/python" "$(dirname "$0")/g3_measure_variants.py"
