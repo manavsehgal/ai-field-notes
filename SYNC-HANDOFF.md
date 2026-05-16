@@ -1,95 +1,91 @@
 <!--
-  ✅ STATUS: SHIPPED — Mac sweep complete (destination commit manavsehgal/ainative-business.github.io@135bcad).
+  ⚠️ STATUS: NEW — Mac sweep pending.
   This file is one feature/release at a time, not a running log.
   At the next release prompt, **clear this entire file and start fresh** (do NOT append to existing sections).
-  Last reset: 2026-05-15 (this rotation supersedes the v0.4.1 cycle scope; the v0.4.1 PyPI release commits 7f1159e..82d95ed are wholly consumed by Mac PR #5).
+  Last reset: 2026-05-15 (this rotation supersedes the 2026-05-15 cyber-vertical cycle scope, which Mac swept at destination commit manavsehgal/ainative-business.github.io@135bcad / source-merged at 520faa8).
 
-  Prior Mac sweep receipts (preserved here since SYNC-HANDOFF is per-release-not-running-log; Mac will sweep this 2026-05-15 cycle next):
+  Prior Mac sweep receipts (preserved here since SYNC-HANDOFF is per-release-not-running-log; Mac will sweep this 2026-05-15 v0.4.2 release next):
+  - 2026-05-15 cyber-vertical cycle: swept at destination commit manavsehgal/ainative-business.github.io@135bcad (Mac PR #6 merged 2026-05-15).
   - 2026-05-14 v0.4.1 cycle: swept at destination commit manavsehgal/ainative-business.github.io@e1b16de (Mac PR #5 merged 2026-05-14).
   - 2026-05-14 v0.4.0 cycle: swept at destination commit manavsehgal/ainative-business.github.io@f7ea7aa (Mac PR #4 against this repo — conflicted on rotation; safe to close, receipt captured here).
   - 2026-05-14 Orionfold/finance-chat-GGUF cycle: swept at destination commit manavsehgal/ainative-business.github.io@85f9307 (Mac PR #3, merged).
   - 2026-05-12 Autoresearch→MTBM rename: swept at destination commit manavsehgal/ainative-business.github.io@71293af (Mac PR #2, merged).
 -->
 ---
-release_slug: 2026-05-15-cyber-vertical
-status: SHIPPED
-source_range: 97e824d..dd81a29
-articles_added:
-  - becoming-a-cyber-curator-on-spark      # third vertical-curator deep-dive; status: published; series: Machine that Builds Machines; book_chapters: [10, 11]; fieldkit_modules: [quant, publish, eval, lineage]; hf_url: https://huggingface.co/Orionfold/SecurityLLM-GGUF; inline fn-diagram (hub-and-spoke: fieldkit.publish at centre, three vertical chips); no signature SVG yet — Mac sweep can leave card without thumbnail or pick up VerticalCuratorRetry as a placeholder
-articles_updated:
-  - becoming-a-gguf-publisher-on-spark     # evidence/lineage-SecurityLLM/results.tsv added (5 variant rows from cyber measure); published article body unchanged
-artifacts_added:
-  - src/content/artifacts/securityllm-gguf.yaml   # third Phase-2 manifest (after finance-chat-gguf.yaml + saul-7b-instruct-v1-gguf.yaml) — license.tier=free, license.model=apache-2.0, base_model=ZySec-AI/SecurityLLM, vertical_eval populated from CyberMetric n=50, recommended_variant=Q4_K_M (differs from finance/legal which both used Q5_K_M — Q4_K_M topped the cyber bench by 6 points within sampling noise)
+release_slug: 2026-05-15-fieldkit-v0.4.2
+status: NEW
+source_range: dd81a29..f23efb3
+articles_added: []
+articles_updated: []
+artifacts_added: []
 artifacts_updated: []
-fieldkit_modules_changed: []               # ZERO fieldkit source changes — the headline. v0.4.1 publishing surface generalized as designed for vertical 3
+fieldkit_modules_changed:
+  - publish                                # ArtifactManifest gains recommended_variant field + publish_quant threads it through; ModelCard.llama_cpp_example_prompt already landed on main in ff1b92f
 papers_added: []
-papers_classify_count: 0                   # no frontier-scout refresh this cycle
+papers_classify_count: 0
 renames_to_replay: []
 removes: []
 new_top_level_pages: []
 breaking_changes: []
 destination_overrides_to_preserve: []
-hf_repos_added:
-  - Orionfold/SecurityLLM-GGUF             # 5 GGUF variants of ZySec-AI/SecurityLLM (Mistral-7B + Zephyr DPO), apache-2.0, CyberMetric-scored (n=50, mcq_letter); sha d4569840, lastModified 2026-05-15T19:51:46Z; pushed live via hf_push_resilient.py (no upload_folder crash this cycle — [[feedback_hf_upload_resilient_api]] paying off)
+hf_repos_added: []
 civitai_artifacts_added: []
-fieldkit_release: null                     # no PyPI release this cycle; current published version remains 0.4.1
+fieldkit_release: 0.4.2                    # https://pypi.org/project/fieldkit/0.4.2/ ; git tag fieldkit/v0.4.2 on 81aca8f
 post_rotation_commits: []                  # rotation happens at end-of-cycle; any post-rotation commits captured in next sweep
 ---
 
 ## Headline
 
-Third Orionfold quant card ships: [`Orionfold/SecurityLLM-GGUF`](https://huggingface.co/Orionfold/SecurityLLM-GGUF) — cyber vertical, five-variant Spark-tested shape, CyberMetric-80 mini-eval (50 rows, `mcq_letter` scorer). The release validates the v0.4.1 publishing surface against its design promise: **zero fieldkit source changes** were needed for the third vertical. The PyPI package version on this release's commit (`dd81a29`) is the same `0.4.1` the prior legal release shipped on.
+fieldkit v0.4.2 cut, tagged, and shipped to PyPI. Patch release with two additive lifts on `fieldkit.publish` — both driven by the 2026-05-15 cyber-vertical cycle. Zero new modules, zero new public classes, zero breaking changes. The headline: every vertical card that ships through `publish_quant` from now on writes the article's recommended-variant pick into the `<slug>.yaml` manifest automatically, and the hardcoded finance prompt that leaked into Saul + cyber HF cards on first push can no longer leak into vertical 4.
 
-What changed for cyber lives entirely in `scripts/` — four files:
+What changed in v0.4.2:
 
-1. **`scripts/cyber_merge.py`** (new, ~110 LOC) — samples 50 rows from `tihanyin/CyberMetric-80` (apache-2.0, arxiv 2402.07688), formats each as a 4-option MCQ prompt with a "reply with only one letter" instruction, emits the `{id, text, answer, task}` JSONL shape that `VerticalBench.from_jsonl(format="legalbench")` already consumed.
-2. **`scripts/g3_measure_variants.py`** — `cybermetric` added to `VERTICAL_BENCH` valid list (alongside `financebench` / `legalbench`); local `mcq_letter` scorer (regex-extract A/B/C/D with preference for "Answer: X" markers); `_wrap_zephyr` chat-template wrapper alongside the existing `_wrap_inst`; per-vertical wrapper dispatch.
-3. **`scripts/g3_preflight_bench.py`** — same VERTICAL_BENCH dispatch + zephyr-template detection (extends `_detect_prompt_format` to recognize `<|user|>` + `<|assistant|>` in `tokenizer_config.json`) + the same local `mcq_letter` scorer; the V0 preflight gate now works for cyber as a five-question fast-fail before the multi-hour quantize+measure cycle.
-4. **`scripts/g3_build_first_quant.sh`** — `ZySec-AI/SecurityLLM` case auto-resolves `MODEL_LICENSE=apache-2.0`, `CHAT_FORMAT=zephyr`, `VERTICAL_BENCH=cybermetric`, `ARTICLE_SLUG=becoming-a-cyber-curator-on-spark`. `CYBERBENCH_JSONL` propagated through `step_preflight_bench` and `step_measure`.
-
-Spark-measured numbers (n=50 per variant): F16 34% · Q8_0 36% · Q6_K 36% · Q5_K_M 38% · **Q4_K_M 40%**. The smaller variants matched or beat F16 — within sampling noise but consistent with the pattern from finance and legal. Q4_K_M is the default-pick on this card (vs Q5_K_M on the prior two cards). Q8_0 throughput anomaly (slower than F16 on both prior verticals) did NOT repeat — Q8_0 = 30.3 tok/s vs F16 = 17.5 — see [[project_q8_anomaly_model_specific]].
+1. **`ModelCard.llama_cpp_example_prompt: Optional[str]`** (already on main in `ff1b92f` since 2026-05-15) — kills the hardcoded `"Explain working capital."` user-message in the default `## How to run` body's `llama-cpp-python` snippet. Renderer now reads `card.llama_cpp_example_prompt` (or a neutral `"Summarize the key idea in one paragraph."` placeholder). Threads through `publish_quant(..., llama_cpp_example_prompt=...)` and from a duck-typed report's `.llama_cpp_example_prompt` attribute. Multi-line MCQ prompts are JSON-escaped (`\n`) so the snippet stays single-line and valid Python.
+2. **`ArtifactManifest.recommended_variant: Optional[str]`** (NEW this release) — was already on `ModelCard` (so the README's How-to-run snippets template against the article's pick) but did NOT flow into the `<slug>.yaml` manifest, so the destination catalog couldn't see the article's narrative choice and had to either run its own rank-avg picker or hand-pin (which Mac did for cyber's `Q4_K_M` in PR #6). `publish_quant` now threads `recommended_variant` into both surfaces from one kwarg. Source `src/content.config.ts` adds the matching `recommended_variant: z.string().optional()` so the manifest YAML passes validation.
 
 ## What Mac CC sweeps
 
-Straight mirror across the cyber cycle — no destination-side rewrites, no schema changes, no renames. Concrete files / paths:
+Straight mirror across the v0.4.2 cut — no destination-side rewrites, no schema changes, no renames. Concrete files:
 
-- **`articles/becoming-a-cyber-curator-on-spark/article.md`** — new long-form. ~1,900 words; inline `fn-diagram` (hub-and-spoke topology: `fieldkit.publish_quant` at centre, three vertical chips for finance/legal/cyber with cyber as accent); `verify_article.sh` passes all gates including SVG hard invariants. Frontmatter: `status: published`, `series: Machine that Builds Machines`, `book_chapters: [10, 11]`, `fieldkit_modules: [quant, publish, eval, lineage]`, `also_stages: [observability]`, `hf_url: https://huggingface.co/Orionfold/SecurityLLM-GGUF`.
-- **`articles/becoming-a-cyber-curator-on-spark/transcript.md`** — full session provenance: model + bench picks, the three scripts deltas, preflight gate (3/5 F16 PASS), scorer smoke-test results.
-- **`articles/becoming-a-gguf-publisher-on-spark/evidence/lineage-SecurityLLM/results.tsv`** — 5 variant rows with four-axis measurement. Q4_K_M = 0.40 cyber-bench (best on bench, beats F16 = 0.34 within n=50 sampling variance), F16 = 7.301 ppl / 17.5 tg, Q4_K_M = 47.7 tg (also throughput pick).
-- **`src/content/artifacts/securityllm-gguf.yaml`** — third Phase-2 manifest. Catalog templates can now render three side-by-side (finance-chat-gguf · saul-7b-instruct-v1-gguf · securityllm-gguf). `license.tier=free`, `license.model=apache-2.0`, `chat_format=zephyr`, `vertical_eval_name="CyberMetric (n=50, mcq_letter)"`.
-- **`scripts/cyber_merge.py`** — new helper (see Headline).
-- **`scripts/g3_measure_variants.py`** + **`scripts/g3_preflight_bench.py`** + **`scripts/g3_build_first_quant.sh`** — incremental patches threading `cybermetric` through the pipeline (see Headline).
+- **`fieldkit/src/fieldkit/_version.py`** — `0.4.1 → 0.4.2`. The fieldkit landing page (`/fieldkit/`) reads this at build time; its version prop will display `0.4.2` after the next destination build. The `FieldkitCli.astro` demo (and any other section that displays the version) updates automatically — no Mac-side patch needed per the audit-landing rule that hardcoded version literals are not allowed.
+- **`fieldkit/CHANGELOG.md`** — new `## [0.4.2] — 2026-05-15` section with the two Added bullets, a **Test suite** sub-section (378 passed, 3 skipped; +3 new tests), an **Articles in this release** sub-section (the cyber article from the prior cycle), and a **Verified on Spark** sub-section (no new HF push, but the v0.4.1 → v0.4.2 source delta was driven by the live cyber push). The `[Unreleased]` heading is now empty (fresh slate for the next cycle).
+- **`fieldkit/src/fieldkit/publish/__init__.py`** — `ArtifactManifest` dataclass gains the `recommended_variant: Optional[str] = None` field; `to_dict()` emits it under `recommended_variant:` when set; `publish_quant` passes `recommended_variant=recommended_variant` into the `ArtifactManifest(...)` construction. No public-symbol additions to `__all__`; no breaking changes to existing call sites.
+- **`fieldkit/docs/api/publish.md`** — `ArtifactManifest` example block grows a `recommended_variant="Q5_K_M"` line and a new paragraph below the license-block description explaining the v0.4.2 sweet-spot semantics.
+- **`fieldkit/tests/test_publish.py`** — three new tests added (`+3 → 378 total`): two on `ArtifactManifest` (round-trip + elision-when-unset) and one on `publish_quant` (kwarg threads to both card and manifest YAML).
+- **`src/content.config.ts`** — `artifacts` collection schema gains `recommended_variant: z.string().optional()` so manifest YAML files emit-pass-through cleanly. This mirrors what Mac already added to its own artifacts schema in PR #6 — Mac can either drop the duplicate (now that source emits the field directly) or keep it as defensive depth.
 
 ### Auto-refreshed
 
-- **`src/data/project-stats.json`** + **`README.md`** — 41 articles total (+1 cyber), +1 product-card on `cyber` tag, LOC nudge from the ~110-line cyber-merge script. Deployment stage gains another entry.
+- **`src/data/project-stats.json`** + **`README.md`** — fieldkit LOC nudge from the +3 new tests + the new `recommended_variant` field. Article count unchanged (cyber was already counted in the prior cycle).
 
 ## What Mac CC does NOT need to do
 
-- **No rename replays.** No new entries in `SYNC-RENAMES.log` this cycle. Existing entries remain fully `complete` after the prior `orionfoldllc → Orionfold` and `Autoresearch → Machine that Builds Machines` sweeps.
-- **No new top-level pages.** Article lives at `/field-notes/becoming-a-cyber-curator-on-spark/`; sorted by ordinal-desc per the existing convention. Manifest renders via the catalog template (already in place from the v0.4.0 cycle).
-- **No destination-prose rewrites.** New article slots into the existing Astro article collection without schema or template changes. The `hf_url` field, the inline `fn-diagram` system, and the `artifacts` collection are all reused unchanged.
-- **No fieldkit changes.** The PyPI package version on this commit (`0.4.1`) is unchanged from the prior cycle. `pip install fieldkit==0.4.1` users see no surface delta. No new SDK call sites land — the `mcq_letter` scorer is intentionally kept as a local helper in `scripts/g3_measure_variants.py` per [[feedback_keep_scorer_local_until_reuse]]; promotion candidacy waits for vertical 4 to confirm reuse.
-- **No new skill IA mirroring.** `hf-publisher`, `hf-model-scout`, and `fieldkit-curator` all live in `~/.claude/skills/` (Spark CC user config), not in the source repo.
-- **No signature SVG.** The article ships without a `signature:` frontmatter field — Mac can leave the home/stage card without a thumbnail (allowed by the schema) or pick up `VerticalCuratorRetry` as a placeholder, author's call. A fresh signature can be added in a future polish PR.
+- **No new articles.** The v0.4.2 release ships with no new article — the cyber-vertical article (which drove the lifts) was already swept at `135bcad` in the prior cycle.
+- **No new artifacts.** No new HF push this cycle. Existing manifests (`finance-chat-gguf.yaml`, `saul-7b-instruct-v1-gguf.yaml`, `securityllm-gguf.yaml`) do NOT carry the new `recommended_variant` field yet — they were written before v0.4.2 landed. Mac's hand-pin for cyber's `Q4_K_M` in PR #6 remains the source of truth on the destination until the next push runs through v0.4.2; no retro re-emit required. The field is additive + optional.
+- **No rename replays.** `SYNC-RENAMES.log` unchanged.
+- **No new top-level pages.** No new article, no new product card, no new section.
+- **No HF README patches.** The Saul + SecurityLLM HF READMEs were patched in-place on 2026-05-15 (HF commits `365dfe2` + `0824439`) to remove the leaked finance prompt — those are HF-side commits, not source repo commits. Mac doesn't need to do anything; flagging only for visibility.
+- **No skill IA mirroring.** `fieldkit-curator` (which drove this release) lives in `~/.claude/skills/` (Spark CC user config), not in the source repo.
 
 ## Verification (Spark-side)
 
-- HF push verified live at <https://huggingface.co/Orionfold/SecurityLLM-GGUF> — HTTP/2 200; all 7 files committed (`.gitattributes`, `README.md`, 5× `model-*.gguf`); sha `d45698400b7b02a036443b3c3cb6520bf946c9f4`; lastModified `2026-05-15T19:51:46Z`.
-- Push wall time: 4h 11min via `hf_push_resilient.py` (`upload_large_folder`, `num_workers=1`). Hit transient socket retries — the WiFi signal at -78 dBm dropped associations every 90–120s during the push window (29 disconnect events in 24h, fixed mid-cycle by `sudo iw dev wlP9s9 set power_save off` + `tcp_keepalive_time=600` lowering). Resilient pusher absorbed every retry cleanly — no `=== PUSH PARTIAL` line emitted, terminal state was `=== PUSH COMPLETE`.
-- `scripts/verify_article.sh becoming-a-cyber-curator-on-spark` — all gates pass: frontmatter valid, image references resolve, slug matches folder, no TODO markers, no PII patterns, SVG hard invariants pass (gradient defs, stroke hierarchy, icon clearance, role+aria-label, no hex literals).
-- Preflight gate: 3/5 F16 PASS on CyberMetric (above the ≥1/5 abort threshold). Two failures were compliance failures (model wrote prose instead of a letter) — `mcq_letter` correctly returned 0; the trap-detection works as designed.
-- Five-variant measure: 5 of 5 GGUFs scored cleanly on n=50 questions. Scores in 17/50–20/50 range (34–40%) — well above 25% random baseline for 4-option MCQ.
+- **PyPI:** <https://pypi.org/project/fieldkit/0.4.2/> — wheel + sdist; `twine check PASSED` on both; fresh-venv PyPI install verify ✅ (`fieldkit version → 0.4.2`).
+- **Git tag:** `fieldkit/v0.4.2` (annotated, unsigned per convention) on `origin/main` at commit `81aca8f`. Tag pushed cleanly; fresh-venv git-source install verify ✅ (`fieldkit version → 0.4.2`).
+- **Audit gates:** `audit-docs` 8/9 PASS, 1 SKIP, 0 FAIL (4 pre-existing kwarg WARNs on `publish` are technical debt from earlier releases, not from this cut; the new `recommended_variant` + `llama_cpp_example_prompt` kwargs are both documented in `docs/api/publish.md`). `audit-landing` 4/4 PASS.
+- **Test suite:** 378 passed, 3 skipped offline (`/tmp/fk/bin/pytest tests/ -q`). The 3 skips are the two `--spark`-gated live-integration tests + the `torch`-import skip in `test_training.py` (CPU-only venv).
+- **`scripts/verify_article.sh`** — not applicable this cycle (no article changes).
 
 ## Release-commit chain (this cycle)
 
-- **`dd81a29`** — `Add cyber-vertical card: Orionfold/SecurityLLM-GGUF + CyberMetric mini-eval` (10 files, +697/-46).
+- **`ff1b92f`** — `fieldkit.publish: make llama_cpp example prompt overridable` (pre-rotation; the `ModelCard.llama_cpp_example_prompt` lift from the post-cyber audit. Landed before this release prompt; the v0.4.2 cut bundles it with the new manifest field).
+- **`81aca8f`** — `fieldkit v0.4.2: card-rendering polish — overridable llama_cpp prompt + manifest recommended_variant` (the release commit: `_version.py` bump, CHANGELOG finalization, `ArtifactManifest.recommended_variant` field + thread-through, `src/content.config.ts` mirror, +3 tests, docs update).
+- **`f23efb3`** — `Refresh stats + README post-fieldkit-v0.4.2` (post-tag stats refresh: `src/data/project-stats.json` + `README.md`).
 
-Single commit this cycle; HF push happened after the commit landed on `origin/main`.
+Three commits this cycle; tag was created on `81aca8f` and pushed before the stats refresh.
 
 ## What Mac CC should look for after sweep
 
-- Three vertical-curator cards should now render side-by-side wherever Mac-side surfaces a catalog page for `artifacts/quants/`: `finance-chat-gguf` (week 1) → `saul-7b-instruct-v1-gguf` (week 2) → `securityllm-gguf` (week 3). Suggested ordering: chronological-desc.
-- The cyber article should appear in the Machine that Builds Machines series listing. It's a peer to `becoming-a-gguf-publisher-on-spark` and `becoming-a-legal-curator-on-spark` in series + book_chapters; the fn-diagram visually anchors the three-vertical relationship.
-- The home-page "At a glance" infographic now reads 41 articles. The cyber tag list may be new — `[cyber, security]` enters tag-stat aggregation.
-- The fieldkit landing page (`/fieldkit/`) version prop continues to display `0.4.1` — no change this cycle. The page's "Articles in this release" section may already render an empty list for v0.4.1+ (the cyber article doesn't list a v0.4.1 release coupling — its `fieldkit_modules` field declares `eval` but the cycle is article-only, not a release coupling).
+- The fieldkit landing page (`/fieldkit/`) should display `0.4.2` everywhere a version is rendered (`FieldkitHero`, `FieldkitCli` demo line, `FieldkitCTAFooter`). The `audit-landing` rule guarantees no hardcoded version literal exists in any `*.astro` file under `src/components/sections/fieldkit/`, so this should update cleanly with the `_version.py` read.
+- The `Articles in this release` section on the v0.4.1 → v0.4.2 transition lists `becoming-a-cyber-curator-on-spark` (per CHANGELOG). Mac-side article-listing surfaces should reflect this if/when they index by `fieldkit_modules` × release coupling.
+- The `recommended_variant` schema field on `artifacts` is now source-side authoritative. Once a vertical-4 push runs through v0.4.2, its `<slug>.yaml` will arrive with `recommended_variant:` populated — Mac's destination catalog can then render the "Sweet spot" badge from the manifest directly instead of running the rank-avg picker or hand-pinning.
+- No new HF repos; the three existing Orionfold cards (`finance-chat-GGUF`, `Saul-7B-Instruct-v1-GGUF`, `SecurityLLM-GGUF`) remain the catalog set.
