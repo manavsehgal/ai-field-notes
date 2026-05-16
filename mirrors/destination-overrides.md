@@ -8,7 +8,7 @@
 > adds a new top-level page or override, Mac CC opens a PR back to source updating only this
 > file (PR title prefix: `mirror: destination-overrides update — <date> — <summary>`).
 >
-> **Last reverse-sync: 2026-05-12.**
+> **Last reverse-sync: 2026-05-16.**
 
 ## Top-level pages (Mac-authoritative)
 
@@ -38,6 +38,36 @@ These will appear as `fieldkit v0.4` ships artifact-publishing modules. Mac owns
 - `/artifacts/spaces/` — HF Space app catalog (G10).
 - `/artifacts/benchmarks/` — eval benchmark publisher catalog (G11).
 - `/skills/**` — cross-vendor SKILL.md catalog (D7 + side-effect distribution), if/when it ships.
+
+## Article-body overrides (narrow, gated)
+
+Articles live under `articles/**` and are Spark-authoritative for editorial content. Mac CC owns the
+following narrow append-only chrome blocks; Spark CC never writes these blocks and never overwrites
+them on republish. The blocks are gated on destination-side conditions Spark cannot observe (e.g.
+existence of a matching artifact manifest), so the safe rule is "if you see one of these blocks at
+the tail of an article, leave it alone."
+
+- **Trailing catalog footer** — When an article has a matching artifact manifest at
+  `src/content/artifacts/<slug>.yaml` (destination-side), Mac CC appends a single trailing block of
+  the shape:
+
+  ```markdown
+  ---
+
+  **Catalog page:** [`/artifacts/quants/<slug>/`](/artifacts/quants/<slug>/) — the same four-axis card rendered on this site, with the sweet-spot variant highlighted on a heatmap row.
+  ```
+
+  The block sits after the article's final editorial paragraph (or after the last `:::` if the
+  article closes inside a directive). It points at destination-side catalog URLs (`/artifacts/<kind>/<slug>/`)
+  that Mac owns per the chrome boundary table. Spark CC never emits this block; if `tech-writer`
+  ever needs a similar pointer at source, surface it as a separate handoff item rather than writing
+  into this gated region.
+
+  Currently in use on (auto-grown as new artifact manifests land):
+  - `articles/becoming-a-cyber-curator-on-spark/article.md` → `/artifacts/quants/securityllm-gguf/`
+  - `articles/becoming-a-legal-curator-on-spark/article.md` → `/artifacts/quants/saul-7b-instruct-v1-gguf/`
+  - `articles/becoming-a-gguf-publisher-on-spark/article.md` → `/artifacts/quants/finance-chat-gguf/`
+  - `articles/becoming-a-medical-curator-on-spark/article.md` → `/artifacts/quants/ii-medical-8b-gguf/` (added 2026-05-16)
 
 ## Style overrides
 

@@ -1,5 +1,5 @@
 <!--
-  ⚠️ STATUS: NEW — Mac sweep pending.
+  ✅ STATUS: SHIPPED — Mac swept 2026-05-16 at destination commit manavsehgal/ainative-business.github.io@10a74a5 (medical-vertical-II-Medical-8B cycle).
   This file is one feature/release at a time, not a running log.
   At the next release prompt, **clear this entire file and start fresh** (do NOT append to existing sections).
   Last reset: 2026-05-16 (medical-vertical / II-Medical-8B-GGUF live HF push).
@@ -14,7 +14,9 @@
 -->
 ---
 release_slug: 2026-05-16-medical-vertical-II-Medical-8B
-status: NEW
+status: SHIPPED
+swept_at: 2026-05-16
+swept_by: manavsehgal/ainative-business.github.io@10a74a5
 source_range: f23efb3..HEAD
 articles_added:
   - slug: becoming-a-medical-curator-on-spark    # status: published — full 8-section draft promoted in commit f005b52 with new MedicalQuad signature
