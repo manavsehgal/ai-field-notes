@@ -162,6 +162,12 @@ const artifacts = defineCollection({
     sustained_load_minutes: z.number().optional(),
     vertical_eval: z.record(z.string(), z.number()).optional(),
     vertical_eval_name: z.string().optional(),
+    // Article-narrative pick — when set, destination catalogs pin the
+    // "Sweet spot" badge to this variant instead of running the rank-avg
+    // picker. Mirrors `ArtifactManifest.recommended_variant` (fieldkit
+    // v0.4.2). Mac added the same field to its own artifacts schema in
+    // PR #6; this is the forward-compatible source mirror.
+    recommended_variant: z.string().optional(),
     lineage_run_id: z.string().optional(),
     license: z.object({
       tier: z.string().default('free'),

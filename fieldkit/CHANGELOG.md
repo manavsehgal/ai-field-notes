@@ -6,10 +6,27 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
-### Added — `fieldkit.publish` card-rendering polish (v0.4.2 candidates)
+## [0.4.2] — 2026-05-15
+
+Patch release. Two card-rendering polish lifts on `fieldkit.publish` driven by the 2026-05-15 cyber-vertical cycle (`Orionfold/SecurityLLM-GGUF`, the third vertical card on this surface — zero fieldkit source changes between Saul / cyber, the v0.4.1 publishing surface generalized exactly as designed). Both lifts are additive (one new `ModelCard` field already shipped on `main` in `ff1b92f`; one new `ArtifactManifest` field added here). No new modules, no new public classes, no breaking changes — purely a tightening pass.
+
+### Added — `fieldkit.publish` card-rendering polish
 
 - **`ModelCard.llama_cpp_example_prompt: Optional[str]`** — new field. Threads through `publish_quant(..., llama_cpp_example_prompt=...)` and from a duck-typed report's `.llama_cpp_example_prompt` attribute. The default `## How to run` body's `llama-cpp-python` snippet now uses this string for the user-message; when omitted it falls back to a neutral `"Summarize the key idea in one paragraph."` placeholder instead of the previously-hardcoded `"Explain working capital."` (which leaked into the legal + cyber vertical cards on first push). Multi-line MCQ-shaped prompts are JSON-escaped (`\n`) so the snippet stays single-line + valid Python — caller passes the raw prompt, the renderer handles escaping.
-- **Side fix:** the previous renderer rendered the hardcoded finance prompt on every vertical card; the cyber + legal cards on HF were patched out-of-band on 2026-05-15. Going forward, every `publish_quant` call should pass `llama_cpp_example_prompt=...` matching the article's "Using this release" section, per `[[feedback_customer_link_audit]]`.
+- **Side fix:** the previous renderer rendered the hardcoded finance prompt on every vertical card; the cyber + legal cards on HF were patched out-of-band on 2026-05-15 (commits `365dfe2`, `0824439`). Going forward, every `publish_quant` call should pass `llama_cpp_example_prompt=...` matching the article's "Using this release" section, per `[[feedback_customer_link_audit]]`.
+- **`ArtifactManifest.recommended_variant: Optional[str]`** — new field. Was already on `ModelCard` (so the README's How-to-run snippets template against the article's pick) but did NOT flow into the `<slug>.yaml` manifest, so the destination catalog couldn't see the article's narrative choice and ran its own rank-avg picker instead. `publish_quant` now threads `recommended_variant` into both surfaces — the HF README badge and the destination "Sweet spot" badge stay in sync from one kwarg. Mac added the matching `recommended_variant: z.string().optional()` to its artifacts schema in PR #6 (`mac-sweep/2026-05-15-cyber-vertical`) and pinned cyber's catalog `Q4_K_M` manually; source `src/content.config.ts` now mirrors that field for forward-compat. Motivated by cyber-vertical (2026-05-15): `Q4_K_M` topped CyberMetric at 40% but its worst-in-class perplexity dragged its rank-avg down, so without the override the picker selected `Q5_K_M`.
+
+### Test suite
+
+**+3 new tests:** `test_artifact_manifest_carries_recommended_variant_when_set` + `test_artifact_manifest_omits_recommended_variant_when_unset` (round-trip + elision on the new manifest field) and `test_publish_quant_threads_recommended_variant_into_card_and_manifest` (kwarg threads to both surfaces via `publish_quant`). Total: **378 passed, 3 skipped** offline (`pytest -q`). The 3 skips are the two `--spark`-gated live-integration tests + the `torch`-import skip in `test_training.py` (CPU-only venv).
+
+### Articles in this release
+
+- [`becoming-a-cyber-curator-on-spark`](https://ainative.business/field-notes/becoming-a-cyber-curator-on-spark/) — third Orionfold quant card. Drives both lifts: surfaces the `llama_cpp_example_prompt` leak (cyber's MCQ prompt would have shipped as "Explain working capital." otherwise) and motivates `ArtifactManifest.recommended_variant` (the destination's rank-avg picker would have surfaced `Q5_K_M` instead of `Q4_K_M`).
+
+### Verified on Spark
+
+- **Live HF push:** `Orionfold/SecurityLLM-GGUF` (5 GGUF variants + README, ~26 GB) shipped 2026-05-15 via the same `publish_quant(dry_run=False)` path as Saul and finance-chat. Zero source changes in `fieldkit.publish` between Saul (v0.4.1) and cyber (the cycle that drove this v0.4.2 patch) — the surface generalized as designed across three verticals.
 
 ## [0.4.1] — 2026-05-14
 

@@ -99,6 +99,7 @@ m = ArtifactManifest(
     sustained_load_minutes=2.18,
     vertical_eval={"Q4_K_M": 0.14, ...},
     vertical_eval_name="FinanceBench (n=50, numeric_match)",
+    recommended_variant="Q5_K_M",           # article-narrative pick; destination pins the "Sweet spot" badge to this variant
     lineage_run_id=None,
     license_tier="free",                    # Orionfold commercial tier (free / pro)
     license_commercial_tier=None,
@@ -112,6 +113,8 @@ print(m.to_yaml())
 ```
 
 The `license_tier` / `license_commercial_tier` fields live alongside `model_license` under a nested `license:` block in YAML output. Mac destination's Zod schema mirrors this shape.
+
+`recommended_variant` (v0.4.2+) lets the article's narrative pick — the variant the writeup recommends — override the destination's rank-avg picker. Cyber's `Q4_K_M` topped CyberMetric but its worst-in-class perplexity dragged its rank-avg down, so without this field the catalog page would pin `Q5_K_M` as the "Sweet spot" instead. Same value flows into both `ModelCard` (HF README's How-to-run snippets) and `ArtifactManifest` (destination catalog) so the badge and the snippet stay in sync.
 
 ### `write_artifact_manifest(manifest, *, artifacts_dir)`
 

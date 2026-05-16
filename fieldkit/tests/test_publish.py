@@ -457,6 +457,32 @@ def test_artifact_manifest_carries_vertical_eval_when_set() -> None:
     assert "vertical_eval_name:" in yaml_text
 
 
+def test_artifact_manifest_carries_recommended_variant_when_set() -> None:
+    m = ArtifactManifest(
+        slug="securityllm-gguf",
+        kind="quant",
+        artifact_class="gguf",
+        base_model="ZySec-AI/SecurityLLM",
+        hf_repo="Orionfold/SecurityLLM-GGUF",
+        variants=("Q4_K_M", "Q5_K_M"),
+        recommended_variant="Q4_K_M",
+    )
+    d = m.to_dict()
+    assert d["recommended_variant"] == "Q4_K_M"
+    yaml_text = m.to_yaml()
+    assert "recommended_variant: Q4_K_M" in yaml_text
+
+
+def test_artifact_manifest_omits_recommended_variant_when_unset() -> None:
+    m = ArtifactManifest(
+        slug="s", kind="quant", artifact_class="gguf",
+        base_model="b", hf_repo="Orionfold/x",
+    )
+    d = m.to_dict()
+    assert "recommended_variant" not in d
+    assert "recommended_variant" not in m.to_yaml()
+
+
 def test_artifact_manifest_yaml_is_parseable_round_trip() -> None:
     yaml_text = ArtifactManifest(
         slug="s",
@@ -651,6 +677,29 @@ def test_publish_quant_reads_vertical_eval_from_quant_report_duck_typed(
     card = result.card_path.read_text()
     assert "LegalBench (mini)" in card
     assert "55.0%" in card and "60.0%" in card
+
+
+def test_publish_quant_threads_recommended_variant_into_card_and_manifest(
+    tmp_path: Path,
+) -> None:
+    """`recommended_variant` kwarg flows to the README's How-to-run snippets
+    AND to the manifest YAML so the destination catalog pins the same pick."""
+    qr = _stub_quant_report(tmp_path / "source")
+    result = publish_quant(
+        quant_report=qr,
+        base_model="ZySec-AI/SecurityLLM",
+        repo_name="SecurityLLM-GGUF",
+        staging_dir=tmp_path / "stage",
+        artifacts_dir=tmp_path / "content" / "artifacts",
+        recommended_variant="Q4_K_M",
+        dry_run=True,
+    )
+    card = result.card_path.read_text()
+    # The default How-to-run snippet templates against the recommended variant
+    assert "Q4_K_M" in card
+    # Manifest YAML carries the recommended_variant field
+    manifest = result.manifest_path.read_text()
+    assert "recommended_variant: Q4_K_M" in manifest
 
 
 def test_publish_quant_threads_model_license_into_card_and_manifest(

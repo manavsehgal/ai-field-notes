@@ -536,6 +536,14 @@ class ArtifactManifest:
     vertical_eval_name: Optional[str] = None
     """Display name for the vertical eval (e.g.,
     "FinanceBench (n=50, numeric_match)")."""
+    recommended_variant: Optional[str] = None
+    """Article-narrative pick for the "Sweet spot" — the variant the catalog
+    page should pin under `recommended_variant:` instead of letting the
+    destination's rank-avg picker choose. Mirrors `ModelCard.recommended_variant`
+    so the HF README badge and the destination catalog page stay in sync.
+    Added in v0.4.2 after cyber-vertical: Q4_K_M topped the bench but its
+    worst-in-class perplexity dragged its rank-avg down, so the picker selected
+    Q5_K_M. This field lets the article's narrative judgment win."""
     lineage_run_id: Optional[str] = None
     license_tier: str = "free"
     license_commercial_tier: Optional[str] = None
@@ -575,6 +583,8 @@ class ArtifactManifest:
             d["vertical_eval"] = dict(self.vertical_eval)
         if self.vertical_eval_name:
             d["vertical_eval_name"] = self.vertical_eval_name
+        if self.recommended_variant:
+            d["recommended_variant"] = self.recommended_variant
         if self.lineage_run_id:
             d["lineage_run_id"] = self.lineage_run_id
         d["license"] = {"tier": self.license_tier}
@@ -966,6 +976,7 @@ def publish_quant(
             sustained_load_minutes=sustained,
             vertical_eval=vertical_eval,
             vertical_eval_name=vertical_eval_name,
+            recommended_variant=recommended_variant,
             lineage_run_id=lineage_run_id,
             model_license=model_license,
             article=f"articles/{article_slug}/" if article_slug else None,
