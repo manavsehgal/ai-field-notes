@@ -26,7 +26,7 @@
 
 | Articles | Words | Lines of code | Models | NVIDIA products |
 |:-:|:-:|:-:|:-:|:-:|
-| **37** *(+4 upcoming)* | **124,081** | **24,254** | **8** | **11** |
+| **37** *(+5 upcoming)* | **124,081** | **24,254** | **8** | **11** |
 
 ### Stages
 
@@ -36,9 +36,9 @@
 | [Training](https://ainative.business/field-notes/stage/training/) | 12 | 1 |
 | [Fine-tuning](https://ainative.business/field-notes/stage/fine-tuning/) | 8 | 1 |
 | [Inference](https://ainative.business/field-notes/stage/inference/) | 14 | — |
-| [Deployment](https://ainative.business/field-notes/stage/deployment/) | 5 | — |
+| [Deployment](https://ainative.business/field-notes/stage/deployment/) | 5 | 1 |
 | [Agentic](https://ainative.business/field-notes/stage/agentic/) | 14 | — |
-| [Observability](https://ainative.business/field-notes/stage/observability/) | 9 | 1 |
+| [Observability](https://ainative.business/field-notes/stage/observability/) | 9 | 2 |
 | [Dev-tools](https://ainative.business/field-notes/stage/dev-tools/) | 2 | 1 |
 
 ### Products & frameworks
@@ -121,6 +121,7 @@ Each article is a deep-dive essay grown from a single session transcript on the 
 - **[Orionfold/Saul-7B-Instruct-v1-GGUF on Spark — five legal variants, LegalBench mini-eval, four-axis measurement card](https://ainative.business/field-notes/articles/becoming-a-legal-curator-on-spark/)** — Five GGUF variants of Equall/Saul-7B-Instruct-v1 measured on a DGX Spark — Q5_K_M scores 72% on LegalBench (n=50, contains) at 20 tok/s and 4.8 GB. Each card carries perplexity, sustained tok/s, thermal envelope, and a 5-task LegalBench subset score.
 - **[Orionfold/finance-chat-GGUF on Spark — five variants, FinanceBench mini-eval, four-axis measurement card](https://ainative.business/field-notes/articles/becoming-a-gguf-publisher-on-spark/)** — Five GGUF variants of AdaptLLM/finance-chat measured on a DGX Spark — Q8_0 perplexity-matches F16 losslessly, Q4_K_M ships at 31 tok/s. Each card carries perplexity, sustained tok/s, thermal envelope, and FinanceBench accuracy.
 - **[TensorRT-LLM on the Spark — FP8 Isn't the Reason to Drop NIM. NVFP4 Is.](https://ainative.business/field-notes/articles/trtllm-and-triton-on-spark/)** — Dropping below NIM to raw TensorRT-LLM on a GB10 Spark. FP8 beats NIM's vLLM by 10-15% — barely worth the rebuild. NVFP4 beats it by 76% on decode, 43% on TTFT, and ships a 34%-smaller engine. The reason to drop NIM is the Blackwell-native 4-bit kernel, not FP8.
+- 🔜 **[Orionfold/II-Medical-8B-GGUF on Spark — five medical-reasoning variants, MedMCQA mini-eval, ChatML reasoning format](https://ainative.business/field-notes/articles/becoming-a-medical-curator-on-spark/)** *(planned 2026-05-16)* — Vertical 4 in the Orionfold series — five GGUF variants of Intelligent-Internet's II-Medical-8B (Qwen3-8B base, SFT + DAPO reasoning recipe) measured on a DGX Spark. Q5_K_M lands at 36.4 tok/s, 5.45 GB, and 52% on a MedMCQA n=50 mini-eval — slightly above F16. First reasoning-recipe pick in the series.
 
 ### Agentic
 

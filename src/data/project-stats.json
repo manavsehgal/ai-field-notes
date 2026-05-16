@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-05-16T01:39:30Z",
+  "generated_at": "2026-05-16T09:40:14Z",
   "articles": {
     "total": 37,
     "published": 37,
-    "upcoming": 4,
+    "upcoming": 5,
     "drafts": 0
   },
   "words": {
@@ -45,9 +45,9 @@
     "training": 1,
     "fine-tuning": 1,
     "inference": 0,
-    "deployment": 0,
+    "deployment": 1,
     "agentic": 0,
-    "observability": 1,
+    "observability": 2,
     "dev-tools": 1
   },
   "models": [
