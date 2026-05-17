@@ -51,15 +51,22 @@ The `## Methods` section already links to the article at `https://ainative.busin
 
 Check 4 already validates the article exists locally; this reference adds the requirement that the wire-back is *explicit and visible*, not just a buried URL.
 
-### 4. GitHub Sponsors link — the conversion endpoint
+### 4. Launch-list call — the engagement endpoint
 
-Engagement-pull without a conversion endpoint is a vanity metric. The Orionfold series has a clear funnel: HF card → article deep-dive → GitHub Sponsors. Every card includes a Sponsors line in the footer:
+Engagement-pull without a conversion endpoint is a vanity metric. The Orionfold funnel is: HF card → article deep-dive → orionfold.com mailing list. **The endpoint is the launch list**, not a paid Sponsors page — Orionfold's commercial brand is still pre-launch, asking for sponsorship is premature. Every card includes a launch-list line in the footer:
 
 ```markdown
-> Built on the NVIDIA DGX Spark by [@manavsehgal](https://github.com/manavsehgal). If this saves you a week of quant work, [sponsor the next vertical](https://github.com/sponsors/manavsehgal).
+> Want to know when the next Orionfold vertical curator drops? [Join the launch list at orionfold.com](https://orionfold.com).
 ```
 
-The placement matters: footer, after the License section, single line, conversational. Not an ad-block; a credit-line that happens to convert.
+The placement matters: footer, after the publisher attribution line, single line, conversational. Not an ad-block; a "stay in the loop" credit-line that captures interested traffic into a real channel.
+
+**When Sponsors becomes the right endpoint** (revisit per `[[project_orionfold_parent_brand]]`):
+- Orionfold has shipped 6+ verticals (commercial credibility floor)
+- A working `github.com/sponsors/manavsehgal` page exists (don't link before it exists — a 404 conversion endpoint is worse than nothing)
+- The product launch on orionfold.com has happened (sponsorship asks land better post-launch)
+
+Until those conditions hold, the launch list is the right call.
 
 ### 5. Frontmatter metadata completeness
 

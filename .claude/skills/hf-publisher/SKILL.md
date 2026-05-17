@@ -276,9 +276,10 @@ grep -n -E "^## Spark-tested|^## How to run" "$AUDIT_DIR/README.md"
 grep -n "Other Orionfold vertical curators" "$AUDIT_DIR/README.md"
 # Expect 1 hit; if 0, missing.
 
-# Element 3 — Sponsors footer
-grep -n "github.com/sponsors" "$AUDIT_DIR/README.md"
-# Expect ≥1 hit; if 0, missing.
+# Element 3 — Launch-list footer (Sponsors is deferred per references/card-polish.md §4)
+grep -nE "Join the launch list|github\.com/sponsors" "$AUDIT_DIR/README.md"
+# Expect ≥1 hit; if 0, missing. Launch-list is the current default endpoint;
+# Sponsors becomes valid once orionfold.com launches + 6+ verticals ship.
 
 # Element 4 — Read-the-deep-dive wire-back
 grep -nE "Read the deep-dive|ainative\.business/field-notes" "$AUDIT_DIR/README.md"
@@ -308,7 +309,7 @@ Write `$AUDIT_DIR/gaps.md` summarising verify_stage output + the step-D hand-che
 |--------------------------------------|----------|-------------------------------------------|
 | Spark-tested block above How to run | <Y/N>    | <line numbers>                           |
 | Cross-link block                     | <Y/N>    | <listed siblings vs expected>            |
-| GitHub Sponsors footer               | <Y/N>    |                                          |
+| Launch-list footer                   | <Y/N>    | (Sponsors deferred — see card-polish.md §4) |
 | Article wire-back                    | <Y/N>    |                                          |
 | Recommended variant prominent        | <Y/N>    |                                          |
 
