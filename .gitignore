@@ -25,7 +25,8 @@ pnpm-debug.log*
 # local-only working material (not for the public blog)
 ideas/
 HANDOFF.md
-.claude/
+.claude/*
+!.claude/skills/
 
 # transient vibe-test artifacts (Playwright screenshots written to repo root)
 .playwright-mcp/
