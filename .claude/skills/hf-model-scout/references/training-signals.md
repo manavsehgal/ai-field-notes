@@ -88,3 +88,7 @@ When `chat_format` is MISSING but the name + README both signal SFT, surface as 
 ## When in doubt
 
 Recommend the SAFE choice: a clearly SFT-tagged sibling. Almost every domain has both `*-pretrain` and `*-chat` variants from the same author (AdaptLLM publishes both, EleutherAI publishes both, Microsoft publishes both). Pick the chat variant; let the user override if they specifically want pretrain.
+
+## Downstream — the Q8_0 shape implication
+
+The training-type classification above has a second use beyond trap-avoidance: it predicts Q8_0 throughput on GB10 (continued-pretrain shapes saw Q8_0 *slower* than F16; chat-tune-only shapes saw Q8_0 *faster*). See `references/quant-shape-signals.md` for the n=4 evidence table, per-shape Q8_0 expectation, and the vertical N+1 sample-balancing rule the scout report should encode.

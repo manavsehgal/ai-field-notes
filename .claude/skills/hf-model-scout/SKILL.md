@@ -140,7 +140,16 @@ Each probe writes one JSON to `$RUN_DIR/probes/<repo-slug>/probe.json`:
 
 `score` is 0–100; baseline = trending+downloads percentile + 10 per passing axis. Top 3 of the RECOMMEND-tier go into the report.
 
-### Step 4. Write the report
+### Step 4. Gather the sample-balancing state
+
+Before writing the report, read the current Orionfold shape distribution so the recommendation can pre-load the Q8_0 expectation per `references/quant-shape-signals.md`. Two paths:
+
+- **Fast path** — read the snapshot table in `references/quant-shape-signals.md` ("Vertical N+1 sample-balancing — the discriminating-pick rule") and use the counts. Cheap; one read; drift risk if a vertical has shipped since the doc was edited.
+- **Authoritative path** — survey shipped verticals via `git log --diff-filter=A --name-only -- 'articles/becoming-a-*-curator-on-spark/' | head -50`, then for each `becoming-a-<X>-curator-on-spark` resolve the base model's training shape (cross-check `articles/<slug>/index.mdx` or the HF card). Use this when you suspect the snapshot is stale (>1 week since last vertical ship date).
+
+Record the resulting count (e.g., "current: 2 continued-pretrain / 2 chat-tune-only") in a one-line state variable; you'll inline it into the report header in step 5. Also pre-tag each candidate's training-shape so step 5 can emit the per-pick "Q8_0 expectation" line.
+
+### Step 5. Write the report
 
 Template at `references/report-template.md`. The shape:
 
@@ -150,15 +159,24 @@ Template at `references/report-template.md`. The shape:
 > Run: <YYYY-MM-DD HH:MM:SS UTC> · <license_tier> · <eval_bench>
 > <user-notes line if supplied>
 
+## Sample-balancing gate
+
+> Current Orionfold shape distribution: <N> continued-pretrain (<verticals>), <M> chat-tune-only (<verticals>).
+> Strategy prescription this cycle: pick **<shape>** to promote the n=<count> pattern toward an n=<count+1> rule.
+> Source: `references/quant-shape-signals.md` + `[[project_q8_anomaly_model_specific]]`.
+
+(Use this block to frame the picks below. If all top-3 candidates fall on the prescribed side, no further action. If none do, flag in the "Why it wins" paragraph and recommend either re-running on different keywords or accepting an off-prescription sample.)
+
 ## Recommended picks
 
 ### 1. <repo> — score N/100 · <one-line verdict>
 - **License**: <tag> — <commercial-OK or NC-blocker>
 - **Chat format**: <llama-2/llama-3/chatml/…> — detection signal: `<tokenizer-template snippet>`
 - **Training type**: <SFT/RLHF/DPO/continued-pretrain> — based on name + README
+- **Q8_0 expectation**: <~25–35% slower / ~70–80% faster / UNKNOWN_SHAPE> — recommended-variant default = <Q5_K_M / Q4_K_M / Q8_0 / defer> per `references/quant-shape-signals.md`
 - **Spark envelope**: F16=<X> GB, Q4_K_M=<Y> GB, est tg=<Z> tok/s — <fits / doesn't fit>
 - **llama.cpp**: <arch> supported ✓
-- **Why it wins**: <one paragraph — what makes this the right pick vs the others>
+- **Why it wins**: <one paragraph — what makes this the right pick vs the others; if this is the prescribed shape, say so; if it isn't, note the trade-off vs the sample-balancing strategy>
 
 ### 2. <repo> — score N/100 …
 ### 3. <repo> — score N/100 …
@@ -207,6 +225,7 @@ User says "quick scout" or "give me a one-liner". Skip step 3. Run step 1 + 2, s
 
 - `references/vertical-queries.md` — search query stems per vertical (finance/legal/cyber/medical/code/math), with rationale for each keyword pick
 - `references/training-signals.md` — name pattern + README signal table for SFT/RLHF/DPO vs continued-pretrain
+- `references/quant-shape-signals.md` — downstream Q8_0 expectation per training shape (n=4 evidence) + the vertical N+1 sample-balancing rule
 - `references/arch-compat.md` — `convert_hf_to_gguf.py` supported architectures, kept in sync with llama.cpp release tags
 - (cross-skill) `~/.claude/skills/hf-publisher/references/chat-formats.md` — chat-template detection table
 - (cross-skill) `~/.claude/skills/hf-publisher/references/license-tags.md` — license-tag decision tree
@@ -216,6 +235,7 @@ User says "quick scout" or "give me a one-liner". Skip step 3. Run step 1 + 2, s
 
 - `[[feedback_chat_vs_continued_pretrain_trap]]` — the load-bearing reason this skill exists
 - `[[feedback_preflight_bench_before_quant]]` — the gate downstream of this skill
+- `[[project_q8_anomaly_model_specific]]` — the 4-vertical Q8_0 split feeding the sample-balancing gate
 - `[[project_orionfold_parent_brand]]` — the commercial-tier constraint on `license_tier=permissive` default
 - `[[project_spark_unified_memory_oom]]` — the upper bound on Spark envelope checks
 
