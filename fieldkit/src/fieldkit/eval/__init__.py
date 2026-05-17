@@ -45,6 +45,8 @@ __all__ = [
     "REFUSAL_PATTERNS",
     "RUBRIC_CORRECTNESS",
     "RUBRIC_FAITHFULNESS",
+    "RUBRIC_OFFICE_ACTION_ARGUMENT",
+    "RUBRIC_PATENT_CLAIM_VALIDITY",
     "RUBRIC_RELEVANCE",
     "AgentRun",
     "AssertionGrader",
@@ -60,6 +62,7 @@ __all__ = [
     "MatchedBaseComparisonResult",
     "PassAtK",
     "PassAtKResult",
+    "PriorArtRelevanceResult",
     "Trajectory",
     "TrajectoryIter",
     "TurnDetail",
@@ -67,10 +70,16 @@ __all__ = [
     "VerticalQA",
     "contains",
     "exact_match",
+    "irac_structure",
     "is_refusal",
+    "load_rubric",
     "mcq_letter",
     "numeric_match",
+    "office_action_argument",
     "pass_at_k_estimator",
+    "patent_claim_validity",
+    "prior_art_relevance",
+    "prior_art_relevance_full",
     "summarize_agent_runs",
     "summarize_metric",
 ]
@@ -157,6 +166,365 @@ def mcq_letter(
     if m:
         return 1.0 if m.group(1).upper() == exp else 0.0
     return 0.0
+
+
+# --- Patent-strategist specialty scorers ---------------------------------
+# Added in v0.4.3 alongside the `format='patent-strategist'` branch of
+# `VerticalBench`. Two are LLM-judge-backed (`patent_claim_validity`,
+# `office_action_argument` — they wrap a caller-supplied `Judge`), one is
+# deterministic regex-checklist (`irac_structure`), and one is a pure
+# Spearman-rank reducer over ranked prior-art lists (`prior_art_relevance`).
+# Per `specs/patent-strategist-v1.md` §3.3. Rubric markdown ships alongside
+# this module under `rubrics/` and loads via `load_rubric()`.
+
+
+def load_rubric(name: str) -> str:
+    """Return the text of a rubric markdown file shipped with `fieldkit.eval`.
+
+    `name` is the bare filename without extension — e.g. ``"patent_claim_validity"``
+    resolves to ``fieldkit/eval/rubrics/patent_claim_validity.md``. The file
+    is read once per call (small files, no caching needed for the wheel-bundled
+    surface).
+    """
+    rubrics_dir = Path(__file__).parent / "rubrics"
+    path = rubrics_dir / f"{name}.md"
+    return path.read_text(encoding="utf-8")
+
+
+RUBRIC_PATENT_CLAIM_VALIDITY: str = load_rubric("patent_claim_validity")
+"""System prompt for the PatentScore-methodology 7-dim claim-validity rubric.
+
+Pass to `Judge(client=..., rubric=RUBRIC_PATENT_CLAIM_VALIDITY)` and feed
+into `patent_claim_validity(predicted, expected, judge=<that judge>)`."""
+
+RUBRIC_OFFICE_ACTION_ARGUMENT: str = load_rubric("office_action_argument")
+"""System prompt for the 4-dim office-action-response rubric (rejection-type
+ID, statutory citation accuracy, argument structure, persuasiveness)."""
+
+
+def _format_rubric_hints(rubric: dict[str, Any] | None) -> str:
+    """Render a per-row rubric dict as a stable `Hints:` block.
+
+    Keys are sorted for determinism; list values get bullet-rendered; nested
+    objects fall through to `json.dumps`. Returns ``""`` on empty/None input.
+    """
+    if not rubric:
+        return ""
+    lines = ["Hints:"]
+    for k in sorted(rubric.keys()):
+        v = rubric[k]
+        if isinstance(v, (list, tuple)):
+            lines.append(f"- {k}:")
+            for item in v:
+                lines.append(f"  - {item}")
+        elif isinstance(v, dict):
+            lines.append(f"- {k}: {json.dumps(v, sort_keys=True)}")
+        else:
+            lines.append(f"- {k}: {v}")
+    return "\n".join(lines)
+
+
+def patent_claim_validity(
+    predicted: str,
+    expected: str,
+    *,
+    judge: Judge,
+    rubric: dict[str, Any] | None = None,
+) -> float:
+    """Score a predicted patent claim against a reference via the PatentScore
+    7-dim rubric (`RUBRIC_PATENT_CLAIM_VALIDITY`).
+
+    Caller supplies a `Judge` instance constructed with
+    `rubric=RUBRIC_PATENT_CLAIM_VALIDITY`; this function feeds the prediction
+    + reference (+ optional per-row `rubric` dict rendered as `Hints:`) into
+    `judge.grade()` and returns the parsed score, mapping ``None`` →
+    ``0.0`` so the bench's accuracy-averaging stays well-defined.
+
+    Per-row `rubric` keys are convention rather than enforcement — typical
+    examples include ``cited_prior_art``, ``claim_type``
+    (``independent`` / ``dependent``), ``dependency_target``,
+    ``statutory_focus`` (e.g. ``["102", "103"]``).
+    """
+    hints = _format_rubric_hints(rubric)
+    context: str | None = hints or None
+    result = judge.grade(
+        prediction=predicted,
+        reference=expected or None,
+        context=context,
+    )
+    return result.score if result.score is not None else 0.0
+
+
+def office_action_argument(
+    predicted: str,
+    expected: str,
+    *,
+    judge: Judge,
+    rubric: dict[str, Any] | None = None,
+) -> float:
+    """Score an attorney's predicted office-action response via the 4-dim
+    rubric (`RUBRIC_OFFICE_ACTION_ARGUMENT`).
+
+    Caller supplies a `Judge` constructed with that rubric; `predicted` is
+    the attorney response text, `expected` is the reference response (or
+    empty when the row's gold is a rubric dict only). Per-row `rubric`
+    convention keys: ``rejection_type`` (``102`` / ``103`` / ``112(a)`` /
+    ``112(b)`` / ``101`` / ``double-patenting`` / ``restriction``),
+    ``required_citations`` (list of expected MPEP/CFR/case cites),
+    ``claim_count``, ``relies_on_official_notice`` (bool).
+    """
+    hints = _format_rubric_hints(rubric)
+    context: str | None = hints or None
+    result = judge.grade(
+        prediction=predicted,
+        reference=expected or None,
+        context=context,
+    )
+    return result.score if result.score is not None else 0.0
+
+
+# IRAC structure detector — one regex per component. Each pattern matches if
+# the predicted response signals the component's presence via a section
+# heading, transition phrase, or canonical lead-in. Patterns are deliberately
+# tolerant (markdown / plain prose / numbered lists all hit) — false positives
+# are far less harmful than false negatives at the 0.25-granularity we report.
+_IRAC_PATTERNS: dict[str, re.Pattern[str]] = {
+    "issue": re.compile(
+        r"\b(?:issue\s*[:\s]|the\s+issue\b|question\s+presented\b|whether\b)",
+        re.IGNORECASE,
+    ),
+    "rule": re.compile(
+        r"(?:\brule\b|\bthe\s+rule\b|"
+        r"\bunder\s+(?:35\s+u\.?s\.?c\.?|the\s+(?:statute|law|holding|standard|mpep))|"
+        r"\bmpep\s+(?:§|sec(?:tion)?\.?)?\s*\d|"
+        r"\b35\s+u\.?s\.?c\.?\s*(?:§|sec(?:tion)?\.?)?\s*\d{2,3}|"
+        r"\blaw\s+(?:provides|states|requires)\b|"
+        r"\bholding\b)",
+        re.IGNORECASE,
+    ),
+    "application": re.compile(
+        r"(?:\bapplication\b|\bapplying\b|\bhere[,\s]|\bin\s+this\s+case\b|"
+        r"\bin\s+the\s+(?:present|instant)\b|"
+        r"\bthe\s+(?:present|instant)\s+(?:claim|application|invention)\b|"
+        r"\bas\s+applied\b|\bapplied\s+to\b)",
+        re.IGNORECASE,
+    ),
+    "conclusion": re.compile(
+        r"(?:\bconclusion\b|\bin\s+conclusion\b|\btherefore\b|\baccordingly\b|"
+        r"\bthus[,\s]|"
+        r"\bfor\s+(?:the\s+)?(?:above|foregoing)\s+reasons\b|"
+        r"\bin\s+sum\b|"
+        r"\bthe\s+(?:examiner|applicant)\s+(?:should|is\s+respectfully\s+requested)\b)",
+        re.IGNORECASE,
+    ),
+}
+
+
+def irac_structure(predicted: str, expected: str = "") -> float:
+    """Deterministic 4-checklist IRAC structure scorer.
+
+    Returns one of ``{0.0, 0.25, 0.5, 0.75, 1.0}`` — one quarter per IRAC
+    component (Issue / Rule / Application / Conclusion) detected via
+    regex on `predicted`. `expected` is ignored (the scorer measures
+    structural form, not factual agreement) but kept in the signature
+    for `VerticalBench` compatibility.
+
+    Detection patterns are deliberately tolerant: markdown headings,
+    plain-prose transitions, and canonical Patent-Bar lead-ins
+    ("Whether…", "Under 35 USC 103…", "Here…", "Therefore…") all count.
+    False positives are far less harmful than false negatives at this
+    granularity — the score's job is to flag *structural absence*, not
+    to grade rhetorical polish.
+    """
+    if not predicted:
+        return 0.0
+    hits = sum(1 for pat in _IRAC_PATTERNS.values() if pat.search(predicted))
+    return hits / 4.0
+
+
+@dataclass(frozen=True, slots=True)
+class PriorArtRelevanceResult:
+    """Full result from `prior_art_relevance_full` — both rank-correlation and
+    Likert-MSE figures. The bench-facing `prior_art_relevance` scorer
+    surfaces just `spearman_rho` per spec §3.3; callers who need both
+    metrics import this dataclass directly.
+    """
+
+    spearman_rho: float
+    mse_likert: float | None
+    n: int
+
+
+_RANKED_LIST_RE = re.compile(r"^[\s\-\*\d.\)]*([^\s].*?)\s*$")
+
+
+def _parse_ranked_list(s: str) -> list[str]:
+    """Tolerant parser: JSON array, comma-separated, or newline-separated.
+
+    Strips numeric / bullet / paren prefixes ("1.", "1)", "- ", "* ") so
+    a model can emit "1. doc-a\n2. doc-b" and the scorer recovers
+    ``["doc-a", "doc-b"]``. Empty/whitespace lines are dropped.
+    """
+    raw = (s or "").strip()
+    if not raw:
+        return []
+    if raw.startswith("["):
+        try:
+            arr = json.loads(raw)
+            if isinstance(arr, list):
+                return [str(x).strip() for x in arr if str(x).strip()]
+        except json.JSONDecodeError:
+            pass
+    sep = "\n" if "\n" in raw else ","
+    items: list[str] = []
+    for chunk in raw.split(sep):
+        chunk = chunk.strip()
+        if not chunk:
+            continue
+        m = _RANKED_LIST_RE.match(chunk)
+        if m:
+            items.append(m.group(1).strip())
+        else:
+            items.append(chunk)
+    return items
+
+
+def _spearman_rho(ranks_a: list[float], ranks_b: list[float]) -> float:
+    """Spearman rank correlation. Both inputs must be equal-length rank
+    vectors (already converted from raw values to ranks). Returns 0.0 for
+    n<2 (insufficient signal to correlate)."""
+    n = len(ranks_a)
+    if n < 2 or len(ranks_b) != n:
+        return 0.0
+    mean_a = sum(ranks_a) / n
+    mean_b = sum(ranks_b) / n
+    cov = sum((ranks_a[i] - mean_a) * (ranks_b[i] - mean_b) for i in range(n))
+    var_a = sum((r - mean_a) ** 2 for r in ranks_a)
+    var_b = sum((r - mean_b) ** 2 for r in ranks_b)
+    denom = math.sqrt(var_a * var_b)
+    if denom == 0.0:
+        return 0.0
+    return cov / denom
+
+
+def prior_art_relevance_full(
+    predicted: str | list[str],
+    expected: str | list[str],
+) -> PriorArtRelevanceResult:
+    """Compute Spearman ρ (and Likert MSE when both sides are numeric) between
+    a predicted ranked list of prior-art IDs and a gold ranked list.
+
+    Accepts list-of-str directly or a string (JSON / comma / newline). Items
+    in `predicted` that don't appear in `expected` are dropped; items in
+    `expected` that don't appear in `predicted` are assigned the worst
+    available rank (so omissions still penalize). Comparison is on the
+    overlap, padded for missing items.
+
+    `mse_likert` is computed only when both sides parse as numeric Likert
+    scores (1-5 relevance ratings rather than ID lists); otherwise it's
+    ``None``. The bench-facing `prior_art_relevance` surface uses
+    `spearman_rho` per spec §3.3.
+    """
+    pred_items = predicted if isinstance(predicted, list) else _parse_ranked_list(predicted)
+    gold_items = expected if isinstance(expected, list) else _parse_ranked_list(expected)
+    pred_items = [str(x) for x in pred_items]
+    gold_items = [str(x) for x in gold_items]
+
+    # Likert MSE branch — both sides parse as numbers and same length.
+    pred_nums = _try_parse_numeric_list(pred_items)
+    gold_nums = _try_parse_numeric_list(gold_items)
+    mse_likert: float | None
+    if pred_nums is not None and gold_nums is not None and len(pred_nums) == len(gold_nums) and pred_nums:
+        n = len(pred_nums)
+        mse_likert = sum((pred_nums[i] - gold_nums[i]) ** 2 for i in range(n)) / n
+        # When both sides are Likert vectors, Spearman runs on the numbers themselves.
+        rho = _spearman_rho(_rankify(pred_nums), _rankify(gold_nums))
+        return PriorArtRelevanceResult(spearman_rho=rho, mse_likert=mse_likert, n=n)
+
+    mse_likert = None
+
+    # ID-list branch — rank by position; missing-from-pred → worst available.
+    if not gold_items:
+        return PriorArtRelevanceResult(spearman_rho=0.0, mse_likert=None, n=0)
+
+    # Gold rank: 1 = best, N = worst.
+    gold_rank: dict[str, int] = {item: i + 1 for i, item in enumerate(gold_items)}
+    n_gold = len(gold_items)
+
+    # Predicted rank for each gold item: position in `pred_items`, or n_gold+1
+    # (worst-plus-one) if absent.
+    pred_rank: dict[str, int] = {}
+    seen: set[str] = set()
+    for i, item in enumerate(pred_items):
+        if item not in seen:
+            pred_rank[item] = i + 1
+            seen.add(item)
+
+    paired_gold: list[float] = []
+    paired_pred: list[float] = []
+    worst = n_gold + 1
+    for item in gold_items:
+        paired_gold.append(float(gold_rank[item]))
+        paired_pred.append(float(pred_rank.get(item, worst)))
+
+    # Re-rank both vectors before Spearman so positional gaps (from
+    # duplicates skipped in pred, or worst-rank padding) collapse to
+    # contiguous 1..N ranks. Without this, ["a","a","b","c"] vs ["a","b","c"]
+    # would produce pred-rank-vector [1,3,4] vs gold [1,2,3] and yield ρ≈0.98
+    # instead of the intuitive 1.0 (the pred order *is* monotonic in gold).
+    rho = _spearman_rho(_rankify(paired_pred), _rankify(paired_gold))
+    return PriorArtRelevanceResult(spearman_rho=rho, mse_likert=mse_likert, n=n_gold)
+
+
+def prior_art_relevance(
+    predicted: str | list[str],
+    expected: str | list[str],
+) -> float:
+    """Spearman ρ between predicted and gold prior-art rankings.
+
+    Bench-facing wrapper around `prior_art_relevance_full` — returns just
+    `spearman_rho` so it slots into `VerticalBench`'s
+    ``Callable[..., float]`` scorer contract. ρ ranges over ``[-1.0, 1.0]``;
+    bench averages it across questions per spec §3.3.
+
+    See `prior_art_relevance_full` for input parsing rules (JSON array,
+    comma-separated, newline-separated all accepted; list[str] accepted
+    directly) and the Likert-MSE second metric.
+    """
+    return prior_art_relevance_full(predicted, expected).spearman_rho
+
+
+def _try_parse_numeric_list(items: list[str]) -> list[float] | None:
+    """Return a list of floats if every item parses as a number, else None."""
+    if not items:
+        return None
+    out: list[float] = []
+    for x in items:
+        try:
+            out.append(float(x))
+        except (TypeError, ValueError):
+            return None
+    return out
+
+
+def _rankify(values: list[float]) -> list[float]:
+    """Convert a value vector to its average-rank vector (1-indexed).
+
+    Ties get the mean of the ranks they span — standard Spearman tie-handling.
+    """
+    n = len(values)
+    indexed = sorted(range(n), key=lambda i: values[i])
+    ranks = [0.0] * n
+    i = 0
+    while i < n:
+        j = i
+        while j + 1 < n and values[indexed[j + 1]] == values[indexed[i]]:
+            j += 1
+        avg_rank = (i + j) / 2.0 + 1.0
+        for k in range(i, j + 1):
+            ranks[indexed[k]] = avg_rank
+        i = j + 1
+    return ranks
 
 
 # --- Bench ---------------------------------------------------------------

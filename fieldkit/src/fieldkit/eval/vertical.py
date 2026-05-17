@@ -58,11 +58,21 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
 
-from fieldkit.eval import Bench, BenchCall, is_refusal, mcq_letter
+from fieldkit.eval import (
+    Bench,
+    BenchCall,
+    irac_structure,
+    is_refusal,
+    mcq_letter,
+    office_action_argument,
+    patent_claim_validity,
+    prior_art_relevance,
+)
 
 
 __all__ = [
     "PATENT_STRATEGIST_SCORERS",
+    "PATENT_STRATEGIST_SCORER_FNS",
     "VerticalBench",
     "VerticalQA",
     "contains",
@@ -74,12 +84,10 @@ __all__ = [
 # --- Patent-strategist scorer dispatch -----------------------------------
 
 PATENT_STRATEGIST_SCORERS: dict[str, str] = {
-    # Per `specs/patent-strategist-v1.md` §3.3. Values are scorer names
-    # rather than callables so callers resolve lazily — Family A/B/D/E
-    # specialty scorers (`patent_claim_validity`, `office_action_argument`,
-    # `irac_structure`, `prior_art_relevance`) land in fieldkit v0.4.3 / T6
-    # alongside this branch's first real usage; the dispatch keys are
-    # forward-stable.
+    # Per `specs/patent-strategist-v1.md` §3.3. Values are scorer *names*
+    # (strings) for callers that want lazy resolution or want to render the
+    # dispatch into a config dump. The matching live-callable map below
+    # (`PATENT_STRATEGIST_SCORER_FNS`) is the import-it-and-use surface.
     "A": "patent_claim_validity",        # generative / inventive — claim broadening/narrowing
     "B": "prior_art_relevance",          # search / analytical — Spearman ρ on ranked priors
     "C": "judge_rubric",                 # strategic / portfolio — open-ended Judge
@@ -92,6 +100,23 @@ PATENT_STRATEGIST_SCORERS: dict[str, str] = {
 configure ``VerticalBench(scorer=...)`` per-slice; per-row dispatch isn't
 wired into ``VerticalBench.run`` because each scorer has distinct kwargs
 (rubric dict, ranking list, judge backend) that don't share a signature."""
+
+
+PATENT_STRATEGIST_SCORER_FNS: dict[str, Callable[..., float]] = {
+    # Live-callable companion to `PATENT_STRATEGIST_SCORERS`. The two
+    # ``judge_rubric`` slots ("C", "E") aren't included here because they're
+    # open-ended `Judge.grade(...)` calls parameterized by the caller's
+    # chosen rubric — there isn't a single scorer fn that fits.
+    "A": patent_claim_validity,
+    "B": prior_art_relevance,
+    "D-mcq": mcq_letter,
+    "D-oa": office_action_argument,
+    "D-irac": irac_structure,
+}
+"""Live-callable map for the four T6 scorers + the promoted `mcq_letter`.
+Skips the two ``judge_rubric`` slots ("C", "E"): those are open-ended
+`Judge.grade(...)` calls where the rubric is caller-chosen, not a single
+named scorer fn."""
 
 
 @dataclass(frozen=True, slots=True)

@@ -17,10 +17,17 @@ from fieldkit.eval import (
     VerticalQA,
     contains,
     exact_match,
+    irac_structure,
     mcq_letter,
     numeric_match,
+    office_action_argument,
+    patent_claim_validity,
+    prior_art_relevance,
 )
-from fieldkit.eval.vertical import PATENT_STRATEGIST_SCORERS
+from fieldkit.eval.vertical import (
+    PATENT_STRATEGIST_SCORER_FNS,
+    PATENT_STRATEGIST_SCORERS,
+)
 
 
 # --- Scorers -----------------------------------------------------------------
@@ -713,3 +720,68 @@ class TestPatentStrategistFormat:
         s = bench.summary()
         assert s["n"] == 2
         assert s["accuracy"]["mean"] == 1.0  # both correct via mcq_letter
+
+    def test_scorer_fns_dispatch_resolves_to_callables(self) -> None:
+        # The live-callable companion must cover all non-judge_rubric slots
+        # and each value must be importable from fieldkit.eval verbatim.
+        assert PATENT_STRATEGIST_SCORER_FNS["A"] is patent_claim_validity
+        assert PATENT_STRATEGIST_SCORER_FNS["B"] is prior_art_relevance
+        assert PATENT_STRATEGIST_SCORER_FNS["D-mcq"] is mcq_letter
+        assert PATENT_STRATEGIST_SCORER_FNS["D-oa"] is office_action_argument
+        assert PATENT_STRATEGIST_SCORER_FNS["D-irac"] is irac_structure
+        # The two judge_rubric slots ("C", "E") aren't in the fn map by design.
+        assert "C" not in PATENT_STRATEGIST_SCORER_FNS
+        assert "E" not in PATENT_STRATEGIST_SCORER_FNS
+
+    def test_scorer_name_map_matches_fn_map(self) -> None:
+        # Every keyed scorer fn should have a matching name entry with the
+        # function's actual __name__ so config dumps + live dispatch stay in
+        # sync (no drift between the two surfaces).
+        for key, fn in PATENT_STRATEGIST_SCORER_FNS.items():
+            assert PATENT_STRATEGIST_SCORERS[key] == fn.__name__
+
+    def test_irac_end_to_end_via_vertical_bench(self, tmp_path: Path) -> None:
+        # Wire `irac_structure` as a vertical-bench scorer — it's the only
+        # T6 scorer that's bench-shaped (predicted, expected) → float and
+        # doesn't need a network. Validates the dispatch end-to-end without
+        # a live NIM.
+        rows = [
+            _ps_row(
+                "ps-irac-1",
+                "Write an IRAC response to this 103 rejection.",
+                "any-reference",
+                family="D",
+                use_case="D2",
+                scoring_mode="closed",
+            ),
+            _ps_row(
+                "ps-irac-2",
+                "Write an IRAC response.",
+                "any",
+                family="D",
+                use_case="D2",
+                scoring_mode="closed",
+            ),
+        ]
+        p = _write_jsonl(tmp_path, "ps.jsonl", rows)
+        vb = VerticalBench.from_jsonl(
+            p,
+            scorer=PATENT_STRATEGIST_SCORER_FNS["D-irac"],
+        )
+
+        def model_fn(prompt: str) -> str:
+            # First call: full IRAC; second: only I + R.
+            if "103 rejection" in prompt:
+                return (
+                    "Issue: whether the claim is obvious. "
+                    "Under 35 USC 103 the rule provides Graham factors apply. "
+                    "Here, the references fail to teach element X. "
+                    "Therefore the rejection should be withdrawn."
+                )
+            return "Issue: whether X. Under 35 USC 103 the rule applies."
+
+        bench = vb.run(model_fn)
+        s = bench.summary()
+        assert s["n"] == 2
+        # mean of 1.0 + 0.5 = 0.75
+        assert s["accuracy"]["mean"] == pytest.approx(0.75)

@@ -59,6 +59,7 @@ packages = ["src/fieldkit"]
 include = [
   "src/fieldkit/**/*.py",
   "src/fieldkit/**/data/*.json",
+  "src/fieldkit/eval/rubrics/*.md",
 ]
 
 [tool.hatch.build.targets.sdist]

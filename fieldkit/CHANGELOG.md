@@ -6,6 +6,38 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+### Added — `fieldkit.eval` patent-strategist scorer build-out (T6)
+
+Four new scorers in `fieldkit.eval` round out the `format='patent-strategist'` branch landed in v0.4.2 (T4) and the `mcq_letter` promotion (T5), per `specs/patent-strategist-v1.md` §3.3:
+
+- **`patent_claim_validity(predicted, expected, *, judge, rubric=None)`** — PatentScore-methodology 7-dim claim-validity scorer (novelty / non-obviousness / written-description / enablement / indefiniteness / subject-matter-eligibility / dependent-claim-structure). LLM-judge backed; caller supplies a `Judge(client=..., rubric=RUBRIC_PATENT_CLAIM_VALIDITY)`. Per-row `rubric` dict (e.g. `cited_prior_art`, `claim_type`) is rendered into a sorted, deterministic `Hints:` block fed to the judge as context. PatentScore methodology only — no data reuse from the cited paper (license unclear).
+- **`office_action_argument(predicted, expected, *, judge, rubric=None)`** — 4-dim office-action-response scorer (rejection-type identification, statutory citation accuracy, argument structure, persuasiveness). Same `Judge`-wrapping shape; per-row hints like `rejection_type`, `required_citations`, `claim_count`, `relies_on_official_notice` flow through the `Hints:` block.
+- **`irac_structure(predicted, expected="")`** — deterministic 4-checklist scorer for Patent-Bar-style IRAC responses. One regex per component (Issue / Rule / Application / Conclusion); returns `{0.0, 0.25, 0.5, 0.75, 1.0}` based on how many fire. Tolerant patterns — markdown headings, all-caps section labels, transition prose ("Whether…", "Under 35 USC 103…", "Here…", "Therefore…") all count. False positives are far less harmful than false negatives at quarter-granularity. The only T6 scorer that needs no network, so it's the one wired end-to-end through `VerticalBench` in the integration test.
+- **`prior_art_relevance(predicted, expected) -> float`** — Spearman ρ on ranked prior-art lists, returning just the rho per spec §3.3. Tolerant parser accepts JSON arrays (`'["a","b","c"]'`), comma-separated, or newline-separated (with `1.`, `1)`, `- `, `* ` prefixes stripped) as well as `list[str]` directly. Missing-from-pred gold items get worst-rank padding so omissions still penalize. The paired-rank vectors are re-rankified before correlation so positional gaps from dup-skipping or padding collapse to contiguous ranks — without this, `["a","a","b","c"]` vs `["a","b","c"]` would yield ρ≈0.98 instead of the intuitive 1.0. **`prior_art_relevance_full`** returns the same rho plus an `mse_likert` field (populated only when both sides parse as numeric Likert vectors) and `n`, packaged as the frozen `PriorArtRelevanceResult` dataclass.
+
+### Added — rubric markdown bundled in the wheel
+
+- **`fieldkit/src/fieldkit/eval/rubrics/{patent_claim_validity,office_action_argument}.md`** — system-prompt markdown shipped alongside the module. Loaded lazily via the new **`load_rubric(name)`** helper (and exposed via the **`RUBRIC_PATENT_CLAIM_VALIDITY`** / **`RUBRIC_OFFICE_ACTION_ARGUMENT`** module constants for the common case). `[tool.hatch.build.targets.wheel].include` extended with `src/fieldkit/eval/rubrics/*.md` so the markdown lands in the wheel.
+
+### Added — `fieldkit.eval.vertical` live-callable dispatch
+
+- **`PATENT_STRATEGIST_SCORER_FNS: dict[str, Callable[..., float]]`** — companion to the existing string-keyed `PATENT_STRATEGIST_SCORERS` map. Resolves the four T6 scorers + the promoted `mcq_letter` to live functions (skips the two `judge_rubric` slots ("C", "E") which are open-ended `Judge.grade(...)` calls without a single named scorer fn). Drift-detection test asserts every fn's `__name__` matches the matching string-map entry.
+
+### Test suite
+
+**+93 new tests** across three new test files + the existing vertical-bench test class:
+
+- `tests/eval/test_irac_structure.py` — perfect / partial / per-component-detector coverage; quarter-granularity parametrize; whitespace-only / empty / expected-arg-ignored edges.
+- `tests/eval/test_prior_art_relevance.py` — perfect / reversed / partial-overlap; string-parsing variants (JSON, comma, newline-numbered, bullet, paren-numbered); Likert MSE branch (perfect, off-by-one, length-mismatch fallback, non-numeric); dataclass shape (frozen, three fields); the known-value `n=4` swap (ρ=0.8) plus the dup-skip test that drove the `_rankify`-on-paired-vectors fix.
+- `tests/eval/test_judge_backed_scorers.py` — `load_rubric` round-trip + missing-file error; `_format_rubric_hints` (empty / scalar / list-bullet / sorted-determinism / nested-dict JSON); both judge-backed scorers wired against a `_FakeJudge` fixture (no network) covering happy path, `None`-score fallback to `0.0`, rubric→`Hints:` threading, empty-reference collapse to `None`; signature-introspection tests ensuring `judge` and `rubric` stay keyword-only so `VerticalBench.scorer_kwargs` plumbing works.
+- `tests/test_vertical_bench.py::TestPatentStrategistFormat` — 3 new tests: `PATENT_STRATEGIST_SCORER_FNS` resolves each key to the expected callable; name-map vs fn-map drift assertion; full end-to-end `VerticalBench.run` exercising `irac_structure` over a 2-row JSONL with one perfect and one half-formed IRAC response (mean accuracy = 0.75).
+
+Total suite: **507 passed, 2 skipped** offline (`pytest -q`, `/tmp/fk` venv). The 2 skips are the long-standing `--spark`-gated live-NIM / pgvector integration tests.
+
+### Articles in this release
+
+- `articles/becoming-a-patent-strategist-on-spark/` — patent-strategist v1.0 article (W3 publish target per spec §1 deliverables). T6's scorer build-out is the load-bearing dependency for the article's bench-comparison numbers; v0.4.3 is the version the article will pin against.
+
 ## [0.4.2] — 2026-05-15
 
 Patch release. Two card-rendering polish lifts on `fieldkit.publish` driven by the 2026-05-15 cyber-vertical cycle (`Orionfold/SecurityLLM-GGUF`, the third vertical card on this surface — zero fieldkit source changes between Saul / cyber, the v0.4.1 publishing surface generalized exactly as designed). Both lifts are additive (one new `ModelCard` field already shipped on `main` in `ff1b92f`; one new `ArtifactManifest` field added here). No new modules, no new public classes, no breaking changes — purely a tightening pass.
