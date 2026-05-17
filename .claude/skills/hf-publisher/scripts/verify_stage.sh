@@ -150,6 +150,71 @@ else
   fi
 fi
 
+# --- Check 6: frontmatter engagement-pull metadata -----------------------
+# v5 §3.15.b: cards missing pipeline_tag / library_name / tags get ranked
+# poorly in HF's discoverability surfaces. Confirmed empirically on
+# Orionfold/II-Medical-8B-GGUF (472 DL / 0 likes). The renderer in
+# fieldkit.publish supplies pipeline_tag + library_name defaults, but
+# `tags` is rendered from a tuple that's empty unless the publish_quant
+# caller passes a non-empty `tags=(...)` kwarg.
+#
+# Required tags include `spark-tested` — the Orionfold engagement-pull
+# differentiator. Configurable via VERIFY_REQUIRED_TAGS (comma-separated);
+# overall tag count via VERIFY_MIN_TAGS (default 3).
+VERIFY_REQUIRED_TAGS="${VERIFY_REQUIRED_TAGS:-spark-tested}"
+VERIFY_MIN_TAGS="${VERIFY_MIN_TAGS:-3}"
+
+# Extract frontmatter into a temp buffer so all four sub-checks read from
+# the same delimited block (between the first two `---` lines).
+fm_block=$(awk '/^---$/{c++; if(c==2)exit; next} c==1' "$README")
+
+pipeline_tag_value=$(echo "$fm_block" | awk '/^pipeline_tag:/' | sed 's/^pipeline_tag:[[:space:]]*//' | tr -d '"' | tr -d "'")
+library_name_value=$(echo "$fm_block" | awk '/^library_name:/' | sed 's/^library_name:[[:space:]]*//' | tr -d '"' | tr -d "'")
+
+if [[ -z "$pipeline_tag_value" ]]; then
+  fail "pipeline_tag frontmatter is missing — publish_quant should default to 'text-generation' (and supply explicitly for non-GGUF formats)"
+else
+  pass "pipeline_tag frontmatter present (got: $pipeline_tag_value)"
+fi
+
+if [[ -z "$library_name_value" ]]; then
+  fail "library_name frontmatter is missing — publish_quant should default to 'gguf' (or 'transformers' for non-GGUF formats)"
+else
+  pass "library_name frontmatter present (got: $library_name_value)"
+fi
+
+# tags is a YAML list — either inline `tags: [a, b, c]` or block list
+# (`tags:\n- a\n- b`). Normalise to a flat space-separated token list.
+tags_inline=$(echo "$fm_block" | awk '/^tags:[[:space:]]*\[/' | sed -E 's/^tags:[[:space:]]*\[//; s/\][[:space:]]*$//' | tr ',' ' ' | tr -d '"' | tr -d "'")
+tags_block=$(echo "$fm_block" | awk '
+  /^tags:[[:space:]]*$/ { in_block=1; next }
+  in_block && /^[[:space:]]*-[[:space:]]/ { sub(/^[[:space:]]*-[[:space:]]*/, ""); print; next }
+  in_block && /^[^[:space:]-]/ { exit }
+' | tr -d '"' | tr -d "'" | tr '\n' ' ')
+tags_all="$tags_inline $tags_block"
+tags_count=$(echo "$tags_all" | tr -s '[:space:]' '\n' | grep -cE '\S' || true)
+
+if (( tags_count == 0 )); then
+  fail "tags frontmatter is empty — at minimum needs: $VERIFY_REQUIRED_TAGS plus N≥$VERIFY_MIN_TAGS engagement-pull tags (e.g., gguf, llama-cpp, spark-tested, $vertical-tag)"
+elif (( tags_count < VERIFY_MIN_TAGS )); then
+  fail "tags frontmatter has only $tags_count entries (need ≥$VERIFY_MIN_TAGS) — current: $tags_all"
+else
+  missing_required=()
+  IFS=',' read -ra required_arr <<< "$VERIFY_REQUIRED_TAGS"
+  for req in "${required_arr[@]}"; do
+    req_trimmed=$(echo "$req" | xargs)
+    [[ -z "$req_trimmed" ]] && continue
+    if ! grep -qw "$req_trimmed" <<< "$tags_all"; then
+      missing_required+=("$req_trimmed")
+    fi
+  done
+  if (( ${#missing_required[@]} > 0 )); then
+    fail "tags frontmatter is missing required engagement-pull tags: ${missing_required[*]} (have: $(echo "$tags_all" | xargs))"
+  else
+    pass "tags frontmatter is complete ($tags_count entries including: ${VERIFY_REQUIRED_TAGS//,/ })"
+  fi
+fi
+
 # --- Summary --------------------------------------------------------------
 TOTAL=$((PASS + FAIL))
 if (( FAIL == 0 )); then

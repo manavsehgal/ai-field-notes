@@ -15,7 +15,8 @@ This skill is a **workflow conductor**, not a code library. The actual push prim
 |------------------|----------------------------------------------------------------------|----------------------------------------------------------------|
 | `interactive`    | default; "publish to HF", "push to huggingface", `/hf-publisher`     | Confirm license, chat_format, recommended_variant, push gate via `AskUserQuestion` at each step. Quote staged README slices back. |
 | `resume-stage`   | a verified stage already exists at `/tmp/orionfold-stage/<slug>/`    | Auto-detect via `ls`. Skip dry-run + metadata resolution. Run verify_stage, brief stage-content sanity, then push. |
-| `full-auto`      | "publish/ship/distribute `<slug>` to hf", "auto-publish to hf"       | Auto-resolve everything. Hard-stop on: missing token, verify_stage <5/5, missing override for non-Apache license. Otherwise proceed. |
+| `full-auto`      | "publish/ship/distribute `<slug>` to hf", "auto-publish to hf"       | Auto-resolve everything. Hard-stop on: missing token, verify_stage <6/6, missing override for non-Apache license. Otherwise proceed. |
+| `card-audit`     | "audit `<repo>`'s HF card", "card-audit `Orionfold/<slug>-GGUF`", "what's missing from the `<X>` card", `/hf-publisher card-audit <repo>` | Read-only: pull README + file list from an *already-pushed* HF repo, run verify_stage + diff against `references/card-polish.md`, report gaps. No upload. |
 
 If the user's intent is ambiguous, default to `interactive`. Never escalate to `full-auto` without an explicit auto-phrase from the user.
 
@@ -120,14 +121,15 @@ The dry-run writes:
 bash /home/nvidia/.claude/skills/hf-publisher/scripts/verify_stage.sh /tmp/orionfold-stage/<slug>
 ```
 
-Five automated checks:
+Six automated checks:
 1. `license:` frontmatter is non-default (or explicitly `apache-2.0` after upstream-Apache verification).
 2. `## How to run` body has ≥ 8 non-empty lines after the header.
 3. `## Spark-tested` table column count matches variants count + 1.
 4. `## Methods` link points at an existing `/home/nvidia/ai-field-notes/articles/<slug>/` directory.
 5. The `## Variants` table covers every `model-*.gguf` file in stage.
+6. Engagement-pull metadata: `pipeline_tag` + `library_name` present, `tags:` has ≥ `$VERIFY_MIN_TAGS` (default 3) entries including the required tag(s) in `$VERIFY_REQUIRED_TAGS` (default `spark-tested`). The 0-likes / 472-DL gap on `Orionfold/II-Medical-8B-GGUF` was the lesson here — HF's discoverability surfaces rank these fields heavily and a card that lands without them gets buried regardless of measurement quality. See `references/card-polish.md` for the full engagement-pull recipe.
 
-Exit code = number of failed checks. **In `full-auto` mode, hard-stop if exit > 0.** In `interactive`, surface failures + ask whether to fix and re-dry-run.
+Exit code = number of failed checks. **In `full-auto` mode, hard-stop if exit > 0.** In `interactive`, surface failures + ask whether to fix and re-dry-run. The fix path for check 6 is usually: re-run `publish_quant(..., tags=("gguf", "llama-cpp", "spark-tested", "<vertical>", ...))` in step 2; for older already-pushed cards, see the `card-audit` mode below.
 
 ### Step 4 — Manual review gate (interactive only; auto-pass in full-auto when verify is 5/5)
 
@@ -199,6 +201,128 @@ The easy-to-forget tail. Compounds across releases — every skipped item is a f
 - [ ] **Promote the article** — flip `status: upcoming` → `status: published` in `articles/<slug>/article.md` if not already done. Add `hf_url` to frontmatter if the schema supports it.
 - [ ] **Commit + push to main** — solo-blog repo per `[[project_nvidia_learn_git_workflow]]`. Confirm with the user first; expect a permission prompt on first main-push per session.
 
+## `card-audit` mode — gap report against an already-pushed card
+
+Read-only mode for **post-hoc remediation** of cards that landed before `references/card-polish.md` codified the engagement-pull recipe. The canonical use case is `Orionfold/II-Medical-8B-GGUF` (472 DL / 0 likes), but applies to any Orionfold card whose pull doesn't match the v5 §3.15.b recipe.
+
+This mode does **not** push. It produces a gap report; the user picks which gaps to remediate and runs the retro-fix playbook in `references/card-polish.md` (steps 1–5).
+
+### Step A — Resolve the audit target
+
+```bash
+REPO=<user-supplied>                    # e.g., Orionfold/II-Medical-8B-GGUF
+SLUG=$(basename "$REPO")                # II-Medical-8B-GGUF
+AUDIT_DIR=/tmp/card-audit/$SLUG
+mkdir -p "$AUDIT_DIR"
+```
+
+`REPO` should already exist on HF — confirm with `hf auth whoami` + a `list_repo_files` round-trip.
+
+### Step B — Pull the README + file list (no LFS download)
+
+```bash
+set -a && source /home/nvidia/ai-field-notes/.env.local && set +a
+PYBIN=${HF_VENV:-/tmp/fk}/bin/python    # /tmp/fk-test is stale per [[reference_fk_test_venv_stale]]
+"$PYBIN" - <<EOF
+from huggingface_hub import HfApi
+import os, pathlib
+api = HfApi(token=os.environ["HF_TOKEN"])
+audit_dir = pathlib.Path("$AUDIT_DIR")
+# README only — no LFS bytes
+api.hf_hub_download(repo_id="$REPO", filename="README.md", local_dir=str(audit_dir))
+# File list → synthesise empty model-*.gguf placeholders so Check 5 can pass
+files = api.list_repo_files(repo_id="$REPO")
+for f in files:
+    if f.startswith("model-") and f.endswith(".gguf"):
+        (audit_dir / f).touch()
+print(f"audit ready: {audit_dir}")
+EOF
+```
+
+The `touch` placeholders are how Check 5 (Variants table coverage) passes against an HF audit without paying the LFS-download bandwidth. The verifier opens README, scans `## Variants` rows, and compares against `ls`-visible files — empty stubs are equivalent for that check.
+
+### Step C — Run verify_stage against the audit dir
+
+```bash
+bash /home/nvidia/.claude/skills/hf-publisher/scripts/verify_stage.sh "$AUDIT_DIR"
+```
+
+In audit mode, all six checks are meaningful:
+1. License frontmatter — usually passes (cards were dry-run-verified at push time)
+2. `## How to run` body — usually passes
+3. `## Spark-tested` table shape — usually passes
+4. `## Methods` article link — usually passes (article is local)
+5. Variants table covers `model-*.gguf` — passes via touch'd placeholders from step B
+6. **The check that triggered this mode** — `pipeline_tag` / `library_name` / `tags` completeness, including required `spark-tested`
+
+If 6/6 PASSED → the card metadata is current; the engagement gap (if any) is content-design, not metadata. Move on to step D for the deeper card-polish.md diff anyway.
+
+### Step D — Diff against `references/card-polish.md` engagement-pull recipe
+
+verify_stage covers the *automatable* metadata gates. The five engagement-pull elements in `references/card-polish.md` include three that aren't easily greppable:
+
+1. Spark-tested block placement (must be above `## How to run`, not buried)
+2. `## Other Orionfold vertical curators` block presence + completeness (all sibling cards listed)
+3. GitHub Sponsors footer line presence
+
+For each, hand-read the staged README and report. Suggested grep helpers:
+
+```bash
+# Element 1 — Spark-tested position relative to How to run
+grep -n -E "^## Spark-tested|^## How to run" "$AUDIT_DIR/README.md"
+# Spark-tested line number should be LESS than How to run line number.
+
+# Element 2 — Cross-link block
+grep -n "Other Orionfold vertical curators" "$AUDIT_DIR/README.md"
+# Expect 1 hit; if 0, missing.
+
+# Element 3 — Sponsors footer
+grep -n "github.com/sponsors" "$AUDIT_DIR/README.md"
+# Expect ≥1 hit; if 0, missing.
+
+# Element 4 — Read-the-deep-dive wire-back
+grep -nE "Read the deep-dive|ainative\.business/field-notes" "$AUDIT_DIR/README.md"
+# Expect ≥1 hit.
+
+# Element 5 — Recommended variant prominence
+grep -nE "^\*\*Recommended:?\*\*|Recommended.*Q[0-9]_K_M" "$AUDIT_DIR/README.md"
+# Expect ≥1 hit ABOVE or IN the variants table, not just under it.
+```
+
+### Step E — Write the gap report
+
+Write `$AUDIT_DIR/gaps.md` summarising verify_stage output + the step-D hand-checks. Quote the failing lines back to the user. Recommended template:
+
+```markdown
+# Card audit — $REPO
+
+> Audited: <YYYY-MM-DD HH:MM UTC>
+
+## verify_stage.sh
+
+<paste the [PASS]/[FAIL] table here>
+
+## Engagement-pull elements (references/card-polish.md)
+
+| Element                              | Present? | Notes                                    |
+|--------------------------------------|----------|-------------------------------------------|
+| Spark-tested block above How to run | <Y/N>    | <line numbers>                           |
+| Cross-link block                     | <Y/N>    | <listed siblings vs expected>            |
+| GitHub Sponsors footer               | <Y/N>    |                                          |
+| Article wire-back                    | <Y/N>    |                                          |
+| Recommended variant prominent        | <Y/N>    |                                          |
+
+## Recommended retro-fix
+
+<one paragraph naming the gaps + linking to card-polish.md step 1–5>
+```
+
+Print only the gap-count summary + audit-dir path to chat. The user opens `gaps.md` for detail.
+
+### Step F — Stop. Do not upload.
+
+`card-audit` is read-only. The retro-fix playbook in `references/card-polish.md` (steps 1–5) is the user's call after reading the gap report. If they want, they can invoke `hf-publisher` in `interactive` mode pointed at the audit dir with explicit `card-only-push` intent — but that's a follow-on session, not this mode's responsibility.
+
 ## Non-negotiables
 
 - **Never push without dry-run + verify_stage in the same session.** The `fieldkit.publish` rendering bugs that cost the finance-chat push were both invisible until the staged README hit human eyes.
@@ -212,6 +336,7 @@ The easy-to-forget tail. Compounds across releases — every skipped item is a f
 
 - `references/license-tags.md` — common HF license tags + decision tree + how to detect from a downloaded model.
 - `references/chat-formats.md` — `llama_cpp.Llama(chat_format=...)` reference for the rendered card snippets.
+- `references/card-polish.md` — v5 §3.15.b engagement-pull recipe (Spark-tested placement, sibling cross-links, llms.txt wire-back, GH Sponsors, frontmatter completeness) — driver for `verify_stage.sh` Check 6 and the `card-audit` mode.
 - `/home/nvidia/ai-field-notes/scripts/g3_build_first_quant.sh` — canonical dry-run + measure pipeline; read `step_dry_run_publish` for the publish_quant call shape.
 - `/home/nvidia/ai-field-notes/fieldkit/src/fieldkit/publish/__init__.py` — `publish_quant` kwargs (especially `model_license`, `chat_format`, `recommended_variant`, `vertical_eval`, `vertical_eval_name`).
 - `/home/nvidia/ai-field-notes/.env.local` — `HF_TOKEN` store. chmod 600. Don't leak.
