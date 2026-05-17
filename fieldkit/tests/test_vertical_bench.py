@@ -17,8 +17,10 @@ from fieldkit.eval import (
     VerticalQA,
     contains,
     exact_match,
+    mcq_letter,
     numeric_match,
 )
+from fieldkit.eval.vertical import PATENT_STRATEGIST_SCORERS
 
 
 # --- Scorers -----------------------------------------------------------------
@@ -467,3 +469,247 @@ class TestEndToEnd:
         assert bench.calls[0].metrics["accuracy"] == 1.0
         assert bench.calls[0].metrics["refusal"] == 0.0
         assert bench.calls[0].success is True
+
+
+# --- Patent-strategist format (T4 / specs/patent-strategist-v1.md §3.3) -----
+
+
+def _ps_row(
+    qid: str,
+    question: str,
+    gold_label: str,
+    *,
+    family: str = "D",
+    use_case: str = "D1",
+    scoring_mode: str = "closed",
+    options: list[str] | None = None,
+    context: str | None = None,
+    oracle_context: str | None = None,
+    reviewed: bool = True,
+    tags: dict | None = None,
+) -> dict:
+    row: dict = {
+        "qid": qid,
+        "question": question,
+        "family": family,
+        "use_case": use_case,
+        "scoring_mode": scoring_mode,
+        "gold_label": gold_label,
+        "reviewed": reviewed,
+    }
+    if options is not None:
+        row["options"] = options
+    if context is not None:
+        row["context"] = context
+    if oracle_context is not None:
+        row["oracle_context"] = oracle_context
+    if tags is not None:
+        row["tags"] = tags
+    return row
+
+
+class TestPatentStrategistFormat:
+    def test_autodetect_via_family_use_case_scoring_mode(self, tmp_path: Path) -> None:
+        rows = [_ps_row("ps-001", "Which 35 USC section?", "B")]
+        p = _write_jsonl(tmp_path, "ps.jsonl", rows)
+        vb = VerticalBench.from_jsonl(p)
+        assert len(vb.questions) == 1
+        # mcq_letter is the default for patent-strategist.
+        assert vb.scorer.__name__ == "mcq_letter"
+
+    def test_mcq_options_appended_to_question(self, tmp_path: Path) -> None:
+        rows = [
+            _ps_row(
+                "ps-002",
+                "Which 35 USC section governs novelty?",
+                "B",
+                family="D",
+                use_case="D1",
+                scoring_mode="closed",
+                options=["35 USC 101", "35 USC 102", "35 USC 103", "35 USC 112"],
+            )
+        ]
+        p = _write_jsonl(tmp_path, "ps.jsonl", rows)
+        vb = VerticalBench.from_jsonl(p)
+        q = vb.questions[0]
+        assert "Options:" in q.question
+        assert "A. 35 USC 101" in q.question
+        assert "B. 35 USC 102" in q.question
+        assert "C. 35 USC 103" in q.question
+        assert "D. 35 USC 112" in q.question
+        assert q.expected == "B"
+
+    def test_retrieval_mode_prepends_context(self, tmp_path: Path) -> None:
+        rows = [
+            _ps_row(
+                "ps-003",
+                "Does the cited reference anticipate?",
+                "yes",
+                family="B",
+                use_case="B2",
+                scoring_mode="retrieval",
+                context="The cited reference discloses all elements...",
+            )
+        ]
+        p = _write_jsonl(tmp_path, "ps.jsonl", rows)
+        vb = VerticalBench.from_jsonl(p)
+        q = vb.questions[0]
+        assert "Context:" in q.question
+        assert "The cited reference discloses all elements" in q.question
+        assert "Question: Does the cited reference anticipate?" in q.question
+
+    def test_oracle_mode_uses_oracle_context_over_retrieval(self, tmp_path: Path) -> None:
+        rows = [
+            _ps_row(
+                "ps-004",
+                "Apply MPEP 2143.",
+                "obvious",
+                family="D",
+                use_case="D2",
+                scoring_mode="oracle",
+                context="retrieved chunk (wrong)",
+                oracle_context="MPEP 2143: ideal text",
+            )
+        ]
+        p = _write_jsonl(tmp_path, "ps.jsonl", rows)
+        vb = VerticalBench.from_jsonl(p)
+        q = vb.questions[0]
+        assert "MPEP 2143: ideal text" in q.question
+        assert "retrieved chunk (wrong)" not in q.question
+
+    def test_oracle_falls_back_to_context_when_oracle_missing(self, tmp_path: Path) -> None:
+        rows = [
+            _ps_row(
+                "ps-005",
+                "Q?",
+                "yes",
+                family="D",
+                scoring_mode="oracle",
+                context="fallback retrieval text",
+            )
+        ]
+        p = _write_jsonl(tmp_path, "ps.jsonl", rows)
+        vb = VerticalBench.from_jsonl(p)
+        assert "fallback retrieval text" in vb.questions[0].question
+
+    def test_closed_mode_no_context_prepend(self, tmp_path: Path) -> None:
+        rows = [
+            _ps_row(
+                "ps-006",
+                "Closed-book question.",
+                "A",
+                scoring_mode="closed",
+                context="should not appear",
+                oracle_context="also should not appear",
+            )
+        ]
+        p = _write_jsonl(tmp_path, "ps.jsonl", rows)
+        q = VerticalBench.from_jsonl(p).questions[0]
+        assert "Context:" not in q.question
+        assert "should not appear" not in q.question
+
+    def test_tags_carry_family_use_case_scoring_mode_reviewed(self, tmp_path: Path) -> None:
+        rows = [
+            _ps_row(
+                "ps-007",
+                "Q?",
+                "A",
+                family="A",
+                use_case="A3",
+                scoring_mode="retrieval",
+                reviewed=True,
+                tags={"jurisdiction": "US", "art_unit": "2143"},
+            )
+        ]
+        p = _write_jsonl(tmp_path, "ps.jsonl", rows)
+        q = VerticalBench.from_jsonl(p).questions[0]
+        assert q.tags["family"] == "A"
+        assert q.tags["use_case"] == "A3"
+        assert q.tags["scoring_mode"] == "retrieval"
+        assert q.tags["reviewed"] is True
+        assert q.tags["jurisdiction"] == "US"
+        assert q.tags["art_unit"] == "2143"
+
+    def test_missing_qid_synthesized(self, tmp_path: Path) -> None:
+        rows = [
+            {
+                "question": "Q?",
+                "family": "C",
+                "use_case": "C1",
+                "scoring_mode": "closed",
+                "gold_label": "answer",
+            }
+        ]
+        p = _write_jsonl(tmp_path, "ps.jsonl", rows)
+        vb = VerticalBench.from_jsonl(p)
+        assert vb.questions[0].qid.startswith("ps-")
+
+    def test_missing_gold_label_drops_row(self, tmp_path: Path) -> None:
+        rows = [
+            _ps_row("ps-008", "Q?", "A"),
+            {  # missing gold_label
+                "qid": "ps-009",
+                "question": "Q?",
+                "family": "D",
+                "use_case": "D1",
+                "scoring_mode": "closed",
+            },
+        ]
+        p = _write_jsonl(tmp_path, "ps.jsonl", rows)
+        vb = VerticalBench.from_jsonl(p)
+        assert len(vb.questions) == 1
+        assert vb.questions[0].qid == "ps-008"
+
+    def test_explicit_format_override(self, tmp_path: Path) -> None:
+        # Even if signature is ambiguous, explicit format pins the branch.
+        rows = [
+            {
+                "qid": "ps-010",
+                "question": "Q?",
+                "family": "D",
+                "use_case": "D1",
+                "scoring_mode": "closed",
+                "gold_label": "A",
+            }
+        ]
+        p = _write_jsonl(tmp_path, "ps.jsonl", rows)
+        vb = VerticalBench.from_jsonl(p, format="patent-strategist")
+        assert len(vb.questions) == 1
+
+    def test_default_scorer_is_mcq_letter(self) -> None:
+        # Sanity-check the dispatch table covers all five families.
+        for family_key in ("A", "B", "C", "D-mcq", "D-oa", "D-irac", "E"):
+            assert family_key in PATENT_STRATEGIST_SCORERS
+        assert PATENT_STRATEGIST_SCORERS["D-mcq"] == "mcq_letter"
+
+    def test_end_to_end_scoring(self, tmp_path: Path) -> None:
+        rows = [
+            _ps_row(
+                "ps-011",
+                "Which 35 USC section governs novelty?",
+                "B",
+                family="D",
+                use_case="D1",
+                scoring_mode="closed",
+                options=["101", "102", "103", "112"],
+            ),
+            _ps_row(
+                "ps-012",
+                "Which section governs obviousness?",
+                "C",
+                family="D",
+                use_case="D1",
+                scoring_mode="closed",
+                options=["101", "102", "103", "112"],
+            ),
+        ]
+        p = _write_jsonl(tmp_path, "ps.jsonl", rows)
+        vb = VerticalBench.from_jsonl(p)
+
+        def model_fn(prompt: str) -> str:
+            return "<think>thinking hard</think>\nAnswer: B" if "novelty" in prompt else "C"
+
+        bench = vb.run(model_fn)
+        s = bench.summary()
+        assert s["n"] == 2
+        assert s["accuracy"]["mean"] == 1.0  # both correct via mcq_letter

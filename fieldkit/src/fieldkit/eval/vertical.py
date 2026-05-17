@@ -21,8 +21,17 @@ Supported JSONL shapes (auto-detected by `VerticalBench.from_jsonl`):
   ``company``, ``doc_period``, ``question_type`` into per-row tags.
 - **legalbench** — Stanford CRFM's LegalBench schema. Most tasks use
   ``text`` / ``input`` for prompt and ``answer`` / ``label`` for reference.
+- **patent-strategist** — Orionfold patent-strategist-bench schema
+  (`specs/patent-strategist-v1.md` §3.3). Rows carry ``family`` (A-E),
+  ``use_case``, ``scoring_mode`` (closed/retrieval/oracle), ``gold_label``,
+  optional ``options`` (MCQ subset), ``context`` (retrieval), and
+  ``oracle_context`` (oracle). The branch handles open-book context
+  prepending per ``scoring_mode`` and MCQ option-appending for rows with
+  ``options``. Default scorer is ``mcq_letter`` (Family D MCQ subset);
+  other families dispatch via ``PATENT_STRATEGIST_SCORERS``.
 - **generic** — `{question, answer}` (or `{prompt, expected}`) JSONL. Falls
-  back here when no FinanceBench / LegalBench signature matches.
+  back here when no FinanceBench / LegalBench / patent-strategist signature
+  matches.
 
 Three scorers ship in v0.4.x; callers pass any `Callable[[str, str], float]`
 for custom scoring. ``exact_match`` and ``contains`` are deterministic;
@@ -49,16 +58,40 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
 
-from fieldkit.eval import Bench, BenchCall, is_refusal
+from fieldkit.eval import Bench, BenchCall, is_refusal, mcq_letter
 
 
 __all__ = [
+    "PATENT_STRATEGIST_SCORERS",
     "VerticalBench",
     "VerticalQA",
     "contains",
     "exact_match",
     "numeric_match",
 ]
+
+
+# --- Patent-strategist scorer dispatch -----------------------------------
+
+PATENT_STRATEGIST_SCORERS: dict[str, str] = {
+    # Per `specs/patent-strategist-v1.md` §3.3. Values are scorer names
+    # rather than callables so callers resolve lazily — Family A/B/D/E
+    # specialty scorers (`patent_claim_validity`, `office_action_argument`,
+    # `irac_structure`, `prior_art_relevance`) land in fieldkit v0.4.3 / T6
+    # alongside this branch's first real usage; the dispatch keys are
+    # forward-stable.
+    "A": "patent_claim_validity",        # generative / inventive — claim broadening/narrowing
+    "B": "prior_art_relevance",          # search / analytical — Spearman ρ on ranked priors
+    "C": "judge_rubric",                 # strategic / portfolio — open-ended Judge
+    "D-mcq": "mcq_letter",               # procedural prosecution — MCQ subset
+    "D-oa": "office_action_argument",    # procedural prosecution — office-action response
+    "D-irac": "irac_structure",          # procedural prosecution — IRAC scenarios
+    "E": "judge_rubric",                 # communication / education — open-ended Judge (MCQ quiz subset uses mcq_letter)
+}
+"""Family/use-case → scorer-name map. Callers slice the bench by family and
+configure ``VerticalBench(scorer=...)`` per-slice; per-row dispatch isn't
+wired into ``VerticalBench.run`` because each scorer has distinct kwargs
+(rubric dict, ranking list, judge backend) that don't share a signature."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -147,6 +180,8 @@ def _detect_format(row: dict[str, Any]) -> str:
     keys = set(row.keys())
     if "financebench_id" in keys or "gold_standard" in keys:
         return "financebench"
+    if {"family", "use_case", "scoring_mode"}.issubset(keys):
+        return "patent-strategist"
     if {"text", "answer"}.issubset(keys) or {"input", "label"}.issubset(keys):
         return "legalbench"
     return "generic"
@@ -195,6 +230,39 @@ def _row_to_qa(
         question = row.get("text") or row.get("input") or row.get("question") or ""
         expected = row.get("answer") or row.get("label") or ""
         tags = {k: row[k] for k in ("task", "subtask") if k in row}
+    elif fmt == "patent-strategist":
+        qid = str(row.get("qid") or f"ps-{fallback_idx}")
+        question = row.get("question") or ""
+        expected = row.get("gold_label") or ""
+        scoring_mode = row.get("scoring_mode") or "closed"
+        # Open-book-style context prepending. `oracle` mode wins over
+        # `retrieval` if both fields are populated — oracle is the
+        # idealized-retrieval upper-bound by construction.
+        ctx: str | None = None
+        if scoring_mode == "oracle":
+            ctx = row.get("oracle_context") or row.get("context")
+        elif scoring_mode == "retrieval":
+            ctx = row.get("context")
+        if ctx and question:
+            question = f"Context:\n\n{ctx}\n\nQuestion: {question}"
+        # MCQ option-appending — Family D MCQ + Family E quiz subset.
+        options = row.get("options")
+        if options and isinstance(options, list) and question:
+            opts_block = "\n".join(
+                f"{chr(65 + i)}. {opt}" for i, opt in enumerate(options) if isinstance(opt, str)
+            )
+            if opts_block:
+                question = f"{question}\n\nOptions:\n{opts_block}"
+        tags = {
+            "family": row.get("family"),
+            "use_case": row.get("use_case"),
+            "scoring_mode": scoring_mode,
+            "reviewed": bool(row.get("reviewed", False)),
+        }
+        # Caller-supplied tags merge in — jurisdiction, art-unit, year-band.
+        extra_tags = row.get("tags")
+        if isinstance(extra_tags, dict):
+            tags.update(extra_tags)
     else:
         qid = str(row.get("id") or row.get("qid") or f"q-{fallback_idx}")
         question = row.get("question") or row.get("prompt") or row.get("input") or ""
@@ -323,8 +391,17 @@ class VerticalBench:
         if open_book is None:
             open_book = False
         # Pick a sensible default scorer per format if caller didn't override.
+        # patent-strategist defaults to `mcq_letter` because the Family D MCQ
+        # subset is the largest single sub-population (~40 of 200 Qs per spec
+        # §5.1) — callers slicing other families pass the right scorer
+        # explicitly (see ``PATENT_STRATEGIST_SCORERS``).
         if scorer is None:
-            scorer = numeric_match if fmt == "financebench" else exact_match
+            if fmt == "financebench":
+                scorer = numeric_match
+            elif fmt == "patent-strategist":
+                scorer = mcq_letter
+            else:
+                scorer = exact_match
         return cls(
             name=name or p.stem,
             questions=questions,

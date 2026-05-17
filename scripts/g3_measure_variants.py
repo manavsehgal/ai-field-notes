@@ -44,7 +44,6 @@ from __future__ import annotations
 
 import json
 import os
-import re
 import subprocess
 import sys
 import threading
@@ -89,35 +88,10 @@ def _wrap_chatml(question: str) -> str:
     return f"<|im_start|>user\n{question.strip()}<|im_end|>\n<|im_start|>assistant\n"
 
 
-# --- MCQ-letter scorer (cybermetric) ---------------------------------------
-# Cyber gold is a single letter (A/B/C/D); `contains` over single letters is
-# too permissive (a stray "A" anywhere matches). Extract the decisive letter
-# from the response, preferring "Answer: X" markers, falling back to first
-# word-bounded [A-D].
-
-_MCQ_AFTER_ANSWER_RE = re.compile(
-    r"\b(?:answer|choice|option)\b[^A-Za-z0-9]{0,20}([A-D])\b",
-    re.IGNORECASE,
-)
-_MCQ_BOUNDED_RE = re.compile(r"\b([A-D])\b", re.IGNORECASE)
-
-
-def mcq_letter(predicted: str, expected: str) -> float:
-    """1.0 if the model's chosen letter == expected, else 0.0."""
-    pred = (predicted or "").strip()
-    exp = (expected or "").strip().upper()
-    if not pred or exp not in ("A", "B", "C", "D"):
-        return 0.0
-    stripped = pred.upper().strip(".,)!:- ")
-    if len(stripped) <= 1 and stripped in ("A", "B", "C", "D"):
-        return 1.0 if stripped == exp else 0.0
-    m = _MCQ_AFTER_ANSWER_RE.search(pred)
-    if m:
-        return 1.0 if m.group(1).upper() == exp else 0.0
-    m = _MCQ_BOUNDED_RE.search(pred)
-    if m:
-        return 1.0 if m.group(1).upper() == exp else 0.0
-    return 0.0
+# Promoted to `fieldkit.eval.mcq_letter` after three vertical-bench reuses
+# (cyber, medical, patent-strategist) per
+# [[feedback_keep_scorer_local_until_reuse]].
+from fieldkit.eval import mcq_letter  # noqa: E402
 from fieldkit.lineage import FailureLabel, LineageStore, Trial  # noqa: E402
 from fieldkit.quant import (  # noqa: E402
     LlamaCppPaths,

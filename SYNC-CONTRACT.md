@@ -19,6 +19,7 @@ Companion files:
 | `fieldkit/**` | **Spark** | Python package; published to PyPI by the `fieldkit-curator` skill. Mac renders `/fieldkit/` chrome around it. |
 | `papers/**` | **Spark** | Frontier-scout reports + `papers.json` sidecar. |
 | `evidence/**`, `scripts/**`, `ideas/**` | **Spark** | Working corpus + brainstorms + helper scripts. |
+| `specs/**` | **Spark** | Durable project specs; Mac never edits. First spec: `specs/patent-strategist-v1.md`. |
 | `src/content.config.ts` | **Spark** | Astro content-collection schema (shared; Mac mirrors). |
 | `src/content/articles/**` | **Spark** | Article frontmatter + body. |
 | `src/content/artifacts/**` *(Phase 2, when fieldkit v0.4 lands)* | **Spark** | Artifact manifests written by `fieldkit.publish`; Mac renders catalog pages from these. |

@@ -58,7 +58,6 @@ from __future__ import annotations
 
 import json
 import os
-import re
 import socket
 import subprocess
 import sys
@@ -74,38 +73,13 @@ from fieldkit.eval import VerticalBench, contains, numeric_match  # noqa: E402
 
 
 # --- MCQ-letter scorer (cybermetric, MCQ-shape verticals) ---------------
-# Cyber gold is a single letter (A/B/C/D); contains() over single letters is
-# too permissive (a stray "A" in any response would match). Extract the
-# decisive letter from the model output, preferring "Answer: X" markers,
-# falling back to bounded-letter first match.
+# Promoted to `fieldkit.eval.mcq_letter` after three vertical-bench reuses
+# (cyber, medical, patent-strategist) per
+# [[feedback_keep_scorer_local_until_reuse]]. The fieldkit version has a
+# `strip_think=True` default that no-ops on text without `<think>` tags, so
+# this import is byte-for-byte compatible with the previous local copy.
 
-_MCQ_AFTER_ANSWER_RE = re.compile(
-    r"\b(?:answer|choice|option)\b[^A-Za-z0-9]{0,20}([A-D])\b",
-    re.IGNORECASE,
-)
-_MCQ_BOUNDED_RE = re.compile(r"\b([A-D])\b", re.IGNORECASE)
-
-
-def mcq_letter(predicted: str, expected: str) -> float:
-    """1.0 if the model's chosen letter == expected, else 0.0.
-
-    Decision order: (a) stripped one-letter output ("B"); (b) "answer: X" /
-    "answer is X" / "option X" / "choice X" with X in [A-D]; (c) first
-    word-bounded [A-D] in the response. Case-insensitive throughout.
-    """
-    pred = (predicted or "").strip()
-    exp = (expected or "").strip().upper()
-    if not pred or exp not in ("A", "B", "C", "D"):
-        return 0.0
-    if len(pred) <= 5 and pred.upper().strip(".,)!:- ") in ("A", "B", "C", "D"):
-        return 1.0 if pred.upper().strip(".,)!:- ") == exp else 0.0
-    m = _MCQ_AFTER_ANSWER_RE.search(pred)
-    if m:
-        return 1.0 if m.group(1).upper() == exp else 0.0
-    m = _MCQ_BOUNDED_RE.search(pred)
-    if m:
-        return 1.0 if m.group(1).upper() == exp else 0.0
-    return 0.0
+from fieldkit.eval import mcq_letter  # noqa: E402
 
 
 def _log(msg: str) -> None:

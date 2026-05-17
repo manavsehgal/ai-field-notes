@@ -1,0 +1,56 @@
+{
+  "pulled_at": "2026-05-17T14:13:21+00:00",
+  "spec_ref": "specs/patent-strategist-v1.md \u00a76",
+  "sources": {
+    "bigpatent": {
+      "status": "pulled",
+      "hf_repo": "big_patent",
+      "commit_sha": "2a5336492ddc4e21cebd3865fd2a7e8b070bfede",
+      "license": "CC-BY-4.0",
+      "rows": 10000,
+      "files": [
+        "bigpatent-g-train.jsonl",
+        "bigpatent-h-train.jsonl"
+      ],
+      "notes": "configs g+h (physics+electricity); abstracts capped to 8k chars"
+    },
+    "patentmatch": {
+      "status": "pulled",
+      "hf_repo": "BNNT/PatentMatch",
+      "commit_sha": "3280babe5feb19b4821656ddf1d84edae5bba600",
+      "license": "Apache-2.0",
+      "rows": 500,
+      "files": [
+        "patentmatch-en.jsonl"
+      ],
+      "notes": "SUBSTITUTE: spec's pakuvis/PatentMatch returns 404; BNNT/PatentMatch used instead (500 rows, instruction-tuning shape \u2014 small for Family B primary). Canonical HPI-Naumann PatentMatch (6.2M EPO pairs) needs direct-download wiring before W2 bench preflight."
+    },
+    "mpep": {
+      "status": "pending",
+      "hf_repo": null,
+      "commit_sha": null,
+      "license": "public-domain (17 USC \u00a7105)",
+      "rows": 0,
+      "files": [],
+      "notes": "Scraper stub. eMPEP TOC is JS-rendered; need Playwright pass or USPTO bulk download. See MPEP_INDEX_URL constant."
+    },
+    "oa": {
+      "status": "blocked",
+      "hf_repo": null,
+      "commit_sha": null,
+      "license": "public-domain (17 USC \u00a7105)",
+      "rows": 0,
+      "files": [],
+      "notes": "USPTO Office Action Research Dataset (4.4M actions 2008-2017). Download via USPTO data portal (https://www.uspto.gov/ip-policy/economic-research/research-datasets/) \u2014 needs portal account + bulk file fetch (CSV/Stata, multi-GB). Wire in W1-late."
+    },
+    "gpat": {
+      "status": "blocked",
+      "hf_repo": null,
+      "commit_sha": null,
+      "license": "CC-BY-4.0",
+      "rows": 0,
+      "files": [],
+      "notes": "Google Patents Public Data BigQuery dataset (patents-public-data). Needs gcloud auth + google-cloud-bigquery + a US-only IPC-class filtered query (Family C landscape work). Wire in W2 alongside the RAG index build."
+    }
+  }
+}

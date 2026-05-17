@@ -68,6 +68,7 @@ __all__ = [
     "contains",
     "exact_match",
     "is_refusal",
+    "mcq_letter",
     "numeric_match",
     "pass_at_k_estimator",
     "summarize_agent_runs",
@@ -106,6 +107,56 @@ def is_refusal(text: str | None) -> bool:
     if not text:
         return True
     return any(p.search(text) for p in REFUSAL_PATTERNS)
+
+
+# --- MCQ letter scorer ---------------------------------------------------
+
+_MCQ_AFTER_ANSWER_RE = re.compile(
+    r"\b(?:answer|choice|option)\b[^A-Za-z0-9]{0,20}([A-D])\b",
+    re.IGNORECASE,
+)
+_MCQ_BOUNDED_RE = re.compile(r"\b([A-D])\b", re.IGNORECASE)
+_THINK_BLOCK_RE = re.compile(r"<think>.*?</think>", re.DOTALL)
+
+
+def mcq_letter(
+    predicted: str,
+    expected: str,
+    *,
+    strip_think: bool = True,
+) -> float:
+    """Score MCQ letter responses, with `<think>`-aware extraction for
+    reasoning models.
+
+    Promoted to `fieldkit.eval` after three vertical-bench reuses
+    (cybermetric, medmcqa, patent-strategist). Decision order:
+    (a) stripped one-letter output ("B"); (b) "answer: X" / "answer is X" /
+    "option X" / "choice X" with X in [A-D]; (c) first word-bounded [A-D]
+    in the response. Case-insensitive throughout.
+
+    When `strip_think=True` (default), `<think>...</think>` blocks are
+    regex-stripped from `predicted` *before* the three-step decision —
+    keeps reasoning-trace verbosity from polluting the letter pick on
+    R1-distill family models. No-op on text without `<think>` tags, so
+    cyber/medical callers can flip the default on safely.
+    """
+    pred = (predicted or "")
+    if strip_think:
+        pred = _THINK_BLOCK_RE.sub("", pred)
+    pred = pred.strip()
+    exp = (expected or "").strip().upper()
+    if not pred or exp not in ("A", "B", "C", "D"):
+        return 0.0
+    stripped = pred.upper().strip(".,)!:- ")
+    if len(stripped) <= 1 and stripped in ("A", "B", "C", "D"):
+        return 1.0 if stripped == exp else 0.0
+    m = _MCQ_AFTER_ANSWER_RE.search(pred)
+    if m:
+        return 1.0 if m.group(1).upper() == exp else 0.0
+    m = _MCQ_BOUNDED_RE.search(pred)
+    if m:
+        return 1.0 if m.group(1).upper() == exp else 0.0
+    return 0.0
 
 
 # --- Bench ---------------------------------------------------------------
