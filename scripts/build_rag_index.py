@@ -163,19 +163,109 @@ def chunk_patentmatch(src_dir: Path, max_rows: int | None) -> Iterator[Chunk]:
                     return
 
 
-# --- MPEP (T2-followup placeholder) ----------------------------------------
+# --- MPEP -------------------------------------------------------------------
+
+
+_MPEP_TARGET_TOKENS = 800
+_MPEP_OVERLAP_TOKENS = 100
+_MPEP_TOKENIZER: Any | None = None
+
+
+def _mpep_tokenizer(model_name: str) -> Any:
+    """Lazy-load the BGE tokenizer used for accurate chunk-size accounting.
+
+    BGE-small-en-v1.5 is BERT-style WordPiece, so the same tokenizer
+    drives both the chunker (size accounting) and the embedder (downstream
+    encode). One tokenizer load per process, cached at module level.
+    """
+    global _MPEP_TOKENIZER
+    if _MPEP_TOKENIZER is None:
+        from transformers import AutoTokenizer  # type: ignore[import-not-found]
+
+        _MPEP_TOKENIZER = AutoTokenizer.from_pretrained(model_name)
+    return _MPEP_TOKENIZER
+
+
+def _slide_token_windows(
+    tokenizer: Any,
+    text: str,
+    target: int,
+    overlap: int,
+) -> Iterator[tuple[int, str]]:
+    """Yield `(window_idx, text)` chunks via token-aware sliding window.
+
+    For subsections under `target` tokens, yields one untouched chunk.
+    For longer subsections, walks a sliding window with `overlap` tokens
+    of carryover so retrieval hits aren't sliced through mid-sentence.
+    Decodes back to text via the tokenizer to keep chunks
+    self-contained (no detached subword fragments).
+    """
+    ids = tokenizer.encode(text, add_special_tokens=False)
+    if len(ids) <= target:
+        yield 0, text
+        return
+    step = max(1, target - overlap)
+    window_idx = 0
+    for start in range(0, len(ids), step):
+        chunk_ids = ids[start : start + target]
+        if not chunk_ids:
+            break
+        yield window_idx, tokenizer.decode(chunk_ids, skip_special_tokens=True)
+        window_idx += 1
+        if start + target >= len(ids):
+            break
 
 
 def chunk_mpep(src_dir: Path, max_rows: int | None) -> Iterator[Chunk]:
-    """Semantic-section chunking (~800 tokens, overlap 100).
+    """Semantic-section chunking (~800 tokens, overlap 100) per spec §3.4.
 
-    Stub: MPEP corpus pull is `status: pending` per
-    `evidence/patent-strategist/corpus-snapshot.json`. When the
-    scraper lands, this function will iterate per-section JSONL with
-    fields `{section_id, title, text}` and produce sliding-window
-    chunks. Empty-iter for now keeps the dispatch table consistent.
+    Reads per-chapter JSONLs produced by `scripts/build_patent_corpus.py`'s
+    `pull_mpep`, each row already at h1.page-title (subsection) granularity.
+    Subsections under 800 tokens emit one chunk; longer subsections get
+    a token-aware sliding window with 100-token overlap.
+
+    Empty-text rows (section banners like "704 Search and Requirements
+    for Information" — content lives in 704.01, 704.10, ... subsections)
+    are skipped here; their metadata is preserved upstream in the JSONL.
+
+    The tokenizer is the BGE-small tokenizer so window sizes are accurate
+    against the embedder's actual token budget (512-token model max).
     """
-    return iter(())
+    # Use the default embedder so chunk sizes are tokenizer-correct.
+    tokenizer = _mpep_tokenizer(DEFAULT_MODEL)
+    files = sorted(src_dir.glob("mpep-*.jsonl"))
+    emitted = 0
+    for path in files:
+        with path.open() as f:
+            for line in f:
+                row = json.loads(line)
+                text = (row.get("text") or "").strip()
+                if not text:
+                    continue
+                base_doc = f"{row.get('chapter')}/{row.get('section_id')}#{row.get('anchor') or 'top'}"
+                for w_idx, w_text in _slide_token_windows(
+                    tokenizer,
+                    text,
+                    _MPEP_TARGET_TOKENS,
+                    _MPEP_OVERLAP_TOKENS,
+                ):
+                    yield Chunk(
+                        chunk_id=_stable_id("mpep", base_doc, w_idx),
+                        source="mpep",
+                        doc_id=base_doc,
+                        text=w_text,
+                        metadata={
+                            "chapter": row.get("chapter"),
+                            "section_id": row.get("section_id"),
+                            "anchor": row.get("anchor"),
+                            "title": row.get("title"),
+                            "url": row.get("url"),
+                            "window_idx": w_idx,
+                        },
+                    )
+                    emitted += 1
+                    if max_rows is not None and emitted >= max_rows:
+                        return
 
 
 # --- Google Patents (T2-followup placeholder) ------------------------------

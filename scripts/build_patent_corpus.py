@@ -50,6 +50,7 @@ import argparse
 import json
 import os
 import sys
+import time
 from collections.abc import Callable, Iterator
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -189,27 +190,194 @@ def pull_patentmatch(out_dir: Path, max_rows: int | None) -> SourceResult:
 # --- MPEP (Tier 2) ----------------------------------------------------------
 
 
-MPEP_INDEX_URL = "https://mpep.uspto.gov/RDMS/MPEP/current"
+MPEP_BASE = "https://www.uspto.gov/web/offices/pac/mpep"
+# Session-19's stub flagged "JS-rendered" — that was the eMPEP RDMS
+# chrome at https://mpep.uspto.gov/RDMS/MPEP/current, which hash-routes
+# section content via XHR. The static HTML mirror at uspto.gov/web/.../mpep
+# serves chapter TOCs (mpep-0XXX.html) and per-section pages (s<NNN>.html)
+# directly — no JS required. Switch confirmed 2026-05-17 in session 20.
+#
+# MPEP standard ninth-edition chapters are 100..2900 in 100-step increments.
+# Chapter 1700 is reserved (USPTO skipped that band); the puller probes the
+# TOC URL and skips on 404. The "current" alias resolves to E9_R-01.2024
+# (November 2024 publication of January 2024 revision).
+MPEP_CHAPTERS = [f"{n:04d}" for n in range(100, 3000, 100)]
+
+_MPEP_FETCH_DELAY_S = 0.5  # polite throttle for federal site
+
+
+def _http_get(url: str, timeout: int = 30) -> str | None:
+    """Fetch a URL and return text body, or None on 404/timeout.
+
+    Lazy-import requests to keep the rest of the puller drier — non-MPEP
+    sources don't need it.
+    """
+    import requests  # type: ignore[import-not-found]
+
+    try:
+        r = requests.get(url, timeout=timeout, headers={"User-Agent": "ai-field-notes patent-strategist corpus puller (sehgal.manav@gmail.com)"})
+    except requests.RequestException as exc:
+        print(f"  WARN: GET {url} failed: {exc}", file=sys.stderr)
+        return None
+    if r.status_code == 404:
+        return None
+    if not r.ok:
+        print(f"  WARN: GET {url} → HTTP {r.status_code}", file=sys.stderr)
+        return None
+    return r.text
+
+
+def _mpep_extract_subsections(section_html: str, section_id: str, chapter: str) -> Iterator[dict]:
+    """Walk a section page's `h1.page-title` headings in document order.
+
+    Each heading anchors a subsection (e.g. "704.01 Search"). Content
+    between consecutive headings comes from `<p>` and `<li>` descendants;
+    info-class `<div>` tags carry MPEP examiner notes and are kept too.
+    The first h1 on the page is the section banner itself (`704 Search
+    and Requirements for Information`) and has no body content; we still
+    emit it so downstream tools can attach metadata to it if needed.
+    """
+    from bs4 import BeautifulSoup  # type: ignore[import-not-found]
+
+    soup = BeautifulSoup(section_html, "lxml")
+    heads = soup.select("h1.page-title")
+    for i, h in enumerate(heads):
+        title = h.get_text(" ", strip=True)
+        anchor = h.get("id")  # None for the section banner h1
+        nxt = heads[i + 1] if i + 1 < len(heads) else None
+        text_parts: list[str] = []
+        el = h
+        while True:
+            el = el.find_next()
+            if el is None or el is nxt:
+                break
+            if el.name in ("p", "li"):
+                t = el.get_text(" ", strip=True)
+                if t:
+                    text_parts.append(t)
+            elif el.name == "div" and "info" in (el.get("class") or []):
+                t = el.get_text(" ", strip=True)
+                if t:
+                    text_parts.append(t)
+        text = " ".join(text_parts).strip()
+        # Strip the trailing `&nbsp;` placeholder h1s at the bottom of
+        # each section (they wrap the chapter-TOC nav widget; not real
+        # examiner content). Real subsection titles start with a digit
+        # (e.g. `701`, `704.10`, `2106(a)(1)`).
+        title_clean = title.replace("\xa0", " ").strip()
+        if not title_clean or not title_clean[0].isdigit():
+            continue
+        if not text:
+            # Section banner h1 with no body (the subsection h1s carry
+            # the actual content). Emit anyway so callers can attach
+            # section-level metadata; chunker will skip zero-text rows.
+            pass
+        yield {
+            "chapter": chapter,
+            "section_id": section_id,
+            "anchor": anchor,
+            "title": title,
+            "text": text,
+            "url": f"{MPEP_BASE}/{section_id}.html" + (f"#{anchor}" if anchor else ""),
+        }
 
 
 def pull_mpep(out_dir: Path, max_rows: int | None) -> SourceResult:
-    """Scrape USPTO MPEP section text from the eMPEP HTML index.
+    """Pull MPEP per-subsection text from the USPTO static HTML mirror.
 
-    The eMPEP system serves ~2K sections under
-    https://mpep.uspto.gov/RDMS/MPEP/current. Scraping is gated behind a
-    JS-rendered chrome layer in 2026, so this function currently stubs
-    out — wiring requires either (a) a Playwright headless render of the
-    section TOC then per-section HTML fetch, or (b) a one-shot USPTO bulk
-    download (PDF/XML) parsed offline. Both paths are W1 follow-up work.
+    Discovery: iterate `mpep-0XXX.html` chapter TOCs for X in 100..2900,
+    parse out `s<NNN>.html` section filenames. For each section, parse
+    `h1.page-title` boundaries to emit one JSONL row per subsection.
+
+    Caches raw chapter + section HTML at `<out_dir>/_raw/` so re-extraction
+    after a chunking-rule tweak is free. Polite 0.5s throttle between
+    requests — public USPTO infra, not rate-limited but we behave anyway.
+
+    The `max_rows` cap applies to the per-chapter row count, not the
+    section count — useful for smoke runs.
     """
+    raw_dir = out_dir / "_raw"
+    raw_dir.mkdir(parents=True, exist_ok=True)
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    total_rows = 0
+    written_files: list[str] = []
+    chapters_skipped: list[str] = []
+
+    for chapter in MPEP_CHAPTERS:
+        toc_url = f"{MPEP_BASE}/mpep-{chapter}.html"
+        toc_cache = raw_dir / f"mpep-{chapter}.html"
+        if toc_cache.exists():
+            toc_html = toc_cache.read_text()
+        else:
+            toc_html = _http_get(toc_url)
+            time.sleep(_MPEP_FETCH_DELAY_S)
+            if toc_html is None:
+                chapters_skipped.append(chapter)
+                continue
+            toc_cache.write_text(toc_html)
+
+        import re
+
+        section_ids = sorted({m for m in re.findall(r"s\d+\.html", toc_html)})
+        # Strip ".html"
+        section_ids = [s[:-5] for s in section_ids]
+        if not section_ids:
+            chapters_skipped.append(chapter)
+            continue
+
+        chapter_rows: list[dict] = []
+        per_chapter_raw = raw_dir / chapter
+        per_chapter_raw.mkdir(exist_ok=True)
+        for sid in section_ids:
+            sec_url = f"{MPEP_BASE}/{sid}.html"
+            sec_cache = per_chapter_raw / f"{sid}.html"
+            if sec_cache.exists():
+                sec_html = sec_cache.read_text()
+            else:
+                sec_html = _http_get(sec_url)
+                time.sleep(_MPEP_FETCH_DELAY_S)
+                if sec_html is None:
+                    continue
+                sec_cache.write_text(sec_html)
+            for row in _mpep_extract_subsections(sec_html, sid, chapter):
+                chapter_rows.append(row)
+                if max_rows is not None and len(chapter_rows) >= max_rows:
+                    break
+            if max_rows is not None and len(chapter_rows) >= max_rows:
+                break
+
+        if not chapter_rows:
+            chapters_skipped.append(chapter)
+            continue
+
+        path = out_dir / f"mpep-{chapter}.jsonl"
+        with path.open("w") as f:
+            for row in chapter_rows:
+                f.write(json.dumps(row) + "\n")
+        written_files.append(path.name)
+        total_rows += len(chapter_rows)
+        print(
+            f"  mpep[{chapter}] → {path.name}: {len(chapter_rows)} subsections "
+            f"({len(section_ids)} sections); cumulative {total_rows}",
+            flush=True,
+        )
+
+    notes = (
+        f"USPTO static-HTML mirror at {MPEP_BASE}; chapters scraped per "
+        f"mpep-0XXX.html TOC + per-section h1.page-title boundaries. "
+        f"Skipped (404 or empty): {','.join(chapters_skipped) or 'none'}. "
+        f"Raw HTML cached under _raw/ for re-extraction without re-fetch."
+    )
     return SourceResult(
         name="mpep",
-        status="pending",
+        status="pulled" if total_rows else "pending",
+        hf_repo=None,
+        commit_sha=None,
         license="public-domain (17 USC §105)",
-        notes=(
-            "Scraper stub. eMPEP TOC is JS-rendered; need Playwright pass or "
-            "USPTO bulk download. See MPEP_INDEX_URL constant."
-        ),
+        rows=total_rows,
+        files=written_files,
+        notes=notes,
     )
 
 
@@ -265,21 +433,33 @@ def _iter_existing(path: Path) -> Iterator[Path]:
 
 
 def _build_snapshot(results: list[SourceResult]) -> dict[str, Any]:
+    """Merge new pull results into the existing snapshot.
+
+    Sources NOT touched this run keep their prior commit_sha / row counts —
+    selective re-pulls (e.g. `--sources mpep`) don't wipe bigpatent
+    provenance. Sources covered in this run overwrite their entries.
+    """
+    existing: dict[str, Any] = {}
+    if SNAPSHOT_PATH.exists():
+        try:
+            existing = json.loads(SNAPSHOT_PATH.read_text())
+        except json.JSONDecodeError:
+            existing = {}
+    sources = dict(existing.get("sources", {}))
+    for r in results:
+        sources[r.name] = {
+            "status": r.status,
+            "hf_repo": r.hf_repo,
+            "commit_sha": r.commit_sha,
+            "license": r.license,
+            "rows": r.rows,
+            "files": r.files,
+            "notes": r.notes,
+        }
     return {
         "pulled_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "spec_ref": "specs/patent-strategist-v1.md §6",
-        "sources": {
-            r.name: {
-                "status": r.status,
-                "hf_repo": r.hf_repo,
-                "commit_sha": r.commit_sha,
-                "license": r.license,
-                "rows": r.rows,
-                "files": r.files,
-                "notes": r.notes,
-            }
-            for r in results
-        },
+        "sources": sources,
     }
 
 
