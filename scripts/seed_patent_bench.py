@@ -725,7 +725,11 @@ def main() -> int:
             print(f"    - {e}")
         if len(stats.errors) > 20:
             print(f"    … and {len(stats.errors) - 20} more")
-    return 0 if not stats.errors else 1
+    # Exit non-zero only if the bench is short of the requested target. Transient
+    # per-anchor errors that the script recovered from (timeout → skip anchor →
+    # retry with a fresh one) still produce stats.errors entries but should not
+    # poison the exit code when generated == requested.
+    return 0 if stats.generated >= stats.requested else 1
 
 
 if __name__ == "__main__":
