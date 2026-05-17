@@ -137,52 +137,144 @@ def pull_bigpatent(out_dir: Path, max_rows: int | None) -> SourceResult:
     )
 
 
-# --- PatentMatch substitute (Tier 1) ---------------------------------------
+# --- PatentMatch (canonical HPI-Naumann via HiDrive share) -----------------
+
+
+PMATCH_HIDRIVE_SHARE = "rwfam92omy"
+PMATCH_HIDRIVE_API = "https://my.hidrive.com/api"
+# Spec §6.1's canonical PatentMatch from HPI-Naumann (Risch et al. 2021)
+# is hosted at https://hpi.de/naumann/s/patentmatch, which redirects to
+# the HiDrive share above. The share contains 8 zips spanning full +
+# balanced + ultra-balanced × {train, test} × {flat, DPR-format}. The
+# ultra-balanced flat zips are the highest-signal subset (one X and one
+# A per claim, 25,340 rows total) — large enough to dominate Family B
+# corpus weight, small enough to embed in seconds. The full 1.4 GB
+# `patentmatch_train.zip` (6.26M rows) would 99%-overlap retrieval cells
+# for our 200-question bench and lengthen embed time without lifting
+# retrieval quality, so we skip it for v1.0.
+PMATCH_FILES = ("patentmatch_train_ultrabalanced.zip", "patentmatch_test_ultrabalanced.zip")
+
+
+def _hidrive_token(share_id: str) -> str:
+    """POST a share-id to HiDrive's public share-token endpoint, get a
+    4-hour Bearer token. No login required; token scopes to the share."""
+    import requests  # type: ignore[import-not-found]
+
+    r = requests.post(
+        f"{PMATCH_HIDRIVE_API}/share/token",
+        data={"id": share_id},
+        timeout=30,
+    )
+    r.raise_for_status()
+    return r.json()["access_token"]
 
 
 def pull_patentmatch(out_dir: Path, max_rows: int | None) -> SourceResult:
-    """Pull `BNNT/PatentMatch` (Apache-2.0) as a substitute for the spec's
-    `pakuvis/PatentMatch` (404 on HF as of 2026-05-17).
+    """Pull canonical HPI-Naumann PatentMatch ultra-balanced split.
 
-    The English JSON is loaded directly; the canonical HPI-Naumann
-    PatentMatch (6.2M EPO pairs) ships outside HF and needs follow-up.
+    Replaces session-19's `BNNT/PatentMatch` 500-row substitute. The
+    canonical pairs are labeled by EPO patent examiners — `label=1`
+    rows are "X" documents (particularly relevant to claim's novelty
+    /inventive step); `label=0` rows are "A" documents (general
+    background, non-prejudicial). Ultra-balanced means exactly one X
+    and one A per claim — 25,340 rows total (20,272 train + 5,068 test).
+
+    Schema per row (matches the source TSV):
+
+        {
+          "claim_id": str,           # e.g. "44939_1"
+          "patent_application_id": str,  # EPO application, e.g. "EP2551115A1"
+          "cited_document_id": str,  # cited prior art, e.g. "EP2105306"
+          "claim_text": str,         # claim from the application
+          "cited_text": str,         # paragraph from the cited document
+          "label": int,              # 1 = X (relevant), 0 = A (background)
+          "label_letter": "X"|"A",   # convenience for prompt rendering
+          "date": str,               # decision date YYYYMMDD
+          "split": "train"|"test",   # source split (test is held-out)
+        }
+
+    Source paper: Risch et al. 2021, "PatentMatch: A Dataset for Matching
+    Patent Claims & Prior Art" (PatentSemTech@SIGIR 2021). License: MIT
+    per the project GitHub repo (github.com/julian-risch/PatentMatch).
     """
-    from huggingface_hub import HfApi, hf_hub_download  # type: ignore[import-not-found]
+    import csv
+    import io
+    import zipfile
 
-    repo_id = "BNNT/PatentMatch"
-    sha = HfApi().dataset_info(repo_id).sha
+    import requests  # type: ignore[import-not-found]
+
     out_dir.mkdir(parents=True, exist_ok=True)
+    raw_dir = out_dir / "_raw"
+    raw_dir.mkdir(exist_ok=True)
 
-    src = hf_hub_download(repo_id, "PatentMatch_en.json", repo_type="dataset")
-    # Despite the `.json` extension the file is newline-delimited JSON
-    # (one record per line — instruction-tuning shape).
+    token = _hidrive_token(PMATCH_HIDRIVE_SHARE)
+
     rows: list[dict] = []
-    with open(src) as f:
-        for line in f:
-            line = line.strip()
-            if not line:
-                continue
-            rows.append(json.loads(line))
-            if max_rows is not None and len(rows) >= max_rows:
-                break
+    splits_pulled: dict[str, int] = {}
+    for filename in PMATCH_FILES:
+        split = "train" if "train" in filename else "test"
+        zip_path = raw_dir / filename
+        if not zip_path.exists():
+            url = (
+                f"{PMATCH_HIDRIVE_API}/file?attachment=true"
+                f"&path=/{filename}&access_token={token}"
+            )
+            print(f"  patentmatch GET {filename} ...", flush=True)
+            r = requests.get(url, timeout=300, stream=True)
+            r.raise_for_status()
+            with zip_path.open("wb") as f:
+                for chunk in r.iter_content(chunk_size=1 << 16):
+                    f.write(chunk)
 
-    path = out_dir / "patentmatch-en.jsonl"
-    with path.open("w") as f:
+        with zipfile.ZipFile(zip_path) as z:
+            tsv_name = z.namelist()[0]
+            with z.open(tsv_name) as f:
+                text = io.TextIOWrapper(f, encoding="utf-8", errors="replace")
+                reader = csv.DictReader(text, delimiter="\t")
+                for r_in in reader:
+                    label_int = int(r_in["label"])
+                    rows.append({
+                        "claim_id": r_in["claim_id"],
+                        "patent_application_id": r_in["patent_application_id"],
+                        "cited_document_id": r_in["cited_document_id"],
+                        "claim_text": r_in["text"],
+                        "cited_text": r_in["text_b"],
+                        "label": label_int,
+                        "label_letter": "X" if label_int == 1 else "A",
+                        "date": r_in["date"],
+                        "split": split,
+                    })
+                    if max_rows is not None and len(rows) >= max_rows:
+                        break
+            splits_pulled[split] = sum(1 for x in rows if x["split"] == split)
+        if max_rows is not None and len(rows) >= max_rows:
+            break
+
+    # Drop the BNNT substitute JSONL if present (session-19 artifact).
+    legacy = out_dir / "patentmatch-en.jsonl"
+    if legacy.exists():
+        legacy.unlink()
+
+    out_path = out_dir / "patentmatch-ultrabalanced.jsonl"
+    with out_path.open("w") as f:
         for r in rows:
             f.write(json.dumps(r) + "\n")
+
     return SourceResult(
         name="patentmatch",
         status="pulled",
-        hf_repo=repo_id,
-        commit_sha=sha,
-        license="Apache-2.0",
+        hf_repo=None,
+        commit_sha=None,  # HiDrive share lacks a versioning anchor; mtime in raw cache
+        license="MIT (github.com/julian-risch/PatentMatch)",
         rows=len(rows),
-        files=[path.name],
+        files=[out_path.name],
         notes=(
-            "SUBSTITUTE: spec's pakuvis/PatentMatch returns 404; BNNT/PatentMatch "
-            "used instead (500 rows, instruction-tuning shape — small for Family B "
-            "primary). Canonical HPI-Naumann PatentMatch (6.2M EPO pairs) needs "
-            "direct-download wiring before W2 bench preflight."
+            f"CANONICAL HPI-Naumann PatentMatch ultra-balanced "
+            f"(Risch et al. 2021). Pulled via HiDrive share {PMATCH_HIDRIVE_SHARE}; "
+            f"splits: {splits_pulled}. One X and one A per claim — Family B "
+            f"primary corpus. Full 6.26M-row variant skipped for v1.0 (overkill "
+            f"vs 200-Q bench). Replaces session-19's BNNT/PatentMatch 500-row "
+            f"substitute (deleted from this dir on re-pull)."
         ),
     )
 

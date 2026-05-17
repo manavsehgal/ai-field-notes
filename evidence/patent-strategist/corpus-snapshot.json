@@ -1,5 +1,5 @@
 {
-  "pulled_at": "2026-05-17T14:41:13+00:00",
+  "pulled_at": "2026-05-17T14:57:14+00:00",
   "spec_ref": "specs/patent-strategist-v1.md \u00a76",
   "sources": {
     "bigpatent": {
@@ -16,14 +16,14 @@
     },
     "patentmatch": {
       "status": "pulled",
-      "hf_repo": "BNNT/PatentMatch",
-      "commit_sha": "3280babe5feb19b4821656ddf1d84edae5bba600",
-      "license": "Apache-2.0",
-      "rows": 500,
+      "hf_repo": null,
+      "commit_sha": null,
+      "license": "MIT (github.com/julian-risch/PatentMatch)",
+      "rows": 25340,
       "files": [
-        "patentmatch-en.jsonl"
+        "patentmatch-ultrabalanced.jsonl"
       ],
-      "notes": "SUBSTITUTE: spec's pakuvis/PatentMatch returns 404; BNNT/PatentMatch used instead (500 rows, instruction-tuning shape \u2014 small for Family B primary). Canonical HPI-Naumann PatentMatch (6.2M EPO pairs) needs direct-download wiring before W2 bench preflight."
+      "notes": "CANONICAL HPI-Naumann PatentMatch ultra-balanced (Risch et al. 2021). Pulled via HiDrive share rwfam92omy; splits: {'train': 20272, 'test': 5068}. One X and one A per claim \u2014 Family B primary corpus. Full 6.26M-row variant skipped for v1.0 (overkill vs 200-Q bench). Replaces session-19's BNNT/PatentMatch 500-row substitute (deleted from this dir on re-pull)."
     },
     "mpep": {
       "status": "pulled",

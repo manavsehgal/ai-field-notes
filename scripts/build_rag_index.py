@@ -126,37 +126,50 @@ def chunk_bigpatent(src_dir: Path, max_rows: int | None) -> Iterator[Chunk]:
                     return
 
 
-# --- PatentMatch (BNNT substitute) -----------------------------------------
+# --- PatentMatch (canonical HPI-Naumann ultra-balanced) --------------------
 
 
 def chunk_patentmatch(src_dir: Path, max_rows: int | None) -> Iterator[Chunk]:
-    """One atomic chunk per instruction row.
+    """One atomic chunk per claim↔prior-art pair.
 
     Spec §3.4: "PatentMatch claim ↔ prior-art pairs as atomic chunks (no
-    chunking)". BNNT/PatentMatch ships as instruction-tuning rows
-    (`instruction` carries the query patent + 4 candidates, `output`
-    is the chosen letter). For retrieval the full instruction text is
-    the searchable surface; the gold letter rides along in metadata so
-    a retrieval cell can be evaluated against it later.
+    chunking)". The canonical HPI-Naumann schema (claim_text + cited_text
+    + label) lets us index both halves of each pair as one searchable
+    chunk, with the X/A label riding in metadata so a Family B
+    retrieval-cell evaluator can score positives vs negatives later.
 
-    The canonical HPI-Naumann PatentMatch (6.2M EPO pairs) will swap
-    this in at T2-followup time; the chunk shape stays the same.
+    Chunk text format: `<claim_text> [PRIOR ART <X|A>]: <cited_text>`.
+    The bracketed label keeps the BGE embedding sensitive to whether
+    the pair is novelty-prejudicial (X) or background (A); at retrieval
+    time queries that look like claims will preferentially surface X
+    pairs whose claim halves are semantically close.
     """
     seen = 0
     for path in sorted(src_dir.glob("*.jsonl")):
         with path.open() as f:
             for line in f:
                 row = json.loads(line)
-                text = (row.get("instruction") or "").strip()
-                if not text:
+                claim_text = (row.get("claim_text") or "").strip()
+                cited_text = (row.get("cited_text") or "").strip()
+                if not claim_text or not cited_text:
                     continue
-                doc_id = f"{path.stem}#{seen}"
+                label_letter = row.get("label_letter", "?")
+                combined = f"{claim_text} [PRIOR ART {label_letter}]: {cited_text}"
+                doc_id = f"{row.get('claim_id')}::{row.get('cited_document_id')}"
                 yield Chunk(
                     chunk_id=_stable_id("patentmatch", doc_id, 0),
                     source="patentmatch",
                     doc_id=doc_id,
-                    text=text,
-                    metadata={"gold_letter": row.get("output"), "file": path.name},
+                    text=combined,
+                    metadata={
+                        "claim_id": row.get("claim_id"),
+                        "patent_application_id": row.get("patent_application_id"),
+                        "cited_document_id": row.get("cited_document_id"),
+                        "label": row.get("label"),
+                        "label_letter": label_letter,
+                        "date": row.get("date"),
+                        "split": row.get("split"),
+                    },
                 )
                 seen += 1
                 if max_rows is not None and seen >= max_rows:
