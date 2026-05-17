@@ -82,6 +82,10 @@ b.dump("benchmark.json")                  # full JSON
 
 Exceptions in the callable are caught and recorded with `success=False` so a single bad input doesn't sink the sweep. Pass `on_error="raise"` to abort on first failure.
 
+`Bench.record(*, input=None, output=None, latency_ms, success=True, error=None, tags=None, **metrics)` is the imperative variant — use it when the wrapped function already returns its own latency breakdown (embed/retrieve/generate sub-timings) and you want to record those components without re-timing the wall clock. `output` is stashed for `include_outputs=True` dumps; `latency_ms` is the only required kwarg.
+
+`Bench.to_dict(*, include_outputs=False)` and `Bench.dump(path, *, include_outputs=False)` both default to *eliding* the raw per-call outputs because benchmark JSON files balloon fast on long-context generations. Flip `include_outputs=True` when you need the model's actual response text for downstream auditing (e.g. feeding into `Judge` after the fact).
+
 ### `Judge(client: NIMClient, rubric=RUBRIC_CORRECTNESS, ...)`
 
 LLM-as-judge wrapping any `NIMClient`. Three built-in rubrics: `correctness`, `faithfulness`, `relevance`.
@@ -121,6 +125,8 @@ traj.cumulative_best()      # list[float]
 ```
 
 Permissive parser drops malformed lines silently — the agent loop emits intermediate `proposed`/`failed` records too.
+
+`Trajectory.repeat_rate(*, window=None)` returns a single float for the whole trajectory by default; pass `window=N` to get a per-window list of `{first, last, n, repeats, rate}` records — useful for showing the repeat rate climbing as the proposer's history horizon forgets older proposals. `Trajectory.mode_dominance(*, top_n=None)` returns *all* (knob, value) pairs by proposal count when `top_n=None`; pass `top_n=5` (or any int) to cap the list when the trajectory has long tails and you only care about the dominant modes.
 
 ### `is_refusal(text) -> bool`
 
@@ -162,7 +168,7 @@ result = pak.score(
 print(result.pass_at)            # {1: 0.7050, 8: 0.8415}
 ```
 
-`samples` is a sequence-of-sequences with one fixed sample count across problems; `PassAtK.score` raises if they diverge. `extras_fn(problem, samples) -> dict` is an optional hook for attaching per-problem metadata (first-sample tail, decode-token counts, etc.) onto each `per_task` row without bloating the grader interface.
+`samples` is a sequence-of-sequences with one fixed sample count across problems; `PassAtK.score` raises if they diverge. `extras_fn(problem, samples) -> dict` is an optional hook for attaching per-problem metadata (first-sample tail, decode-token counts, etc.) onto each `per_task` row without bloating the grader interface. `task_id_field="task_id"` (default) names the key holding the canonical id; override when the bench uses `id`, `qid`, etc.
 
 When you've already graded the rollout offline (e.g. you have a `comparison.json` from a prior bench), use `pak.from_rows(rows)` with pre-counted `(task_id, n, passed)` triples to skip re-grading.
 
@@ -191,6 +197,8 @@ custom = AgentRun.from_record(
 ```
 
 `TurnDetail` keeps five canonical fields (`turn`, `action`, `duration_s`, `input_tokens`, `output_tokens`) and stuffs everything else from the source record into `extras` so the canonical accessors stay stable while bench-specific fields (`papers_retrieved`, `parse_errors`, `candidate_cfg`) survive round-tripping.
+
+`AgentRun.from_record(raw, *, question_id_field, question_id_path, inference_path, status_field="status", wall_field="total_time", turns_field="turn_details", candidates_field="final_candidates")` exposes every field-name knob the AutoResearchBench parser hardcodes — override `status_field` / `wall_field` / `candidates_field` for benches that emit (say) `"final_status"` + `"wall_seconds"` + `"results"` instead. `AgentRun.to_dict(*, include_raw=False)` defaults to a compact summary; flip `include_raw=True` to preserve the full source record for provenance dumps (large — only do this when the dump is the source-of-truth artifact).
 
 Convenience accessors on `AgentRun` are pure derivations of `turns`: `tool_calls()` (action == "tool"), `tool_format_errors()` (action == "error"), `total_input_tokens()`, `total_output_tokens()`, `succeeded()` (status == "finished" AND ≥1 candidate). Override `succeeded()` for benches with different success semantics.
 
