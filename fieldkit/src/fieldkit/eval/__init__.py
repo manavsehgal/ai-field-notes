@@ -159,9 +159,12 @@ def mcq_letter(
     stripped = pred.upper().strip(".,)!:- ")
     if len(stripped) <= 1 and stripped in ("A", "B", "C", "D"):
         return 1.0 if stripped == exp else 0.0
-    m = _MCQ_AFTER_ANSWER_RE.search(pred)
-    if m:
-        return 1.0 if m.group(1).upper() == exp else 0.0
+    matches = _MCQ_AFTER_ANSWER_RE.findall(pred)
+    if matches:
+        # Bias toward the concluding pick — reasoning models often emit
+        # "Option A is incorrect ... Answer: B" where the first match is the
+        # eliminated distractor and the last match is the actual choice.
+        return 1.0 if matches[-1].upper() == exp else 0.0
     m = _MCQ_BOUNDED_RE.search(pred)
     if m:
         return 1.0 if m.group(1).upper() == exp else 0.0

@@ -221,10 +221,17 @@ class LlamaClient:
 # --- prompt assembly ----------------------------------------------------
 
 
-def build_user_prompt(question: str, context: str | None) -> str:
+def build_user_prompt(question: str, context: str | None, options: list[str] | None = None) -> str:
+    parts: list[str] = []
     if context:
-        return f"Context:\n\n{context}\n\nQuestion: {question}"
-    return question
+        parts.append(f"Context:\n\n{context}\n")
+    parts.append(f"Question: {question}")
+    if options:
+        # D-mcq style — render as labeled choices so the model can answer with a letter.
+        labels = "ABCDEFGH"
+        choices = "\n".join(f"{labels[i]}. {opt}" for i, opt in enumerate(options))
+        parts.append(f"\nOptions:\n{choices}")
+    return "\n".join(parts)
 
 
 # --- scoring ------------------------------------------------------------
@@ -337,7 +344,8 @@ def run_one_question(
         context = format_context(retrieved_chunks, max_chars=max_context_chars)
     # mode == "closed" → no context
 
-    prompt = build_user_prompt(question, context)
+    options = row.get("options") or None
+    prompt = build_user_prompt(question, context, options)
 
     prediction = ""
     latency_s = 0.0

@@ -48,6 +48,15 @@ class TestAnswerMarker:
         assert mcq_letter("A is wrong. Answer: D", "D") == 1.0
         assert mcq_letter("A is wrong. Answer: D", "A") == 0.0
 
+    def test_concluding_answer_wins_over_elimination(self) -> None:
+        # Reasoning models often eliminate distractors with "Option A is
+        # incorrect" / "Option D is incorrect" before naming the final pick.
+        # The scorer must follow the conclusion, not the first trigger.
+        pred = "Option A is incorrect. Option D is incorrect. Answer: B"
+        assert mcq_letter(pred, "B") == 1.0
+        assert mcq_letter(pred, "A") == 0.0
+        assert mcq_letter(pred, "D") == 0.0
+
 
 class TestNoisyProse:
     def test_first_bounded_letter_fallback(self) -> None:

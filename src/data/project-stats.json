@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-05-17T15:27:29Z",
+  "generated_at": "2026-05-18T03:52:37Z",
   "articles": {
     "total": 38,
     "published": 38,
-    "upcoming": 4,
+    "upcoming": 5,
     "drafts": 0
   },
   "words": {
@@ -17,11 +17,11 @@
   },
   "code": {
     "evidence_loc": 14207,
-    "fieldkit_loc": 11290,
+    "fieldkit_loc": 11301,
     "vendored_loc": 344724,
-    "total_loc": 25497,
+    "total_loc": 25508,
     "by_language": {
-      "python": 25469,
+      "python": 25480,
       "sql": 15,
       "shell": 13
     },
@@ -43,7 +43,7 @@
   "stages_upcoming": {
     "foundations": 0,
     "training": 1,
-    "fine-tuning": 1,
+    "fine-tuning": 2,
     "inference": 0,
     "deployment": 0,
     "agentic": 0,
