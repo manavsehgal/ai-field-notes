@@ -1,10 +1,11 @@
 <!--
-  ✅ STATUS: SHIPPED — Mac swept 2026-05-16 at destination commit manavsehgal/ainative-business.github.io@10a74a5 (medical-vertical-II-Medical-8B cycle).
+  🆕 STATUS: NEW — patent-strategist-v1-baseline cycle ready for Mac sweep.
   This file is one feature/release at a time, not a running log.
   At the next release prompt, **clear this entire file and start fresh** (do NOT append to existing sections).
-  Last reset: 2026-05-16 (medical-vertical / II-Medical-8B-GGUF live HF push).
+  Last reset: 2026-05-17 (patent-strategist v1 baseline article + fieldkit v0.4.3 + skills-in-git).
 
-  Prior Mac sweep receipts (preserved here since SYNC-HANDOFF is per-release-not-running-log; Mac will sweep this 2026-05-16 medical-vertical cycle next):
+  Prior Mac sweep receipts (preserved here since SYNC-HANDOFF is per-release-not-running-log):
+  - 2026-05-16 medical-vertical / II-Medical-8B-GGUF cycle: swept at destination commit manavsehgal/ainative-business.github.io@10a74a5 (Mac PR #8, merged 2026-05-16 at ac1b427).
   - 2026-05-15 fieldkit v0.4.2 cycle: swept at destination commit manavsehgal/ainative-business.github.io@495196d (Mac PR #7, merged 2026-05-16 at d332d28).
   - 2026-05-15 cyber-vertical cycle: swept at destination commit manavsehgal/ainative-business.github.io@135bcad (Mac PR #6 merged 2026-05-15).
   - 2026-05-14 v0.4.1 cycle: swept at destination commit manavsehgal/ainative-business.github.io@e1b16de (Mac PR #5 merged 2026-05-14).
@@ -13,120 +14,88 @@
   - 2026-05-12 Autoresearch→MTBM rename: swept at destination commit manavsehgal/ainative-business.github.io@71293af (Mac PR #2, merged).
 -->
 ---
-release_slug: 2026-05-16-medical-vertical-II-Medical-8B
-status: SHIPPED
-swept_at: 2026-05-16
-swept_by: manavsehgal/ainative-business.github.io@10a74a5
-source_range: f23efb3..HEAD
+release_slug: 2026-05-17-patent-strategist-v1-baseline
+status: NEW
+source_range: f005b52..17f59ee
 articles_added:
-  - slug: becoming-a-medical-curator-on-spark    # status: published — full 8-section draft promoted in commit f005b52 with new MedicalQuad signature
+  - slug: patent-strategist-v1-baseline-on-spark    # status: published — three-mode bracket on R1-0528-Qwen3-8B Q5_K_M, signature: PatentBracketSignature
 articles_updated: []
 signatures_added:
-  - component: src/components/svg/MedicalQuad.astro     # 300x200 bar chart, MedMCQA accuracy across 5 variants, Q5_K_M accent above F16 baseline
-artifacts_added:
-  - manifest: src/content/artifacts/ii-medical-8b-gguf.yaml
-    hf_repo: Orionfold/II-Medical-8B-GGUF
-    recommended_variant: Q5_K_M
-    license: apache-2.0
-    chat_format: chatml
-    vertical_eval_name: "MedMCQA (n=50, mcq_letter)"
+  - component: src/components/svg/PatentBracketSignature.astro    # 300x200 three-bar D-mcq ladder (closed 0.62 / retrieval 0.85 / oracle 0.95) + dashed random-4-choice baseline + dashed lift connectors (+0.225 / +0.100)
+artifacts_added: []                                  # no HF push this cycle — bench/eval article, not a model release
 artifacts_updated: []
-fieldkit_modules_changed: []                     # zero fieldkit source-code changes this cycle — second vertical in a row to land via configuration only
+fieldkit_modules_changed:
+  - eval                                             # patent-strategist format wired into VerticalBench.from_jsonl; 4 new scorers (patent_claim_validity, office_action_argument, irac_structure, prior_art_relevance + _full); mcq_letter promoted to top-level + bug-fix to findall-last so reasoning-model elimination-then-answer prose scores on the conclusion
+fieldkit_release:
+  version: 0.4.3
+  pypi: https://pypi.org/project/fieldkit/0.4.3/
+  tag: fieldkit/v0.4.3
+  notes: |
+    Adds patent-strategist scorer family (4 new scorers + dispatch map + rubric markdown
+    bundled in wheel). mcq_letter promoted from internal to top-level export. No schema
+    breakage. PyPI live; install with `pip install fieldkit==0.4.3`.
 papers_added: []
 papers_classify_count: 0
 renames_to_replay: []
 removes: []
 new_top_level_pages: []
 breaking_changes: []
-destination_overrides_to_preserve: []
-hf_repos_added:
-  - Orionfold/II-Medical-8B-GGUF                 # 5 GGUFs + README + .gitattributes; live 2026-05-16 05:15 UTC after 2h32m push
+destination_overrides_to_preserve:
+  - "Live home page lists 40 articles vs local's 39 published. The 2-article gap is the two Mac-authored landing pages already on live (`ai-transformation`, `solo-builder-case-study`) — Mac owns those, no Spark sweep action needed. If Mac wants to formalize this in `mirrors/destination-overrides.md`, the placeholder file is still empty pending the first inventory PR."
+hf_repos_added: []
 civitai_artifacts_added: []
-fieldkit_release: null                           # no fieldkit cut this cycle; current PyPI stays at 0.4.2
 post_rotation_commits:
-  - f005b52  # medical: promote becoming-a-medical-curator-on-spark — full 8-section body + MedicalQuad signature
+  - 17f59ee  # patent-strategist: flip baseline article upcoming → published
 ---
 
 ## Headline
 
-Vertical 4 (**medical**) ships live to HuggingFace at <https://huggingface.co/Orionfold/II-Medical-8B-GGUF>. Five GGUF variants of Intelligent-Internet's II-Medical-8B (Qwen3-8B base, SFT + DAPO reasoning recipe targeting clinical Q&A), measured end-to-end on a DGX Spark with the same four-axis card the prior three Orionfold verticals carry. **Q5_K_M is the narrative-recommended variant** — perplexity essentially equal to F16 (16.24 vs 16.27), MedMCQA accuracy slightly above F16 (52% vs 48% at n=50), 2.3× throughput (36.4 vs 15.9 tok/s), 5.45 GB on disk.
+The patent-strategist v1 **three-mode bracket** ships as a published article. `DeepSeek-R1-0528-Qwen3-8B Q5_K_M` ran the 200-row `patent-strategist-v0.1` bench under closed-book, retrieval, and oracle context modes; D-mcq accuracy climbs **0.625 → 0.850 → 0.950**; overall mean across the 90 scorer-supported rows (B + D-mcq + D-irac) lands **0.397 → 0.489 → 0.541**. Closed-to-retrieval lift is **2.25× the retrieval-to-oracle gap** — the bracket says fine-tune the model first, retriever upgrades later. Three scaffold bugs surfaced mid-flight (options-blind D-mcq prompts, first-Option-wins `mcq_letter` regex, max-tokens truncation mid-`<think>`); two are patched in this release, one is deferred to W4.
 
-This cycle is the **second vertical in a row to ship with zero new code in `fieldkit` itself** — the publishing surface generalized in v0.4.0–v0.4.1 absorbed the medical pick as a configuration change. One real footgun got patched in the preflight harness (a missing `chatml` branch in `_detect_prompt_format` that would have silently dropped `<|im_start|>` wrapping on any future ChatML model), but it lives in `scripts/g3_preflight_bench.py` until the `mcq_letter` scorer hits its third reuse and triggers Phase 8.5 promotion of the bench layer.
+This cycle also ships `fieldkit v0.4.3` on PyPI — the patent-strategist scorer family (`patent_claim_validity`, `office_action_argument`, `irac_structure`, `prior_art_relevance` + `_full`), the `mcq_letter` findall-last fix, and a 26-item kwarg-drift docs cleanup that takes the `--strict-kwargs` audit to **0 FAIL / 0 WARN**.
 
 ## What Mac CC sweeps
 
 Spark-authoritative files (per `[[reference_sync_contract]]`). No destination-side rewrites, no schema changes, no renames.
 
-- **`src/content/artifacts/ii-medical-8b-gguf.yaml`** — NEW artifact manifest (auto-emitted by `publish_quant(dry_run=True)`). Carries `recommended_variant: Q5_K_M` (the v0.4.2 field; this is its first cycle with a fresh push that uses it), `license.model: apache-2.0`, `chat_format: chatml`, `vertical_eval_name: "MedMCQA (n=50, mcq_letter)"`, 5 variants with full Spark-tested metrics. Destination catalog can render the "Sweet spot" badge directly from `recommended_variant:` — no hand-pin required (contrast with cyber's PR #6, where Mac had to hand-pin `Q4_K_M` because the manifest was on pre-v0.4.2 schema).
-- **`articles/becoming-a-medical-curator-on-spark/article.md`** — NEW article, **`status: published`** with the full 8-section draft (promoted in commit `f005b52`). Frontmatter mirrors the sibling finance/legal/cyber-curator articles exactly (`product: llama.cpp`, `stage: deployment`, `series: Machine that Builds Machines`, `fieldkit_modules: [quant, publish, eval, lineage]`, `also_stages: [observability]`, `hf_url`) plus `signature: MedicalQuad`. Body carries 4-vertical hub-and-spoke fn-diagram (medical as accent), the variant table, the variant picker, the use snippets (HF CLI + llama-server + llama-cpp-python with `chat_format="chatml"`), the per-vertical-delta walkthrough, the reasoning-recipe generation-budget section, the MedMCQA-subset note, the thermal-envelope note (with the 4-vertical Q8_0 split now reading as chat-tune-only vs continued-pretrain shape), and 9 explainers across the six directive types (3 `:::define` + 1 `:::why` + 2 `:::pitfall` + 1 `:::math` + 1 `:::deeper` + 1 `:::hardware`). `verify_article.sh` clean — frontmatter, image refs, secret scan, all SVG hard invariants pass.
-- **`src/components/svg/MedicalQuad.astro`** — NEW signature component (300×200) for the medical card. 5-bar MedMCQA chart with Q5_K_M as the accent (above the F16 reference line) and the four other variants as muted-green bars. Sibling cyber + legal cards omitted the signature field; medical chose to ship one because the recommended-variant-beats-F16 story is the card-thumbnail headline.
-- **`articles/becoming-a-gguf-publisher-on-spark/evidence/lineage-II-Medical-8B/results.tsv`** — NEW evidence directory under the gguf-publisher arc article (same shape the cyber + legal + finance verticals use). 5 lineage rows, exp_ids 001–005, status=keep.
-- **`scripts/medmcqa_merge.py`** — NEW; samples N=50 from `openlifescienceai/medmcqa` validation split into the cyber/legal `{id,text,answer,task}` JSONL shape. The `mcq_letter` scorer's second reuse.
-- **`scripts/g3_preflight_bench.py`** — EXTENDED with the medmcqa whitelist, `MEDMCQA_JSONL` env, **and** a new `chatml` branch in `_detect_prompt_format`/`_format_prompt` (the silent-failure fix for ChatML templates).
-- **`scripts/g3_measure_variants.py`** — EXTENDED with medmcqa whitelist, `_wrap_chatml` prompt wrapper, MEDMCQA env, and medical defaults (domain / baseline / bench dataset maps).
-- **`scripts/g3_build_first_quant.sh`** — EXTENDED with a new per-model case for `Intelligent-Internet/II-Medical-8B` (license, chat-format, vertical, article slug, MEDMCQA env threading).
-- **`README.md`** + **`src/data/project-stats.json`** — auto-refreshed twice this cycle: first after the upcoming-placeholder commit (`4392ab6`), then again after the article promotion (`f005b52`). Article count now **38 published + 4 upcoming = 42 total** (the medical placeholder moved from `upcoming` → `published`); word total now 127,405.
+- **`articles/patent-strategist-v1-baseline-on-spark/article.md`** — NEW article, **`status: published`** with the full 9-section draft. Frontmatter: `product: Foundation`, `stage: fine-tuning`, `difficulty: advanced`, `time_required: "~10 hours (mostly automated overnight sweeps)"`, `tags: [eval, rag, reasoning-models, llama-cpp, deepseek-r1, vertical-bench, patent-strategist]`, `signature: PatentBracketSignature`. Body carries the three-mode bracket fn-diagram (color-distinct indigo/blue/primary lanes converging on a haloed model + scorer endpoint with right-edge score callouts), the eval-scaffold-and-bench overview, the journey (picking the model, picking the quantization, standing up llama-server with embedded console code blocks, building the eval driver, plausibility checks), the results table with the full closed/retrieval/oracle ladder, three findings, three bug retros, the targeted-fine-tune unlock, and a closing tie-back to the next-vertical scaffold.
+- **`articles/patent-strategist-v1-baseline-on-spark/transcript.md`** — provenance for the article (drafted mid-T10 sweep). One-page session-source record.
+- **`src/components/svg/PatentBracketSignature.astro`** — NEW signature (300×200) for the card thumbnail on `/stage/fine-tuning/`. Three bars labeled `closed / retrieval / oracle` at heights 0.625 / 0.850 / 0.950, indigo→blue→primary gradient, with the dashed 0.25 random-4-choice baseline, halo behind the oracle bar, and two dashed connector lines carrying the `+0.225` and `+0.100` lift labels. Footer caption hammers the headline thesis: *"closed-to-retrieval lift is 2.25× the retrieval-to-oracle gap → fine-tune the model first, retriever upgrades later"*.
+- **`evidence/patent-strategist/baseline-runs/`** — NEW evidence root. Five run-dirs:
+    - `20260517-102017-retrieval-retonly-4da81a/` — retrieval-only 3-row smoke (no inference)
+    - `20260517-104509-retrieval-518c10/` — 5-row retrieval smoke (post-server-up)
+    - `20260517-104908-retrieval-136ef4/` — full 200-row retrieval sweep, 3h22m, overall 0.489
+    - `20260517-141203-oracle-e6885f/` — full 200-row oracle sweep, 2h52m, overall 0.541
+    - `20260517-170410-closed-b8cfe9/` — full 200-row closed-book sweep, overall 0.397 (initial 175 + 13min E-tail resume after power outage)
+- **`scripts/seed_patent_bench.py`** — NEW (~530 LOC, stdlib-only). 200-row bench seeder via Claude Opus through `claude -p` OAuth; landed in session 25.
+- **`scripts/review_patent_bench.py`** — NEW (~370 LOC, stdlib-only). Human-in-the-loop review CLI with atomic per-decision JSONL rewrite; synthesized-rows-first priority; smoke-tested round-trip clean.
+- **`scripts/run_rag_baseline.py`** — NEW (~500 LOC). T10 driver, three modes (closed/retrieval/oracle) + retrieval-only side-mode; BGE-small/FAISS lookup; OpenAI-compatible chat client; scorer dispatch to `PATENT_STRATEGIST_SCORER_FNS`. Now renders D-mcq `options` as labeled choices (the prior version dropped them on the floor — caught on a 5-row smoke that scored 5/5 because R1 invented plausible options).
+- **`scripts/rescore_predictions.py`** — NEW small helper. Replays scorers against an existing `predictions.jsonl` in place after a scorer-fix; regenerates `scores.json`. Used here after the `mcq_letter` findall-last fix lifted retrieval D-mcq 0.775 → 0.850 without re-running inference.
+- **`scripts/resume_closed_e_tail.py`** — NEW one-off recovery script. Power outage truncated the closed-book sweep at row 175/200; this resumes the missing 25 E-shape rows against the same llama-server endpoint and appends to the same `predictions.jsonl`.
+- **`scripts/build_rag_index.py`** — NEW (W1 T3). BGE-small + FAISS IndexFlatIP build over the patent-strategist corpus; 39,777 vectors total.
+- **`scripts/pull_mpep_static.py`** — NEW (T2 followup). USPTO static-HTML MPEP mirror puller; 2,047 subsections, 4,437 chunks; takes prosecution-query retrieval ceiling from 0.74 → 0.85.
+- **`scripts/pull_patentmatch_naumann.py`** — NEW (T2 followup). Reverse-engineered HiDrive share-token flow for canonical HPI-Naumann PatentMatch; 25,340 EPO claim-pair rows.
+- **`fieldkit/src/fieldkit/eval/__init__.py`** + **`fieldkit/tests/eval/test_mcq_letter.py`** — EXTENDED. `mcq_letter` now uses `re.findall(...)[-1]` so reasoning-model elimination prose (`"Option A is incorrect ... Option D is incorrect ... Answer: B"`) scores on the conclusion rather than the first eliminated distractor. New test `test_concluding_answer_wins_over_elimination` locks the behavior; +3 correct rows on retrieval D-mcq (40-row slice).
+- **`fieldkit/` v0.4.3 on PyPI** — patent-strategist scorers shipped (`fieldkit.eval.vertical.PATENT_STRATEGIST_SCORER_FNS`), rubric markdown bundled in wheel. 507 passed / 2 skipped in suite. **No code-only change required on Mac side** — `fieldkit/docs/api/` pages already mirror the new symbols (audit pass landed in `ae85b66`).
+- **`src/data/project-stats.json`** — auto-refreshed twice this cycle: first after the upcoming-placeholder commit (`1c3e23a` — articles `38 published + 5 upcoming`), then again after the `upcoming → published` flip (`17f59ee` — articles `39 published + 4 upcoming = 43 total`). Word total **130,727** (up from 127,405 on the flip — the article's prose was excluded while it carried `status: upcoming`). LOC unchanged at 25,508. Fine-tuning stage moved from 8 → 9. `DGX Spark` product climbed to 31 (tied with NIM).
+- **`.claude/skills/` tree** — NEW in git. The operational skills layer is now versioned alongside the source. Mac CC's skill tree is separate (`~/.claude/skills/` on Mac); this is the Spark CC user-config layer (`tech-writer`, `hf-publisher`, `hf-model-scout`, `fieldkit-curator`, `frontier-scout`, `nvidia-learn-stats`, etc.). Per `[[reference_sync_contract]]`: skills are Mac-and-Spark each-own-their-own; **no Mac sweep action needed**.
 
 ### Auto-refreshed (no Mac-side action needed)
 
-The stats infographic + README article index reflect the new article entry (with the 🔜 placeholder marker). Top-level numbers shifted only marginally — the upcoming placeholder counts toward `stages_upcoming` but not toward word / LOC totals until promoted.
+The stats infographic + README article index reflect the new article entry and the `upcoming → published` flip. Top-level numbers shifted as noted above. The `/stage/fine-tuning/` page now renders the patent-strategist card with the `PatentBracketSignature` thumbnail (verified via Playwright smoke; zero console errors).
 
 ## What Mac CC does NOT need to do
 
-- **No fieldkit release.** PyPI stays at 0.4.2. No new module, no kwarg drift, no schema change. The v0.4.2 cut absorbed everything this push needed (`ModelCard.llama_cpp_example_prompt` neutral default + `ArtifactManifest.recommended_variant` flow-through).
-- **No rename replays.** `SYNC-RENAMES.log` unchanged.
-- **No new top-level pages.** The new article folder is under the existing `articles/` content collection; no new section, no new stage page (existing `deployment` + `observability` filter pages already render it).
-- **No HF README patches.** The card rendered correctly from the v0.4.2 codepath on first push — no in-place HF edits needed (contrast with the finance + legal + cyber cycles which all required post-push fixups).
-- **No skill IA mirroring.** `hf-publisher`, `hf-model-scout`, `tech-writer`, `fieldkit-curator` all live in `~/.claude/skills/` (Spark CC user config), not in the source repo.
+- **No fieldkit destination action.** `fieldkit/docs/api/` is the canonical reference layer and already mirrors v0.4.3's exports (the kwarg-drift baseline was cleared in `ae85b66`). PyPI publishing is automated from the fieldkit-curator skill — Mac doesn't republish.
+- **No HF push.** This is a bench/eval cycle, not a model release. No `Orionfold/*` repo lands this cycle.
+- **No artifact manifest.** `src/content/artifacts/` is unchanged; no new YAML.
+- **No rename replays.** `SYNC-RENAMES.log` unchanged since the 2026-05-14 Orionfold rename (already swept complete at Mac PR #3).
+- **No new top-level pages.** The new article folder is under the existing `articles/` content collection; no new section, no new stage page (existing `fine-tuning` filter renders it via `signature: PatentBracketSignature`).
+- **No skill IA mirroring.** Skills live under each side's `.claude/skills/` independently.
+- **No destination-overrides change from us.** The 2-article gap between local home (39 published) and live home (40 articles) is the two Mac-authored landing pages (`ai-transformation`, `solo-builder-case-study`); this remains a Mac-owned concern. If Mac wants to surface those counts in `src/data/project-stats.json` so the local home matches the live count, the proper channel is the placeholder `mirrors/destination-overrides.md` per `[[reference_destination_overrides_mirror]]`.
 
-## Verification (Spark-side)
+## Notes for the next sync
 
-- **HF live:** <https://huggingface.co/Orionfold/II-Medical-8B-GGUF> — HTTP 200; 7 files (5 GGUFs + README + .gitattributes) listed via `HfApi.list_repo_files`.
-- **Push:** `hf_push_resilient.py` via `upload_large_folder` with `num_workers=1` per `[[feedback_hf_upload_resilient_api]]`. Started 2026-05-16 02:43, completed 05:15:19 — wall clock **2h 32m 33s** for ~40 GB at ~3.6 MB/s effective (5.2 MB/s raw rate minus per-file LFS commit handshakes). Zero retries triggered, zero httpx errors observed — second consecutive Spark push to ship without crashing (after the cyber cycle).
-- **Preflight bench:** F16 GGUF preflight scored 2/5 on MedMCQA at `LLAMA_CLI_NPREDICT=256` (`<think>`-block truncation; the reasoning-recipe trap that drove the new `[[feedback_reasoning_model_npredict]]` memory). Bumped to 1024 for the full measure sweep; F16 scored 0.48 on n=50.
-- **Variant table (n=250 perplexity, n=50 MedMCQA, llama-bench tg/pp):**
-
-  | Variant | ppl | tg tok/s | pp tok/s | MedMCQA | Size |
-  |---|---|---|---|---|---|
-  | F16 | 16.27 | 15.94 | 2262.2 | 0.48 | 15.3 GB |
-  | Q4_K_M | 16.55 | 43.57 | 2773.2 | 0.42 | 4.68 GB |
-  | **Q5_K_M** ⭐ | **16.24** | **36.36** | 2579.5 | **0.52** | **5.45 GB** |
-  | Q6_K | 16.01 | 32.80 | 2332.2 | 0.46 | 6.26 GB |
-  | Q8_0 | 16.30 | 28.42 | 2523.3 | 0.48 | 8.11 GB |
-
-- **`scripts/verify_article.sh becoming-a-medical-curator-on-spark`** — PASS clean after promotion. Frontmatter valid + required keys present; all image refs resolve; slug matches folder; zero PII / secret patterns; all SVG hard invariants pass (z-order, stroke-width hierarchy ∈ {0.5, 1, 1.5, 2}, no hex literals, gradient defs present on both signature + fn-diagram, role="img" + aria-label correct on both SVGs, no `<title>` children, fn-diagram present in article body so the "must ship at least one inline architectural figure" rule is satisfied).
-- **`scripts/verify_stage.sh`** — 5/5 PASSED at push time (with `APACHE_VERIFIED=1` for the upstream license check).
-
-## Release-commit chain (this cycle)
-
-- **`713a1d0`** — `medical: vertical 4 infra — Intelligent-Internet/II-Medical-8B (Q5_K_M recommended)` (6 files: 3 script extensions + new `scripts/medmcqa_merge.py` + auto-emitted manifest + new lineage directory).
-- **`4392ab6`** — `Upcoming: becoming-a-medical-curator-on-spark (vertical 4 placeholder)` (3 files: new article placeholder + stats refresh + README refresh).
-- **`7ca0018`** — `sync: SYNC-HANDOFF rotated to 2026-05-16-medical-vertical (NEW)` (the rotation commit itself).
-- **`f005b52`** — `medical: promote becoming-a-medical-curator-on-spark — full 8-section body, MedicalQuad signature` (4 files: article promotion + new `src/components/svg/MedicalQuad.astro` + stats refresh + README refresh — post-rotation, captured in the YAML `post_rotation_commits` field above).
-
-Four commits this cycle (rotation + 3 editorial commits, excluding the v0.4.2 sweep-receipt merge `d332d28` which closed the prior cycle).
-
-## Open question — answer to PR #7
-
-**Decision: Option 2 — destination-authoritative catalog-footer override.**
-
-Mac CC raised a recurring drift signal in PR #7 (v0.4.2 sweep-receipt): the cyber + gguf-publisher + legal articles get overwritten on every sync diff because the **destination** renders a trailing "↗ catalog: /artifacts/quants/\<slug\>/" footer block that the **source** doesn't carry. Mac restored those post-sync this cycle but flagged it would re-trigger every release.
-
-Two options were on the table:
-1. **Source-authoritative**: push the catalog-footer convention down to Spark; articles get a `/artifacts/quants/<slug>/` block when an HF artifact exists. Means tech-writer skill grows a footer step.
-2. **Destination-authoritative**: add a narrow `articles/**` rule to `mirrors/destination-overrides.md` scoped to "trailing catalog footer when matching artifact exists." Mac owns the footer; Spark never touches that block; sync diff stops flagging it.
-
-**Decision: Option 2.** Reasoning:
-- The footer is **rendered chrome**, not editorial content — it points at destination-side catalog URLs (`/artifacts/quants/<slug>/`) that Mac already owns per the sync-contract chrome boundary table.
-- Coupling Spark's tech-writer pipeline to destination URL shape would push site-layout concerns into the article-authoring path, which the sync-contract is explicitly designed to keep apart.
-- The override is narrow (one trailing block, gated on artifact existence) so it doesn't expand `articles/**` into a contested area.
-- Zero ongoing cost at source — Spark CC never has to remember to emit the footer or update it when destination URL conventions evolve.
-
-**Action for Mac CC after consuming this:** add the override rule + scope language to `mirrors/destination-overrides.md`, then sweep-receipt as usual. No source-side change required for this decision. (`mirrors/destination-overrides.md` is Mac-authored per `[[reference_destination_overrides_mirror.md]]`.)
-
-## What Mac CC should look for after sweep
-
-- The new artifact manifest at `src/content/artifacts/ii-medical-8b-gguf.yaml` arrives with `recommended_variant: Q5_K_M` populated from source — the destination catalog can render the "Sweet spot" badge directly without hand-pinning (this is the first push to fully exercise the v0.4.2 manifest field).
-- The new article `becoming-a-medical-curator-on-spark` arrives with `status: published` and `signature: MedicalQuad` — destination should render it as a normal card on the home index and on the `/stage/deployment/` + `/stage/observability/` filter pages, with the MedicalQuad bar-chart thumbnail on the right column. The article is customer-link-facing (HF README Methods line points at it), so any destination-side post-sync edits should preserve the customer-link voice (no strategy leak, no roadmap detail in the closing — already audited at source per `[[feedback_customer_link_audit]]`).
-- After the catalog-footer override rule lands on Mac side, the next cyber + gguf-publisher + legal sync diff should run clean (no article overwrites flagged).
-- HF catalog set grows from 3 → 4: `finance-chat-GGUF`, `Saul-7B-Instruct-v1-GGUF`, `SecurityLLM-GGUF`, **`II-Medical-8B-GGUF` (new)**.
+- **patent-strategist W3 — fine-tune kickoff** is the next track. The bracket measured a closed-to-retrieval gap of 22.5 percentage points on D-mcq; W3 will GRPO-fine-tune R1-0528-Qwen3-8B against the deterministic-scorable shapes (D-mcq + D-irac) to close that specific gap. That cycle will likely cut a new fieldkit minor (`fieldkit.training` extensions for the patent reward function) and ship a new article. ETA ~2 weeks of overnight runs.
+- **A-shape + D-oa scorer signature mismatch** is a small W4 follow-up. `score_prediction(shape, prediction, gold_label)` raises TypeError on `patent_claim_validity` (A) and `office_action_argument` (D-oa) for both retrieval and oracle runs — same pattern across all three modes, so the inter-mode comparison is unaffected, but the scorer signature wants either a `judge=` kwarg or a structured-gold wrapper. Tracked in spec §3.5 Judge-backend follow-up.
+- **Spec evolution.** `specs/patent-strategist-v1.md` predates the eval matrix's actual results; §3.5 (Judge backend), §5.5 (1000-row ramp), §5.6 (reasoning-budget cap) all want a post-bracket revision. Holding for the W3 follow-up.
