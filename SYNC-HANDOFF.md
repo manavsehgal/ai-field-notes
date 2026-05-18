@@ -1,10 +1,11 @@
 <!--
-  🆕 STATUS: NEW — patent-strategist-v1-baseline cycle ready for Mac sweep.
+  ✅ STATUS: SHIPPED — Mac swept at destination commit manavsehgal/ainative-business.github.io@df0066c on 2026-05-17.
   This file is one feature/release at a time, not a running log.
   At the next release prompt, **clear this entire file and start fresh** (do NOT append to existing sections).
   Last reset: 2026-05-17 (patent-strategist v1 baseline article + fieldkit v0.4.3 + skills-in-git).
 
   Prior Mac sweep receipts (preserved here since SYNC-HANDOFF is per-release-not-running-log):
+  - 2026-05-17 patent-strategist-v1-baseline cycle: swept at destination commit manavsehgal/ainative-business.github.io@df0066c (this PR).
   - 2026-05-16 medical-vertical / II-Medical-8B-GGUF cycle: swept at destination commit manavsehgal/ainative-business.github.io@10a74a5 (Mac PR #8, merged 2026-05-16 at ac1b427).
   - 2026-05-15 fieldkit v0.4.2 cycle: swept at destination commit manavsehgal/ainative-business.github.io@495196d (Mac PR #7, merged 2026-05-16 at d332d28).
   - 2026-05-15 cyber-vertical cycle: swept at destination commit manavsehgal/ainative-business.github.io@135bcad (Mac PR #6 merged 2026-05-15).
@@ -15,7 +16,7 @@
 -->
 ---
 release_slug: 2026-05-17-patent-strategist-v1-baseline
-status: NEW
+status: SHIPPED
 source_range: f005b52..17f59ee
 articles_added:
   - slug: patent-strategist-v1-baseline-on-spark    # status: published — three-mode bracket on R1-0528-Qwen3-8B Q5_K_M, signature: PatentBracketSignature
