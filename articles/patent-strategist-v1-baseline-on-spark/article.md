@@ -10,31 +10,7 @@ hardware: "NVIDIA DGX Spark"
 tags: [eval, rag, reasoning-models, llama-cpp, deepseek-r1, vertical-bench, patent-strategist]
 summary: "Before you fine-tune a small reasoning model on a domain bench you need to know where it stands. Three context modes — closed, retrieval, oracle — triangulate the model's ceiling on one Spark, no Judge backend or cluster required."
 signature: PatentBracketSignature
-status: upcoming
 ---
-
-<!--
-DRAFT STATE — 2026-05-17 (resumed after session-27 power outage)
-
-Closed-book numbers landed (0.397 overall; D-mcq 0.625, D-irac 1.0, B 0.018).
-Bracket complete on scorer-supported shapes. To promote `status: upcoming → published`
-the following must still land:
-
-  ✅ 1. Closed-book numbers in the "What the bracket revealed" table.
-  2. `signature` frontmatter field pointing at an `src/components/svg/` component
-     (300×200 thumbnail). Pattern: `PatentBracketSignature`.
-  3. The inline fn-diagram in §Architectural context — currently a placeholder
-     <figure> with a working but minimal SVG. Worth a polish pass to lean into
-     the three-mode bracket more strongly (atmospheric lane washes for the
-     three parallel routes, halo+core on the scorer endpoint).
-  4. One or two scrots from the running llama-server console
-     (`screenshots/01-llama-server-loaded.png`, etc.) embedded into §The journey.
-  5. Run `scripts/verify_article.sh patent-strategist-v1-baseline-on-spark`
-     and fix anything it complains about.
-  6. Optional hygiene: re-run the final 25 E rows (judge_rubric, no scorer)
-     against the closed-book mode so its predictions.jsonl matches the 200-row
-     completeness of retrieval and oracle. Article numbers don't depend on it.
--->
 
 A small reasoning model dropped onto a 200-row patent-law bench will answer every multiple-choice question with a 3000-token think trace, and every claim-rewrite question with a confident draft. That doesn't tell you whether the model knows patent law. It tells you the model knows how to answer questions. The interesting signal is somewhere underneath — and you can't get to it without bracketing.
 
