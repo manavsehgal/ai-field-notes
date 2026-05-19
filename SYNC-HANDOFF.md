@@ -1,11 +1,12 @@
 <!--
-  ⚠️ STATUS: NEW — drop received, awaiting Mac sweep.
+  ⚠️ STATUS: SHIPPED — Mac swept at destination commit manavsehgal/ainative-business.github.io@c71a5bb on 2026-05-19.
   This file is one feature/release at a time, not a running log.
   At the next release prompt, **clear this entire file and start fresh** (do NOT append to existing sections).
   Last reset: 2026-05-19 (patent-strategist W3 data-prep article + corpus-contamination signature).
 
   Prior Mac sweep receipts (preserved here since SYNC-HANDOFF is per-release-not-running-log):
-  - 2026-05-17 patent-strategist-v1-baseline cycle: swept at destination commit manavsehgal/ainative-business.github.io@df0066c (Mac PR against this repo).
+  - 2026-05-19 patent-strategist-W3-data-prep-article cycle: swept at destination commit manavsehgal/ainative-business.github.io@c71a5bb (Mac PR #10 against this repo).
+  - 2026-05-17 patent-strategist-v1-baseline cycle: swept at destination commit manavsehgal/ainative-business.github.io@df0066c (Mac PR #9 against this repo).
   - 2026-05-16 medical-vertical / II-Medical-8B-GGUF cycle: swept at destination commit manavsehgal/ainative-business.github.io@10a74a5 (Mac PR #8, merged 2026-05-16 at ac1b427).
   - 2026-05-15 fieldkit v0.4.2 cycle: swept at destination commit manavsehgal/ainative-business.github.io@495196d (Mac PR #7, merged 2026-05-16 at d332d28).
   - 2026-05-15 cyber-vertical cycle: swept at destination commit manavsehgal/ainative-business.github.io@135bcad (Mac PR #6 merged 2026-05-15).
@@ -16,7 +17,7 @@
 -->
 ---
 release_slug: 2026-05-19-patent-strategist-W3-data-prep-article
-status: NEW
+status: SHIPPED
 source_range: 17f59ee..280ad3c
 articles_added:
   - slug: fine-tune-data-prep-decisions-on-spark    # status: published — three-misdiagnoses field report on the W3 fine-tune, signature: CorpusContaminationLayers
