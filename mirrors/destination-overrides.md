@@ -33,10 +33,10 @@ These will appear as `fieldkit v0.4` ships artifact-publishing modules. Mac owns
 - `/artifacts/quants/` — GGUF / AWQ / EXL3 / MLX / NVFP4 quant catalog (G3 + G4).
 - `/artifacts/loras/` — Civitai-shape image/video LoRAs (G9).
 - `/artifacts/adapters/` — LoRA/DoRA/IA3 adapter publisher catalog (G8).
-- `/artifacts/embedders/` — niche embedding model catalog (G1) + reranker (G2).
+- `/artifacts/embeds/` — niche embedding model catalog (G1) + reranker (G2).
 - `/artifacts/datasets/` — synthetic dataset foundry catalog (G6).
 - `/artifacts/spaces/` — HF Space app catalog (G10).
-- `/artifacts/benchmarks/` — eval benchmark publisher catalog (G11).
+- `/artifacts/benches/` — eval benchmark publisher catalog (G11).
 - `/skills/**` — cross-vendor SKILL.md catalog (D7 + side-effect distribution), if/when it ships.
 
 ## Article-body overrides (narrow, gated)
