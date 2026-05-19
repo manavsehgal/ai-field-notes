@@ -33,10 +33,10 @@ to three public sources (USPTO MPEP, HPI-Naumann PatentMatch, BIGPATENT) with
 oracle context attached to every row. Built to evaluate whether a small open
 LLM can perform the day-to-day reasoning tasks of a patent practitioner.
 
-Companion artifact to the article
-[Patent-Strategist v1 baseline on Spark](https://ainative.business/field-notes/patent-strategist-v1-baseline-on-spark/),
-which establishes the first tri-mode (closed-book / retrieval / oracle) baseline
-numbers on this bench using `deepseek-ai/DeepSeek-R1-0528-Qwen3-8B` Q5_K_M.
+Companion artifact to two methodology articles:
+
+1. [Patent-Strategist v1 baseline on Spark](https://ainative.business/field-notes/patent-strategist-v1-baseline-on-spark/) — establishes the first tri-mode (closed-book / retrieval / oracle) baseline numbers on this bench using `deepseek-ai/DeepSeek-R1-0528-Qwen3-8B` Q5_K_M.
+2. [Fine-tune data-prep decisions on Spark](https://ainative.business/field-notes/fine-tune-data-prep-decisions-on-spark/) — documents the corpus-contamination, BOS/EOS-bookend, and catastrophic-forgetting axes that the next paired-prediction drop has to clear.
 
 ## Quick stats
 
@@ -178,8 +178,9 @@ attribution to upstream sources preserved per-row in `source_metadata`).
   on the D-mcq block
 * **v0.3** — add 50 rows for the C-family-landscape and E-shape strategic blocks
   from Google Patents BigQuery (Family C2 cross-licensing question type)
-* **v1.0** — paired R1-0528-Qwen3-8B and fine-tuned `patent-strategist-v1`
-  predictions shipped alongside the bench
+* **v1.0** — paired closed-book / retrieval / oracle and fine-tuned predictions
+  shipped alongside the bench. Specific base model pending; see the
+  methodology articles for the constraints the next attempt has to clear.
 
 ## Provenance
 

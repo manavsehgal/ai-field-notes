@@ -37,10 +37,19 @@ KNOWN_MPEP = {
 
 # Filenames hint LO/HI: chunk_<lo>_<hi>.jsonl
 FILE_PATTERN = re.compile(r"chunk_(\d+)_(\d+)\.jsonl$")
-THINK_RE = re.compile(r"<think>.*?</think>", re.DOTALL)
+THINK_RE = re.compile(r"<think>(.*?)</think>", re.DOTALL)
 MPEP_RE = re.compile(r"MPEP\s+(\d{2,4}(?:\.\d{1,4})?(?:\([A-Za-z0-9]+\))?)")
 CASE_RE = re.compile(r"\b[A-Z][\w'.-]+(?:\s+[A-Z][\w'.-]+){0,3}\s+v\.\s+[A-Z][\w'.-]+")
 MIN_RESPONSE_CHARS = 400
+
+# Producer-subagent meta-state leakage patterns. The producer's working notes
+# (family designator, "duplicate of N", "diversify by …") must not leak into
+# the <think> block — these were the 56% contamination axis from the s40
+# patent-strategist v2 failure documented in
+# articles/fine-tune-data-prep-decisions-on-spark/.
+META_FAMILY_PREFIX_RE = re.compile(r"^\s*(A[124]|E[12])(\s|:|\.|duplicate|spice)", re.IGNORECASE)
+META_DUPLICATE_OF_RE = re.compile(r"\bduplicate\s+of\s+\d+", re.IGNORECASE)
+META_DIVERSIFY_RE = re.compile(r"\bdiversify\s+by\b", re.IGNORECASE)
 
 
 def infer_range(path: Path) -> tuple[int, int] | None:
@@ -99,12 +108,19 @@ def verify(path: Path, lo: int | None = None, hi: int | None = None) -> int:
     mpep_sections_seen: set[str] = set()
     case_cites_total = 0
     chars_dist: list[int] = []
+    meta_family_prefix: list[int] = []
+    meta_duplicate_of: list[int] = []
+    meta_diversify_by: list[int] = []
 
     for r in rows:
         idx = r.get("row_idx", "?")
         resp = r.get("response", "")
-        if not THINK_RE.search(resp):
+        think_match = THINK_RE.search(resp)
+        if not think_match:
             missing_think.append(idx)
+            think_content = ""
+        else:
+            think_content = think_match.group(1)
         chars = len(resp)
         chars_dist.append(chars)
         if chars < MIN_RESPONSE_CHARS:
@@ -113,10 +129,32 @@ def verify(path: Path, lo: int | None = None, hi: int | None = None) -> int:
             mpep_sections_seen.add(m.group(1))
         case_cites_total += len(CASE_RE.findall(resp))
 
+        # Producer-meta-state leakage gates (applied to <think> body only)
+        if think_content:
+            if META_FAMILY_PREFIX_RE.match(think_content):
+                meta_family_prefix.append(idx)
+            if META_DUPLICATE_OF_RE.search(think_content):
+                meta_duplicate_of.append(idx)
+            if META_DIVERSIFY_RE.search(think_content):
+                meta_diversify_by.append(idx)
+
     if missing_think:
         fails.append(f"missing <think>...</think> on rows {missing_think}")
     if short_rows:
         fails.append(f"rows under {MIN_RESPONSE_CHARS} chars: {short_rows}")
+    if meta_family_prefix:
+        fails.append(
+            f"producer meta-state leak — <think> begins with family designator "
+            f"(A1/A2/A4/E1/E2 prefix): rows {meta_family_prefix}"
+        )
+    if meta_duplicate_of:
+        fails.append(
+            f"producer meta-state leak — 'duplicate of N' annotation in <think>: rows {meta_duplicate_of}"
+        )
+    if meta_diversify_by:
+        fails.append(
+            f"producer meta-state leak — 'diversify by …' instruction in <think>: rows {meta_diversify_by}"
+        )
 
     # MPEP audit: sections outside the known list → warn (not fail)
     suspicious_mpep = sorted(m for m in mpep_sections_seen if m not in KNOWN_MPEP)
@@ -133,6 +171,12 @@ def verify(path: Path, lo: int | None = None, hi: int | None = None) -> int:
     print(f"  chars: min={min(chars_dist) if chars_dist else 0} max={max(chars_dist) if chars_dist else 0} mean={mean_chars}")
     print(f"  MPEP sections: {len(mpep_sections_seen)} unique")
     print(f"  Case cites:    {case_cites_total} total ({case_cites_total / max(len(rows), 1):.1f}/row)")
+    n = max(len(rows), 1)
+    print(
+        f"  Meta-state:    family-prefix={len(meta_family_prefix)} ({len(meta_family_prefix)/n*100:.0f}%) "
+        f"duplicate-of={len(meta_duplicate_of)} ({len(meta_duplicate_of)/n*100:.0f}%) "
+        f"diversify-by={len(meta_diversify_by)} ({len(meta_diversify_by)/n*100:.0f}%)"
+    )
 
     for w in warns:
         print(f"  WARN: {w}")

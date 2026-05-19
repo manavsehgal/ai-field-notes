@@ -40,6 +40,21 @@ Every response MUST follow this exact structure:
 - `<think>` chain length: 200-500 tokens typical; A4 traversals may run longer.
 - Cite specific MPEP sections and statutes for A2/A4 rows.
 
+## ⚠️ Producer working-notes MUST NOT leak into `<think>`
+
+The `<think>` block is **in-character reasoning a patent practitioner would write**. It is NOT a place for your pipeline metadata. The s40 patent-strategist v2 failure — documented in `articles/fine-tune-data-prep-decisions-on-spark/` — was caused by 56% of training rows leaking the producer's working notes into `<think>`. The trainer faithfully learned the leak.
+
+Before writing each row, **strip ALL of the following from the `<think>` body** (the verifier will reject the chunk if any survive):
+
+1. **Family designators as a prefix.** Never let `<think>` begin with `A1`, `A2`, `A4`, `E1`, `E2`, optionally followed by a space, colon, period, or the words `duplicate` / `spice`. The family is your assignment, not the patent practitioner's first thought.
+2. **`duplicate of N` annotations.** If the prompt is a duplicate in your slice, handle the de-duplication framing internally — never write the phrase `duplicate of <number>` into `<think>`.
+3. **`diversify by …` instructions.** Diversification angles are your routing logic. The output reads as if a single practitioner thought through the problem. No meta-instruction phrasing.
+4. **Anything that reads like producer state** — spice-combinator notes, queue-position references, sibling-row callouts, "this is the second framing of …", etc.
+
+If your draft `<think>` begins with `"A2 duplicate of 1287. Diversify by emphasizing the §103 angle. The claim recites …"` — rewrite it as `"The claim recites a problematic term: …"` before serialization. The substance moves; the meta vanishes.
+
+Self-check before writing each row: would a working patent attorney recognize this `<think>` as their own scratch reasoning? If no, rewrite.
+
 ## Anti-hallucination whitelist
 
 **MPEP sections — only cite real ones.** Known-real (non-exhaustive): 201.08, 608.01(m), 608.01(n), 608.01(p), 609, 706, 706.07(f), 715, 715.07, 803, 1207, 1207.02, 1207.03, 1209, 2106, 2106.04(a), 2112, 2131, 2141, 2141.01(a), 2164, 2173.02 (and (II)/(III)), 2173.05 and subsections (b), (c), (d), (g), (h), (o), 2173.06(II), 2181. **Do NOT invent subsection letters** (e.g., 2173.05(q) does not exist). If unsure, shift the framing.
