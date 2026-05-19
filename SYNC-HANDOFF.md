@@ -1,10 +1,11 @@
 <!--
-  ⚠️ STATUS: NEW — patent-strategist bench v0.1 HF push + claude-corpus-synth skill patches.
+  ⚠️ STATUS: SHIPPED — Mac swept at destination commit manavsehgal/ainative-business.github.io@7b1b62e on 2026-05-19.
   This file is one feature/release at a time, not a running log.
   At the next release prompt, **clear this entire file and start fresh** (do NOT append to existing sections).
   Last reset: 2026-05-19 (patent-strategist bench v0.1 HF push + synth-skill meta-state gates).
 
   Prior Mac sweep receipts (preserved here since SYNC-HANDOFF is per-release-not-running-log):
+  - 2026-05-19 patent-strategist-bench-v0.1-published-plus-synth-skill-patches cycle: swept at destination commit manavsehgal/ainative-business.github.io@7b1b62e (Mac PR #11 against this repo).
   - 2026-05-19 patent-strategist-W3-data-prep-article cycle: swept at destination commit manavsehgal/ainative-business.github.io@c71a5bb (Mac PR #10 against this repo).
   - 2026-05-17 patent-strategist-v1-baseline cycle: swept at destination commit manavsehgal/ainative-business.github.io@df0066c (Mac PR #9 against this repo).
   - 2026-05-16 medical-vertical / II-Medical-8B-GGUF cycle: swept at destination commit manavsehgal/ainative-business.github.io@10a74a5 (Mac PR #8, merged 2026-05-16 at ac1b427).
@@ -17,7 +18,7 @@
 -->
 ---
 release_slug: 2026-05-19-patent-strategist-bench-v0.1-published-plus-synth-skill-patches
-status: NEW
+status: SHIPPED
 source_range: c1722c2..HEAD
 articles_added: []
 articles_updated: []
