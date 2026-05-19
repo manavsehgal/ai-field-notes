@@ -18,7 +18,7 @@
 
 > One builder maximising the NVIDIA DGX Spark as a personal AI power user and edge AI rig. Every article is a session transcript turned into a deep-dive essay.
 
-<sub><b>38 articles published</b> &nbsp;·&nbsp; Apache 2.0 &nbsp;·&nbsp; by <a href="https://github.com/manavsehgal">Manav Sehgal</a></sub>
+<sub><b>40 articles published</b> &nbsp;·&nbsp; Apache 2.0 &nbsp;·&nbsp; by <a href="https://github.com/manavsehgal">Manav Sehgal</a></sub>
 
 ---
 
@@ -26,7 +26,7 @@
 
 | Articles | Words | Lines of code | Models | NVIDIA products |
 |:-:|:-:|:-:|:-:|:-:|
-| **38** *(+4 upcoming)* | **127,405** | **25,497** | **8** | **11** |
+| **40** *(+4 upcoming)* | **134,203** | **25,508** | **8** | **11** |
 
 ### Stages
 
@@ -34,7 +34,7 @@
 |---|:-:|:-:|
 | [Foundations](https://ainative.business/field-notes/stage/foundations/) | 12 | — |
 | [Training](https://ainative.business/field-notes/stage/training/) | 12 | 1 |
-| [Fine-tuning](https://ainative.business/field-notes/stage/fine-tuning/) | 8 | 1 |
+| [Fine-tuning](https://ainative.business/field-notes/stage/fine-tuning/) | 10 | 1 |
 | [Inference](https://ainative.business/field-notes/stage/inference/) | 14 | — |
 | [Deployment](https://ainative.business/field-notes/stage/deployment/) | 6 | — |
 | [Agentic](https://ainative.business/field-notes/stage/agentic/) | 14 | — |
@@ -45,8 +45,8 @@
 
 | Product | Articles |
 |---|:-:|
+| DGX Spark | 32 |
 | NVIDIA NIM | 31 |
-| DGX Spark | 30 |
 | NeMo Framework | 27 |
 | TensorRT-LLM | 16 |
 | pgvector | 13 |
@@ -94,6 +94,8 @@ Each article is a deep-dive essay grown from a single session transcript on the 
 
 ### Fine-tuning
 
+- **[The Trainer Was Fine, the Corpus Wasn't: Three Misdiagnoses on a Patent-Specialist Fine-Tune](https://ainative.business/field-notes/articles/fine-tune-data-prep-decisions-on-spark/)** — Five thousand rows of synthetic patent reasoning, two clean 131-minute LoRA trains, three rounds of confident diagnosis — and none of them found the bug. The bug was the corpus all along. A field report on the cheapest mistake to make on the Spark.
+- **[Three-Mode Bracket: Baselining a Reasoning Model Before Fine-Tuning, On One Spark](https://ainative.business/field-notes/articles/patent-strategist-v1-baseline-on-spark/)** — Before you fine-tune a small reasoning model on a domain bench you need to know where it stands. Three context modes — closed, retrieval, oracle — triangulate the model's ceiling on one Spark, no Judge backend or cluster required.
 - **[Adaptive Turn Clipping on a Single Spark — A²TGPO, Studied from Source](https://ainative.business/field-notes/articles/a2tgpo-turn-clipping-on-spark/)** — A²TGPO redesigns how Information Gain feeds GRPO: turn-group normalization, variance-rescaled accumulation, and adaptive turn-level clipping. The paper's release is the code; the Spark's contribution is the lineage primitive that records what each trial learned.
 - **[T²PO on Spark — When the Training Pool Says 28/32 and Held-out Says 9/158](https://ainative.business/field-notes/articles/t2po-uncertainty-guided-rl-on-spark/)** — T²PO's two deltas on the Phase 6 ClawGym harness: mean turns 5.00 → 4.61, task_complete 154/158, but the per-assertion ceiling stays flat at 47.7%. The strongest training-side step (45) is the worst held-out checkpoint — pool saturation lies on a single Spark.
 - **[ClawGym GRPO on Spark — Closing the Loop the SFT Adapter Couldn't](https://ainative.business/field-notes/articles/clawgym-on-spark-grpo/)** — Phase 5 SFT taught the agent to keep working but never to stop. 34 GRPO steps with a shaped reward unlearn the failure mode — same model, same base, same LoRA-init, but task_complete climbs 0/158 → 154/158, mean turns drop 12 → 5, and per-assertion still inches up +3.1 pp.
