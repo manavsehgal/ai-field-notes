@@ -190,6 +190,74 @@ Each failure is the kind a hybrid judge-filter would reject. But rejection costs
 
 ---
 
+## Fork 6: How we actually executed the 5k build (sequential → fan-out → /goal failed → /loop succeeded)
+
+The bench gave us Track A (CC-only). But Track A is still ambiguous about *how* a CC session pumps out 5000 rows. We tried four orchestration shapes across sessions 32-37 before landing on the one that finished it. Worth telling honestly because the route was non-linear and the dead ends were instructive.
+
+### Why N=5k (and not 10k or 25k)
+
+The pre-flight projected three scales:
+
+| Corpus size | Mid-projection weekly cap consumption | Worst-case | Sessions needed |
+|---|---|---|---|
+| 5k rows | ~5.9% | ~8.9% | ~25 |
+| 10k rows | ~11% | ~17% | ~50 |
+| 25k rows | ~27% | ~44% | ~125 |
+
+The math was based on the session-29 dry-run measurement (~500 tok/row for in-CC-session generation on Opus 4.7 / 1M). 5k was picked for risk-asymmetry: even if the per-row cost was 3× the estimate, 5k would still leave room for two retries within one weekly cycle, while 25k would lock the cap for the rest of the week. The spec also documents that LoRA can show domain-shift signal on as few as 500 rows — 5k was already 10× past the smoke-test floor. **Conservative cap budget + already-overkill training scale → 5k was the right pick.**
+
+### Orchestration paths we tried (in order)
+
+**Path 1: Sequential single-session, ~25 rows per CC session.** Sessions 32-33 (rows 0-49). Pattern: Claude generates 25 rows inline in one assistant turn via Edit-append. Worked cleanly, measured ~440 tok/row including overhead. Honest math at this rate: 5k rows × ~440 tok/row = ~2.2M tokens ≈ ~3% of one weekly Max 20x cap. The bottleneck was wall-time: ~25 rows/session × ~25 minutes wall = a slow drip across many days. Path 1 was working, but boring.
+
+**Path 2: Sequential larger batches (50-row chunks via helper Python script).** Session 34 batches at rows 50-99. Same per-row cost, larger batch size, written to disk via a generated `append_batch_<lo>_<hi>.py` helper script rather than inline Edit-append. Cleaner pattern, same boring throughput.
+
+**Path 3: Single-subagent stage (`general-purpose` Agent call producing 50 rows in one shot).** Session 34's stage-1 fan-out, rows 100-149. Measured per-row total token cost ≈ ~2200 tok/row including subagent spawn overhead — ~5× the single-session per-row cost, but ~4× wall-time speedup per row. The cost-shape changed because each Agent spawn re-initializes context independently, and that overhead landed on every chunk.
+
+**Path 4: 4-way parallel subagent fan-out, 200 rows per CC turn.** Sessions 35 + 37. Spawn 4 Agent calls in one assistant message, each producing a disjoint 50-row chunk, verify each, merge in row-order, advance cursor. Wall-time per turn ≈ 8-12 min, banked rate ≈ 1000 rows/hour. Session 35 measured ~1525 tok/row at this scale across 4 chunks — recalibrated from the stage-1 estimate.
+
+**Path 5: `/goal` autonomous fan-out (FAILED).** Going into session 37, the HANDOFF was set up to recommend `/goal` — a Claude Code feature that runs autonomously across many turns until a stop condition is met. The plan: type a `/goal` directive describing the corpus-build condition, let Haiku judge progress between turns, walk away while the fan-out runs unattended. Two gates needed: (1) ≥40 pp weekly cap headroom, (2) workspace trust dialog accepted. In practice, `/goal` didn't take — the directive didn't kick off the autonomous loop reliably (likely the trust gate, possibly a CC version mismatch). Rather than debug `/goal` for an hour, the fallback was already documented.
+
+**Path 6: `/loop` with self-paced dynamic mode (SUCCEEDED).** Session 37's actual driver. `/loop` is a sibling feature to `/goal`: instead of an autonomous-burn-until-condition pattern, it runs a stated prompt as a recurring task with the model self-pacing iteration intervals. The directive: "Generate the remaining patent-corpus rows by spawning parallel-subagent fan-out per the `claude-corpus-synth` skill's fanout mode (4 subagents × 50 rows per turn = 200 rows/turn). Stop when wc -l reports 5000 AND grep -c '<think>' reports 5000." The first turn ran one fan-out iteration, scheduled a 60-second wake-up, completed. The user immediately asked "are you waiting again?" — pointed out that the wake-up adds idle time when subagent work itself is the gating factor. From turn 2 onward, the orchestrator ran fan-out turns back-to-back inline in one CC session, no wake-up delays. **22 turns × 200 rows = 4400 rows banked from cursor=600 to cursor=5000 in one ~4-hour session.**
+
+### What the path teaches
+
+- **The /goal failure wasn't wasted time.** It forced us to test `/loop` as a viable replacement, and `/loop` turned out to be lighter-weight (no trust dialog, no judge model overhead, no autonomous-burn safety drama). For tasks where the loop body is well-defined and the stop condition is mechanical (wc -l == N), `/loop` with self-pacing beats `/goal` on operational simplicity.
+- **"Self-paced" turned out to mean "no pacing needed."** The /loop skill defaults to dynamic-mode wake-ups (60-second delay between iterations). For this workload, the wake-up was pure overhead — the subagent fan-out dominates wall-time, so chaining iterations back-to-back is strictly faster than letting the wake-up fire. The skill's default was conservative; our shape needed aggressive.
+- **One transient subagent failure in 88 chunks.** Chunk 2350_2399 returned a socket-closed error with `total_tokens: 0` — never wrote its chunk file. Re-spawned the same slice, second attempt PASSED in ~9 minutes. The spec's "two consecutive failures stops the loop" safety belt was the right shape: one transient failure is recoverable; two means something structural is broken.
+- **88 chunks PASSED `verify_chunk.py` 50/50 `<think>` on first try (one retry).** 100% mechanical yield. The deterministic verifier was the load-bearing piece — without it the autonomous loop wouldn't be trustworthy.
+
+### Wall-time accounting
+
+| Phase | Sessions | Wall-time | Rows banked |
+|---|---|---|---|
+| Sequential single-session | s32, s33 | ~50 min each × 2 = ~1.7 h | 0 → 50 |
+| Sequential larger batches + stage-1 fan-out | s34 | ~2 h | 50 → 150 |
+| 4-way fan-out validation | s35 | ~50 min | 150 → 350 |
+| Sequential re-validation + cursor=400 | s36 | ~25 min | 350 → 400 |
+| (Inter-session work, undocumented) | between s36/s37 | ~30 min | 400 → 600 |
+| **/loop fan-out burn** | **s37** | **~4 h active** | **600 → 5000** |
+| **Total active orchestration wall** | s32-37 | **~9.5 h spread across 6 sessions** | **0 → 5000** |
+
+Most of the wall-time was the /loop run itself. The earlier sessions were lower-throughput but they earned the calibration that made /loop fire confidently — by session 37, the per-chunk verifier, the subagent prompt template, the merge step, and the cursor-advance pattern were all known-good. The /loop wasn't 22 turns of unknown territory; it was 22 turns of the same turn that had passed 4 times already.
+
+### Cap consumption: ~17% of weekly Max 20x for 5k rows
+
+The pre-flight projected 5.9% mid-case. Actual was **~17%** — roughly **3× the projection**. The delta is exactly the session-35 re-calibration: pre-flight modeled per-row cost on single-session generation (~440 tok/row), but most of the actual rows were generated via 4-way subagent fan-out (~1525 tok/row), which is ~3.5× the single-session per-row cost. Sessions 32-33 (rows 0-49 via sequential) and session 36 (rows 350-399 via sequential) used the cheap path; everything else used fan-out.
+
+**Lesson for the next builder:** pre-flight numbers based on single-session per-row cost will systematically underestimate fan-out builds. If the orchestration pattern is going to be fan-out, model the per-row cost as ~3-4× the single-session measurement. The actual ratio depends on how much of the subagent's context is the prompt template vs the actual work output — for a ~3000-char prompt template producing ~75k-token chunks (our case), the spawn overhead is ~4-5%, but the orchestrator-side cost of orchestrating each subagent dominates the absolute number.
+
+The 17% figure also implies that **a 25k corpus via the same /loop fan-out pattern would consume ~85% of weekly cap** — way past the "leave headroom for retries" risk threshold. 5k was the right pick: it left ~83% of cap untouched for everything else (the LoRA train iteration, the article-publishing work, the next vertical's scaffold). Had we picked 25k on the pre-flight's 27% projection, we'd have burned past 100% and stalled mid-build for weekly cycle reset.
+
+### What this tells the next builder
+
+- **Pre-flight against your actual orchestration shape, not your dry-run shape.** Single-session dry-runs are cheap to do but they only measure one of the available cost points. If you're going to use fan-out, dry-run the fan-out shape (one subagent call, measure tokens-per-row including spawn overhead).
+- **Conservative N + aggressive orchestration > ambitious N + conservative orchestration.** 5k via fan-out (~17% cap, ~4h wall) is strictly better than 25k via sequential (~3% cap, ~50h wall across many days) for any project where time-to-train matters more than corpus-size-vs-quality scaling.
+- **/loop dynamic mode is the right tool for mechanical-stop-condition long-running builds.** Self-paced with aggressive inline iteration (no wake-up delay) beats both /goal (autonomous-burn with judge overhead) and manual per-turn driving (slow, easy to lose place).
+- **Failure shape matters more than failure rate.** 1 transient failure in 88 chunks (~1%) is fine if recovery is single-chunk re-spawn. The same 1% rate with whole-batch retry would be catastrophic.
+
+---
+
 ## What this article does NOT cover
 
 - The actual W3 production LoRA train (separate article in the HANDOFF backlog: "Article: W3 LoRA stack on Spark + in-CC-session pattern + local-SLM routing"). This article is the *decisions before* the train; that one is the *mechanics of* the train.
