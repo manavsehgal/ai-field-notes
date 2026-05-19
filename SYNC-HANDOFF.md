@@ -1,11 +1,11 @@
 <!--
-  ✅ STATUS: SHIPPED — Mac swept at destination commit manavsehgal/ainative-business.github.io@df0066c on 2026-05-17.
+  ⚠️ STATUS: NEW — drop received, awaiting Mac sweep.
   This file is one feature/release at a time, not a running log.
   At the next release prompt, **clear this entire file and start fresh** (do NOT append to existing sections).
-  Last reset: 2026-05-17 (patent-strategist v1 baseline article + fieldkit v0.4.3 + skills-in-git).
+  Last reset: 2026-05-19 (patent-strategist W3 data-prep article + corpus-contamination signature).
 
   Prior Mac sweep receipts (preserved here since SYNC-HANDOFF is per-release-not-running-log):
-  - 2026-05-17 patent-strategist-v1-baseline cycle: swept at destination commit manavsehgal/ainative-business.github.io@df0066c (this PR).
+  - 2026-05-17 patent-strategist-v1-baseline cycle: swept at destination commit manavsehgal/ainative-business.github.io@df0066c (Mac PR against this repo).
   - 2026-05-16 medical-vertical / II-Medical-8B-GGUF cycle: swept at destination commit manavsehgal/ainative-business.github.io@10a74a5 (Mac PR #8, merged 2026-05-16 at ac1b427).
   - 2026-05-15 fieldkit v0.4.2 cycle: swept at destination commit manavsehgal/ainative-business.github.io@495196d (Mac PR #7, merged 2026-05-16 at d332d28).
   - 2026-05-15 cyber-vertical cycle: swept at destination commit manavsehgal/ainative-business.github.io@135bcad (Mac PR #6 merged 2026-05-15).
@@ -15,26 +15,20 @@
   - 2026-05-12 Autoresearch→MTBM rename: swept at destination commit manavsehgal/ainative-business.github.io@71293af (Mac PR #2, merged).
 -->
 ---
-release_slug: 2026-05-17-patent-strategist-v1-baseline
-status: SHIPPED
-source_range: f005b52..17f59ee
+release_slug: 2026-05-19-patent-strategist-W3-data-prep-article
+status: NEW
+source_range: 17f59ee..280ad3c
 articles_added:
-  - slug: patent-strategist-v1-baseline-on-spark    # status: published — three-mode bracket on R1-0528-Qwen3-8B Q5_K_M, signature: PatentBracketSignature
+  - slug: fine-tune-data-prep-decisions-on-spark    # status: published — three-misdiagnoses field report on the W3 fine-tune, signature: CorpusContaminationLayers
 articles_updated: []
 signatures_added:
-  - component: src/components/svg/PatentBracketSignature.astro    # 300x200 three-bar D-mcq ladder (closed 0.62 / retrieval 0.85 / oracle 0.95) + dashed random-4-choice baseline + dashed lift connectors (+0.225 / +0.100)
-artifacts_added: []                                  # no HF push this cycle — bench/eval article, not a model release
+  - component: src/components/svg/CorpusContaminationLayers.astro    # 300x200 horizontal-stacked bars showing 2797/5000 (55.94 percent) family-prefix leakage as the dominant accent, plus diversify (20.24 percent) and duplicate-of (6.22 percent) secondary bars. Footer: "the trainer was fine / the corpus was 56% contaminated"
+signatures_updated:
+  - component: src/components/svg/PatentBracketSignature.astro       # stroke-width normalization: 0.4/0.6 → 0.5 (grid), 0.7 → 1 (data trace). Incidental fix to unblock the validator's hard-invariant gate on this commit; no visual change worth flagging.
+artifacts_added: []                                  # no HF push this cycle — the W3 patent-strategist model is SHELVED pending corpus rebuild
 artifacts_updated: []
-fieldkit_modules_changed:
-  - eval                                             # patent-strategist format wired into VerticalBench.from_jsonl; 4 new scorers (patent_claim_validity, office_action_argument, irac_structure, prior_art_relevance + _full); mcq_letter promoted to top-level + bug-fix to findall-last so reasoning-model elimination-then-answer prose scores on the conclusion
-fieldkit_release:
-  version: 0.4.3
-  pypi: https://pypi.org/project/fieldkit/0.4.3/
-  tag: fieldkit/v0.4.3
-  notes: |
-    Adds patent-strategist scorer family (4 new scorers + dispatch map + rubric markdown
-    bundled in wheel). mcq_letter promoted from internal to top-level export. No schema
-    breakage. PyPI live; install with `pip install fieldkit==0.4.3`.
+fieldkit_modules_changed: []                         # no fieldkit changes this cycle
+fieldkit_release: null
 papers_added: []
 papers_classify_count: 0
 renames_to_replay: []
@@ -42,61 +36,63 @@ removes: []
 new_top_level_pages: []
 breaking_changes: []
 destination_overrides_to_preserve:
-  - "Live home page lists 40 articles vs local's 39 published. The 2-article gap is the two Mac-authored landing pages already on live (`ai-transformation`, `solo-builder-case-study`) — Mac owns those, no Spark sweep action needed. If Mac wants to formalize this in `mirrors/destination-overrides.md`, the placeholder file is still empty pending the first inventory PR."
+  - "Live home page count and stage counts shift with this release — 40 published articles now (was 39). The 2-article gap to the Mac-authored landing pages (`ai-transformation`, `solo-builder-case-study`) persists; Mac owns those. If Mac wants to formalize, the `mirrors/destination-overrides.md` placeholder remains pending the first inventory PR."
 hf_repos_added: []
 civitai_artifacts_added: []
-post_rotation_commits:
-  - 17f59ee  # patent-strategist: flip baseline article upcoming → published
+post_rotation_commits: []
 ---
 
-## Headline
+## What shipped this cycle
 
-The patent-strategist v1 **three-mode bracket** ships as a published article. `DeepSeek-R1-0528-Qwen3-8B Q5_K_M` ran the 200-row `patent-strategist-v0.1` bench under closed-book, retrieval, and oracle context modes; D-mcq accuracy climbs **0.625 → 0.850 → 0.950**; overall mean across the 90 scorer-supported rows (B + D-mcq + D-irac) lands **0.397 → 0.489 → 0.541**. Closed-to-retrieval lift is **2.25× the retrieval-to-oracle gap** — the bracket says fine-tune the model first, retriever upgrades later. Three scaffold bugs surfaced mid-flight (options-blind D-mcq prompts, first-Option-wins `mcq_letter` regex, max-tokens truncation mid-`<think>`); two are patched in this release, one is deferred to W4.
+One published deep-dive essay at `articles/fine-tune-data-prep-decisions-on-spark/` (~3400 words) reporting on the W3 patent-strategist fine-tune cycle that failed three times in a row. The article's narrative arc walks the three rounds of misdiagnosis the author hit before finding the actual bug:
 
-This cycle also ships `fieldkit v0.4.3` on PyPI — the patent-strategist scorer family (`patent_claim_validity`, `office_action_argument`, `irac_structure`, `prior_art_relevance` + `_full`), the `mcq_letter` findall-last fix, and a 26-item kwarg-drift docs cleanup that takes the `--strict-kwargs` audit to **0 FAIL / 0 WARN**.
+1. **Round 1 — BOS/EOS misdiagnosis (session 39).** First train completed in 128 min wall with a clean monotonic loss curve. Probe row 1 ran the full `max_new_tokens=4096` budget without closing `</think>`. Diagnosed as missing BOS+EOS bookends in the training text. Memory `feedback_sft_eos_bos_explicit` saved. Fix patched in `scripts/build_train_jsonl.py` and the corpus was re-encoded.
 
-## What Mac CC sweeps
+2. **Round 2 — catastrophic forgetting (session 40).** Retrain ran for 131 min — identical loss curve to s39. Probe row 1 *still* failed (399s wall, `has_think=False`). Investigation: read TRL 1.4's `DataCollatorForLanguageModeling.torch_call()` source. It pads labels with literal `-100`, not by checking pad-token-id positions. Real EOS at the end of unpadded rows is in the gradient. The round-1 diagnosis was wrong about the layer. Reproduced AIME row 1 in isolation — model opens `<think>`, emits Korean Hangul mojibake, falls into a degenerate repetition loop (`1000=2^3*5^3 …` repeating ~40×), never closes `</think>`. Catastrophic forgetting on out-of-distribution input — real but incomplete.
 
-Spark-authoritative files (per `[[reference_sync_contract]]`). No destination-side rewrites, no schema changes, no renames.
+3. **Round 3 — corpus contamination (the actual bug).** Patent-only probe (10 rows) showed presence=1.00 but think length=126 tok vs baseline 1252 (10× shorter). Reading per-row output exposed: no spaces between words, synth-pipeline meta-state leaking at start of every `<think>` block (`A1duplicateof3886.Diversifybyemphasizingthe§103…`), and hallucinated case cites (`Mayo Clinic v. Klein Electric` — Klein Electric doesn't exist; real case is *Mayo v. Prometheus*). Audited the source corpus: 2797/5000 rows (**55.94 percent**) have family-prefix meta in `<think>`, 311 (6.22 percent) have "duplicate of N", 1012 (20.24 percent) have "diversify by". The synth pipeline's producer-subagent state leaked verbatim into 56 percent of training rows.
 
-- **`articles/patent-strategist-v1-baseline-on-spark/article.md`** — NEW article, **`status: published`** with the full 9-section draft. Frontmatter: `product: Foundation`, `stage: fine-tuning`, `difficulty: advanced`, `time_required: "~10 hours (mostly automated overnight sweeps)"`, `tags: [eval, rag, reasoning-models, llama-cpp, deepseek-r1, vertical-bench, patent-strategist]`, `signature: PatentBracketSignature`. Body carries the three-mode bracket fn-diagram (color-distinct indigo/blue/primary lanes converging on a haloed model + scorer endpoint with right-edge score callouts), the eval-scaffold-and-bench overview, the journey (picking the model, picking the quantization, standing up llama-server with embedded console code blocks, building the eval driver, plausibility checks), the results table with the full closed/retrieval/oracle ladder, three findings, three bug retros, the targeted-fine-tune unlock, and a closing tie-back to the next-vertical scaffold.
-- **`articles/patent-strategist-v1-baseline-on-spark/transcript.md`** — provenance for the article (drafted mid-T10 sweep). One-page session-source record.
-- **`src/components/svg/PatentBracketSignature.astro`** — NEW signature (300×200) for the card thumbnail on `/stage/fine-tuning/`. Three bars labeled `closed / retrieval / oracle` at heights 0.625 / 0.850 / 0.950, indigo→blue→primary gradient, with the dashed 0.25 random-4-choice baseline, halo behind the oracle bar, and two dashed connector lines carrying the `+0.225` and `+0.100` lift labels. Footer caption hammers the headline thesis: *"closed-to-retrieval lift is 2.25× the retrieval-to-oracle gap → fine-tune the model first, retriever upgrades later"*.
-- **`evidence/patent-strategist/baseline-runs/`** — NEW evidence root. Five run-dirs:
-    - `20260517-102017-retrieval-retonly-4da81a/` — retrieval-only 3-row smoke (no inference)
-    - `20260517-104509-retrieval-518c10/` — 5-row retrieval smoke (post-server-up)
-    - `20260517-104908-retrieval-136ef4/` — full 200-row retrieval sweep, 3h22m, overall 0.489
-    - `20260517-141203-oracle-e6885f/` — full 200-row oracle sweep, 2h52m, overall 0.541
-    - `20260517-170410-closed-b8cfe9/` — full 200-row closed-book sweep, overall 0.397 (initial 175 + 13min E-tail resume after power outage)
-- **`scripts/seed_patent_bench.py`** — NEW (~530 LOC, stdlib-only). 200-row bench seeder via Claude Opus through `claude -p` OAuth; landed in session 25.
-- **`scripts/review_patent_bench.py`** — NEW (~370 LOC, stdlib-only). Human-in-the-loop review CLI with atomic per-decision JSONL rewrite; synthesized-rows-first priority; smoke-tested round-trip clean.
-- **`scripts/run_rag_baseline.py`** — NEW (~500 LOC). T10 driver, three modes (closed/retrieval/oracle) + retrieval-only side-mode; BGE-small/FAISS lookup; OpenAI-compatible chat client; scorer dispatch to `PATENT_STRATEGIST_SCORER_FNS`. Now renders D-mcq `options` as labeled choices (the prior version dropped them on the floor — caught on a 5-row smoke that scored 5/5 because R1 invented plausible options).
-- **`scripts/rescore_predictions.py`** — NEW small helper. Replays scorers against an existing `predictions.jsonl` in place after a scorer-fix; regenerates `scores.json`. Used here after the `mcq_letter` findall-last fix lifted retrieval D-mcq 0.775 → 0.850 without re-running inference.
-- **`scripts/resume_closed_e_tail.py`** — NEW one-off recovery script. Power outage truncated the closed-book sweep at row 175/200; this resumes the missing 25 E-shape rows against the same llama-server endpoint and appends to the same `predictions.jsonl`.
-- **`scripts/build_rag_index.py`** — NEW (W1 T3). BGE-small + FAISS IndexFlatIP build over the patent-strategist corpus; 39,777 vectors total.
-- **`scripts/pull_mpep_static.py`** — NEW (T2 followup). USPTO static-HTML MPEP mirror puller; 2,047 subsections, 4,437 chunks; takes prosecution-query retrieval ceiling from 0.74 → 0.85.
-- **`scripts/pull_patentmatch_naumann.py`** — NEW (T2 followup). Reverse-engineered HiDrive share-token flow for canonical HPI-Naumann PatentMatch; 25,340 EPO claim-pair rows.
-- **`fieldkit/src/fieldkit/eval/__init__.py`** + **`fieldkit/tests/eval/test_mcq_letter.py`** — EXTENDED. `mcq_letter` now uses `re.findall(...)[-1]` so reasoning-model elimination prose (`"Option A is incorrect ... Option D is incorrect ... Answer: B"`) scores on the conclusion rather than the first eliminated distractor. New test `test_concluding_answer_wins_over_elimination` locks the behavior; +3 correct rows on retrieval D-mcq (40-row slice).
-- **`fieldkit/` v0.4.3 on PyPI** — patent-strategist scorers shipped (`fieldkit.eval.vertical.PATENT_STRATEGIST_SCORER_FNS`), rubric markdown bundled in wheel. 507 passed / 2 skipped in suite. **No code-only change required on Mac side** — `fieldkit/docs/api/` pages already mirror the new symbols (audit pass landed in `ae85b66`).
-- **`src/data/project-stats.json`** — auto-refreshed twice this cycle: first after the upcoming-placeholder commit (`1c3e23a` — articles `38 published + 5 upcoming`), then again after the `upcoming → published` flip (`17f59ee` — articles `39 published + 4 upcoming = 43 total`). Word total **130,727** (up from 127,405 on the flip — the article's prose was excluded while it carried `status: upcoming`). LOC unchanged at 25,508. Fine-tuning stage moved from 8 → 9. `DGX Spark` product climbed to 31 (tied with NIM).
-- **`.claude/skills/` tree** — NEW in git. The operational skills layer is now versioned alongside the source. Mac CC's skill tree is separate (`~/.claude/skills/` on Mac); this is the Spark CC user-config layer (`tech-writer`, `hf-publisher`, `hf-model-scout`, `fieldkit-curator`, `frontier-scout`, `nvidia-learn-stats`, etc.). Per `[[reference_sync_contract]]`: skills are Mac-and-Spark each-own-their-own; **no Mac sweep action needed**.
+The article lands the lesson upstream of the trainer: corpus-quality gates are 20× cheaper than retrain-and-debug, and an emission-only probe gate can't catch corpus contamination — a content gate (LLM judge on think coherence) is the missing piece.
 
-### Auto-refreshed (no Mac-side action needed)
+Voice is the standard ai-field-notes deep-dive essay: first-person, fork-by-fork, measured numbers, every claim backed by a specific incident. 8 explainers (2× `:::define`, 2× `:::why`, 2× `:::pitfall`, 1× `:::math`, 1× `:::deeper`, 1× `:::hardware`). One inline `<figure class="fn-diagram">` (dual-path comparison: intended pipeline vs actual three-rounds-of-misdiagnosis trajectory; 900×440 viewBox). New signature SVG `CorpusContaminationLayers.astro` (300×200 horizontal-stacked bars — 56 percent family-prefix as accent, 20 percent diversify and 6 percent duplicate-of as secondaries; footer *"the trainer was fine / the corpus was 56% contaminated"*).
 
-The stats infographic + README article index reflect the new article entry and the `upcoming → published` flip. Top-level numbers shifted as noted above. The `/stage/fine-tuning/` page now renders the patent-strategist card with the `PatentBracketSignature` thumbnail (verified via Playwright smoke; zero console errors).
+## Mac sweep guidance
 
-## What Mac CC does NOT need to do
+This is a content-only release — one new article, two SVG components (one new, one stroke-width patch), three forensic probe JSONs, one helper script. No fieldkit release, no HF push, no renames, no schema changes.
 
-- **No fieldkit destination action.** `fieldkit/docs/api/` is the canonical reference layer and already mirrors v0.4.3's exports (the kwarg-drift baseline was cleared in `ae85b66`). PyPI publishing is automated from the fieldkit-curator skill — Mac doesn't republish.
-- **No HF push.** This is a bench/eval cycle, not a model release. No `Orionfold/*` repo lands this cycle.
-- **No artifact manifest.** `src/content/artifacts/` is unchanged; no new YAML.
-- **No rename replays.** `SYNC-RENAMES.log` unchanged since the 2026-05-14 Orionfold rename (already swept complete at Mac PR #3).
-- **No new top-level pages.** The new article folder is under the existing `articles/` content collection; no new section, no new stage page (existing `fine-tuning` filter renders it via `signature: PatentBracketSignature`).
-- **No skill IA mirroring.** Skills live under each side's `.claude/skills/` independently.
-- **No destination-overrides change from us.** The 2-article gap between local home (39 published) and live home (40 articles) is the two Mac-authored landing pages (`ai-transformation`, `solo-builder-case-study`); this remains a Mac-owned concern. If Mac wants to surface those counts in `src/data/project-stats.json` so the local home matches the live count, the proper channel is the placeholder `mirrors/destination-overrides.md` per `[[reference_destination_overrides_mirror]]`.
+**Files Mac should sweep on the destination side:**
 
-## Notes for the next sync
+- `articles/fine-tune-data-prep-decisions-on-spark/article.md` (new) — published, `series: Machine that Builds Machines`, `stage: fine-tuning`, `signature: CorpusContaminationLayers`
+- `articles/fine-tune-data-prep-decisions-on-spark/transcript.md` (new) — provenance file, not user-rendered but synced for parity
+- `src/components/svg/CorpusContaminationLayers.astro` (new signature)
+- `src/components/svg/PatentBracketSignature.astro` (stroke-width fix only — no visual diff worth re-eyeballing on destination, but the file changed)
+- `src/data/project-stats.json` (refreshed: now 40 articles / 134,203 words / 25,508 LOC)
+- `README.md` (regenerated by `refresh_readme.py`)
 
-- **patent-strategist W3 — fine-tune kickoff** is the next track. The bracket measured a closed-to-retrieval gap of 22.5 percentage points on D-mcq; W3 will GRPO-fine-tune R1-0528-Qwen3-8B against the deterministic-scorable shapes (D-mcq + D-irac) to close that specific gap. That cycle will likely cut a new fieldkit minor (`fieldkit.training` extensions for the patent reward function) and ship a new article. ETA ~2 weeks of overnight runs.
-- **A-shape + D-oa scorer signature mismatch** is a small W4 follow-up. `score_prediction(shape, prediction, gold_label)` raises TypeError on `patent_claim_validity` (A) and `office_action_argument` (D-oa) for both retrieval and oracle runs — same pattern across all three modes, so the inter-mode comparison is unaffected, but the scorer signature wants either a `judge=` kwarg or a structured-gold wrapper. Tracked in spec §3.5 Judge-backend follow-up.
-- **Spec evolution.** `specs/patent-strategist-v1.md` predates the eval matrix's actual results; §3.5 (Judge backend), §5.5 (1000-row ramp), §5.6 (reasoning-budget cap) all want a post-bracket revision. Holding for the W3 follow-up.
+**Files that are source-only (do not sweep):**
+
+- `probes/patent-strategist-v1-2026-05-19.json` — forensic probe output (4-row aborted run from s39)
+- `probes/patent-strategist-v1-2026-05-19.patent-only.json` — patent-only probe (10 rows, s40), referenced by the article as evidence
+- `probes/patent-only-10q.jsonl` — filtered probe set (10 patent rows)
+- `scripts/build_train_jsonl.py` — corpus→text-shape conversion (with the BOS/EOS fix that turned out unnecessary at trainer level)
+
+All in `probes/` and `scripts/` per the SYNC-CONTRACT — Spark-authoritative, Mac doesn't render these.
+
+**Confirmation points:**
+
+1. Home page "At a glance" infographic should re-render with article count = 40 (was 39 last cycle).
+2. Stage filter `/stage/fine-tuning/` should show the new card with `Article №NN` (ordinal is git-first-add derived; let `article-order.mjs` compute it on destination).
+3. Series filter `/series/machine-that-builds-machines/` should include the new article.
+4. Card on home + stage pages should render the `CorpusContaminationLayers` signature thumbnail (300×200, three horizontal bars, indigo-primary accent on the 56 percent bar).
+5. The inline fn-diagram in the article body should render at 900×440 viewBox via the existing `.prose .fn-diagram` breakout CSS. No new diagram-system changes required.
+
+## What did NOT ship
+
+- **The W3 patent-strategist model is SHELVED** (16.38 GB merged-BF16 sits on the Spark, not promoted to HF). No `Orionfold/patent-strategist-v1-GGUF` push this cycle. The paired bench dataset `Orionfold/patent-strategist-bench-v0.1` is held pending corpus rebuild.
+- **No fieldkit release.** No promotion candidates landed in `[Unreleased]` this cycle.
+- **No renames.** SYNC-RENAMES.log unchanged.
+- **No new top-level pages.** Mac chrome surfaces (`/book/`, `/pricing/`, `/about/`, `/artifacts/<kind>/`) are untouched.
+
+## Next cycle expectations
+
+The patent-strategist arc resumes after a corpus rebuild step (write `scripts/clean_corpus_meta.py` to strip the leaked meta-state; patch `claude-corpus-synth/verify_chunk.py` to refuse contaminated chunks at write time; rerun the 5k synth with the cleaner inline; retrain for ~131 min; reprobe with a content gate added). Best-case timeline for the next paired-drop publish (model + bench): 2-3 sessions, gated on corpus rebuild + content-judging probe scaffold. The next sync drop from this branch will either be that paired drop or a smaller article-only sync if the corpus rebuild blocks.
