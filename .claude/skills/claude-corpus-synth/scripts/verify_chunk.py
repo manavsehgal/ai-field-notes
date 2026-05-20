@@ -50,6 +50,11 @@ MIN_RESPONSE_CHARS = 400
 META_FAMILY_PREFIX_RE = re.compile(r"^\s*(A[124]|E[12])(\s|:|\.|duplicate|spice)", re.IGNORECASE)
 META_DUPLICATE_OF_RE = re.compile(r"\bduplicate\s+of\s+\d+", re.IGNORECASE)
 META_DIVERSIFY_RE = re.compile(r"\bdiversify\s+by\b", re.IGNORECASE)
+# R<digits> row references — the surface form that surfaced in chunk_100_124
+# (cursor=100, 2026-05-19). "For R120 the paralegal audience can handle …"
+# or "R5, R29, R47 have hit MBA-audience framings" are clear producer-state
+# leaks but were not caught by the original three regexes.
+META_ROW_REF_RE = re.compile(r"\bR\d{2,4}\b")
 
 
 def infer_range(path: Path) -> tuple[int, int] | None:
@@ -111,6 +116,7 @@ def verify(path: Path, lo: int | None = None, hi: int | None = None) -> int:
     meta_family_prefix: list[int] = []
     meta_duplicate_of: list[int] = []
     meta_diversify_by: list[int] = []
+    meta_row_ref: list[int] = []
 
     for r in rows:
         idx = r.get("row_idx", "?")
@@ -137,6 +143,8 @@ def verify(path: Path, lo: int | None = None, hi: int | None = None) -> int:
                 meta_duplicate_of.append(idx)
             if META_DIVERSIFY_RE.search(think_content):
                 meta_diversify_by.append(idx)
+            if META_ROW_REF_RE.search(think_content):
+                meta_row_ref.append(idx)
 
     if missing_think:
         fails.append(f"missing <think>...</think> on rows {missing_think}")
@@ -154,6 +162,10 @@ def verify(path: Path, lo: int | None = None, hi: int | None = None) -> int:
     if meta_diversify_by:
         fails.append(
             f"producer meta-state leak — 'diversify by …' instruction in <think>: rows {meta_diversify_by}"
+        )
+    if meta_row_ref:
+        fails.append(
+            f"producer meta-state leak — 'R<digits>' sibling-row callout in <think>: rows {meta_row_ref}"
         )
 
     # MPEP audit: sections outside the known list → warn (not fail)
@@ -175,7 +187,8 @@ def verify(path: Path, lo: int | None = None, hi: int | None = None) -> int:
     print(
         f"  Meta-state:    family-prefix={len(meta_family_prefix)} ({len(meta_family_prefix)/n*100:.0f}%) "
         f"duplicate-of={len(meta_duplicate_of)} ({len(meta_duplicate_of)/n*100:.0f}%) "
-        f"diversify-by={len(meta_diversify_by)} ({len(meta_diversify_by)/n*100:.0f}%)"
+        f"diversify-by={len(meta_diversify_by)} ({len(meta_diversify_by)/n*100:.0f}%) "
+        f"row-ref={len(meta_row_ref)} ({len(meta_row_ref)/n*100:.0f}%)"
     )
 
     for w in warns:

@@ -50,6 +50,7 @@ Before writing each row, **strip ALL of the following from the `<think>` body** 
 2. **`duplicate of N` annotations.** If the prompt is a duplicate in your slice, handle the de-duplication framing internally — never write the phrase `duplicate of <number>` into `<think>`.
 3. **`diversify by …` instructions.** Diversification angles are your routing logic. The output reads as if a single practitioner thought through the problem. No meta-instruction phrasing.
 4. **Anything that reads like producer state** — spice-combinator notes, queue-position references, sibling-row callouts, "this is the second framing of …", etc.
+5. **`R<digits>` row references AND `For R<digits>` framings.** Never write `"R105 hit the MBA-audience framing"` or `"For R120 the paralegal audience can handle …"` or `"R5, R29, R47 have already covered …"`. The integer-suffixed `R`-tag is producer routing telemetry — the patent practitioner has no R-numbers in their head. The verifier rejects any `\bR\d{2,4}\b` token in the `<think>` body.
 
 If your draft `<think>` begins with `"A2 duplicate of 1287. Diversify by emphasizing the §103 angle. The claim recites …"` — rewrite it as `"The claim recites a problematic term: …"` before serialization. The substance moves; the meta vanishes.
 

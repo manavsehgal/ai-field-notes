@@ -26,7 +26,7 @@
 
 | Articles | Words | Lines of code | Models | NVIDIA products |
 |:-:|:-:|:-:|:-:|:-:|
-| **41** *(+4 upcoming)* | **137,670** | **25,508** | **8** | **11** |
+| **41** *(+5 upcoming)* | **137,670** | **25,508** | **8** | **11** |
 
 ### Stages
 
@@ -34,7 +34,7 @@
 |---|:-:|:-:|
 | [Foundations](https://ainative.business/field-notes/stage/foundations/) | 12 | — |
 | [Training](https://ainative.business/field-notes/stage/training/) | 12 | 1 |
-| [Fine-tuning](https://ainative.business/field-notes/stage/fine-tuning/) | 11 | 1 |
+| [Fine-tuning](https://ainative.business/field-notes/stage/fine-tuning/) | 11 | 2 |
 | [Inference](https://ainative.business/field-notes/stage/inference/) | 14 | — |
 | [Deployment](https://ainative.business/field-notes/stage/deployment/) | 6 | — |
 | [Agentic](https://ainative.business/field-notes/stage/agentic/) | 14 | — |
@@ -103,6 +103,7 @@ Each article is a deep-dive essay grown from a single session transcript on the 
 - **[ClawGym on Spark — A 7B Base, A LoRA Adapter, and the +15 pp the Adapter Earned](https://ainative.business/field-notes/articles/clawgym-on-spark/)** — ClawGym shipped only a .github profile, so we built the substrate ourselves — persona task synth, sandbox harness, 200-task corpus, LoRA SFT, matched-base eval. The adapter earns +3.8 pp task pass and +15.0 pp per-assertion against its own base. The diagnostic is the lift.
 - **[Distilling the Architect — A 3B LoRA Trained on the Agent's Own Trajectory](https://ainative.business/field-notes/articles/distill-architect-lora-from-trajectories/)** — A4's 50-iter trajectory becomes training data for a Qwen2.5-3B LoRA proposer. Holding out 8 iters, the 3B mode-collapses onto d_model=768 (the trajectory's most-frequent keep) and matches 0 / 8 exact; the 8B at T=0.5 matches 4 / 8 of its own past picks.
 - **[LoRA on Your Own Q&A — What 231 Pairs Actually Teach a 3B Model](https://ainative.business/field-notes/articles/lora-on-your-own-qa-pairs/)** — 231 own-voice Q&A pairs, a rank-16 LoRA, 69 s of training on a GB10 Spark. The adapter won't memorize your exact numbers, but it will take a model that refuses 61% of questions about your work and turn it into one that answers all of them in your voice. For facts you still need RAG.
+- 🔜 **[Synthetic Corpus Frameworks on the Spark — From a Bespoke Pipeline to an Orchestration Layer](https://ainative.business/field-notes/articles/synthetic-corpus-frameworks-on-spark/)** *(planned 2026-06-15)* — A bespoke synth pipeline got 200 rows into a 5000-row reasoning corpus before a fourth meta-state surface form forced a retreat. The diagnosis: a regex-floor approach cannot catch novel surface forms by construction. The fix is the open-source orchestration layer.
 - 🔜 **[LoRA on Nemotron Nano — Fine-tuning a 9B Without Blowing Unified Memory](https://ainative.business/field-notes/articles/lora-fine-tune-nemotron-on-spark/)** *(planned 2026-05-14)* — A planned walk through LoRA fine-tuning on Nemotron Nano 9B with NeMo Customizer: rank and alpha sweeps, a tiny domain corpus, and the memory accounting that keeps a PEFT run from tripping the Spark's 128 GB unified-memory wall.
 
 ### Inference
