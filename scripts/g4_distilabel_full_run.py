@@ -56,10 +56,18 @@ OUT_DIR = Path("/home/nvidia/data/aifn-corpus-v2/full-5000")
 NIM_BASE_URL = "http://172.17.0.1:8000/v1"
 MODEL = "nvidia/nemotron-nano-9b-v2"
 
+# Skip rows already generated and salvaged from the prior c=8 attempt.
+# Salvaged rows are at /home/nvidia/data/aifn-corpus-v2/salvaged-128/out.jsonl
+# and will be concat'd with this run's output post-hoc.
+SKIP_ROWS_BELOW = int(os.environ.get("G4_SKIP_ROWS_BELOW", "128"))
+
 
 def load_full_queue() -> list[dict]:
     with QUEUE.open() as f:
-        return [json.loads(line) for line in f if line.strip()]
+        rows = [json.loads(line) for line in f if line.strip()]
+    if SKIP_ROWS_BELOW > 0:
+        rows = [r for r in rows if r["row_idx"] >= SKIP_ROWS_BELOW]
+    return rows
 
 
 def main() -> None:
@@ -82,22 +90,25 @@ def main() -> None:
         max_retries=3,
     )
 
+    # All step batch sizes aligned at 32 so batches flow through without
+    # repacking. Memory headroom (28 GB free, vLLM KV-cache <1% used at
+    # c=8) supports 32× concurrent NIM requests.
     with Pipeline(name="patent-corpus-v2-full-5000") as pipeline:
-        loader = LoadDataFromDicts(name="loader", data=rows, batch_size=8)
-        retriever = MPEPRetriever(name="retriever", input_batch_size=8)
+        loader = LoadDataFromDicts(name="loader", data=rows, batch_size=32)
+        retriever = MPEPRetriever(name="retriever", input_batch_size=32)
         generator = TextGeneration(
             name="generator",
             llm=llm,
             system_prompt=SYSTEM_PROMPT,
             template=USER_TEMPLATE,
             columns=["mpep_context", "prompt"],
-            input_batch_size=8,
+            input_batch_size=32,
             num_generations=1,
         )
         keeper = KeepColumns(
             name="keeper",
             columns=["row_idx", "family", "prompt", "mpep_context", "generation"],
-            input_batch_size=8,
+            input_batch_size=32,
         )
         loader >> retriever >> generator >> keeper
 
