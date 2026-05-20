@@ -16,8 +16,6 @@ Per HANDOFF G3.2 + G2 findings:
     inside the reasoning block).
   - temperature 0.6, top_p 0.95 per Nemotron defaults.
 """
-from __future__ import annotations
-
 import json
 import os
 import re
@@ -34,7 +32,7 @@ import pandas as pd
 
 from distilabel.llms import OpenAILLM
 from distilabel.pipeline import Pipeline
-from distilabel.steps import KeepColumns, LoadDataFromDicts, Step, StepInput
+from distilabel.steps import KeepColumns, LoadDataFromDicts, Step, StepInput, StepOutput
 from distilabel.steps.tasks import TextGeneration
 from sentence_transformers import SentenceTransformer
 
@@ -94,27 +92,32 @@ class MPEPRetriever(Step):
             out.append(f"### MPEP {title}\n{row['text'][:1200]}")
         return "\n\n".join(out)
 
-    def process(self, *inputs: StepInput):
-        for batch in inputs:
-            for input in batch:
-                input["mpep_context"] = self._retrieve(input["prompt"])
-            yield batch
+    def process(self, inputs: StepInput) -> StepOutput:
+        for row in inputs:
+            row["mpep_context"] = self._retrieve(row["prompt"])
+        yield inputs
 
 
 def split_think(raw: str) -> tuple[str, str]:
     """Apply NIM's 'assistant prefix = <think>' convention.
 
     Prepend `<think>\n` to the response, take everything before the first
-    `</think>` as chain, treat the rest as answer (with any stray second
-    `<think>...</think>` block stripped out).
+    `</think>` as chain, treat the rest as answer. Scrub the answer of any
+    stray paired `<think>...</think>` blocks AND any orphan `<think>`/`</think>`
+    tokens — in practice the model emits an unclosed `<think>` opener about
+    84% of the time on this teacher, wrapping the actual answer text.
     """
     decorated = "<think>\n" + raw
     if "</think>" not in decorated:
         return "", decorated.strip()
     chain, rest = decorated.split("</think>", 1)
     chain = chain.removeprefix("<think>\n").strip()
-    rest = re.sub(r"<think>.*?</think>", "", rest, flags=re.DOTALL).strip()
-    return chain, rest
+    rest = re.sub(r"<think>.*?</think>", "", rest, flags=re.DOTALL)
+    rest = re.sub(r"</?think>", "", rest)
+    # Model emits `<>` and stray `…` as section dividers in ~14% of answers.
+    rest = re.sub(r"…?\s*<>\s*", "\n\n", rest)
+    rest = re.sub(r"\n{3,}", "\n\n", rest)
+    return chain, rest.strip()
 
 
 def load_50_rows(seed: int = 42, n: int = 50) -> list[dict]:
@@ -184,28 +187,30 @@ def main():
     distiset.save_to_disk(str(OUT_DIR / "distiset"))
     print(f"Saved distiset to {OUT_DIR / 'distiset'}", flush=True)
 
-    # Materialize to plain JSONL with chain/answer split
+    # Materialize to plain JSONL with chain/answer split.
+    # distiset structure: Distiset → {config: DatasetDict → {split: Dataset}}
     out_jsonl = OUT_DIR / "out.jsonl"
     n_with_answer = 0
     n_total = 0
     with out_jsonl.open("w") as fout:
         for sub in distiset:
-            for row in distiset[sub]:
-                raw = row.get("generation") or ""
-                chain, answer = split_think(raw)
-                rec = {
-                    "row_idx": row.get("row_idx"),
-                    "family": row.get("family"),
-                    "prompt": row.get("prompt"),
-                    "chain": chain,
-                    "answer": answer,
-                    "answer_chars": len(answer),
-                    "chain_chars": len(chain),
-                }
-                fout.write(json.dumps(rec) + "\n")
-                n_total += 1
-                if answer.strip():
-                    n_with_answer += 1
+            for split_name in distiset[sub]:
+                for row in distiset[sub][split_name]:
+                    raw = row.get("generation") or ""
+                    chain, answer = split_think(raw)
+                    rec = {
+                        "row_idx": row.get("row_idx"),
+                        "family": row.get("family"),
+                        "prompt": row.get("prompt"),
+                        "chain": chain,
+                        "answer": answer,
+                        "answer_chars": len(answer),
+                        "chain_chars": len(chain),
+                    }
+                    fout.write(json.dumps(rec) + "\n")
+                    n_total += 1
+                    if answer.strip():
+                        n_with_answer += 1
     print(f"\nWrote {n_total} rows → {out_jsonl}", flush=True)
     print(f"  with non-empty answer: {n_with_answer}/{n_total}", flush=True)
 
