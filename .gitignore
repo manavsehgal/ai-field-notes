@@ -37,6 +37,9 @@ articles/*/evidence/runs/
 
 __pycache__/
 
+# Unsloth + triton JIT scratch — root-owned, written by the in-container trainer
+unsloth_compiled_cache/
+
 # fieldkit Python build / venv detritus (keep alongside the package, not committed)
 fieldkit/build/
 fieldkit/dist/
