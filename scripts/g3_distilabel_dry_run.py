@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 """G3 — 50-row distilabel dry-run for patent corpus v2.
 
+⚠️ DEMOTED 2026-05-20 — HISTORICAL / REPRO-AUDIT ONLY.
+Superseded by NeMo DataDesigner + NIM (see ``ideas/uber-local-corpus-gen-decision.md``
+Phase 7 §613, "Delete / demote in the codebase"). The G3 dry-run flow is now
+replaced by Phase 3+4 of the pilot — see ``/tmp/dd-pilot/phase3/scale_100row.py``
+(to be moved into ``scripts/`` once v3 regen validates the recipe end-to-end).
+The ``split_think()`` helper below is still canonical and re-used by the
+DataDesigner driver as a post-process step; keep that import path stable.
+
 Pipeline:
   LoadDataFromDicts (50 rows from queue.jsonl)
     → MPEPRetriever (custom Step, FAISS top-3)

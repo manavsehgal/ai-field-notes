@@ -1,6 +1,16 @@
 #!/usr/bin/env python3
 """G4 — full 5000-row distilabel run for patent corpus v2.
 
+⚠️ DEMOTED 2026-05-20 — HISTORICAL / REPRO-AUDIT ONLY.
+Superseded by the NeMo DataDesigner + Curator + NIM stack per the validation
+pilot recorded in ``ideas/nemo-stack-validation-2026-05-20.md`` (Phase 4+5
+results) and locked-in by ``ideas/uber-local-corpus-gen-decision.md`` (Phase 7,
+"What unblocks immediately after this Phase 7 commit", §613). This file is
+preserved for the G4 RCA trail (distilabel silent-None failure mode → 3308/5000
+placeholder rows; see ``ideas/rca-g4-corpus-failure-2026-05-20.md``). DO NOT
+run for new corpora — use the dd-pilot:0.1 image + DataDesigner pipeline
+instead. distilabel is no longer a project dependency.
+
 Identical pipeline to scripts/g4 G3 dry-run, scaled to the full queue and
 restart-safe via distilabel's pipeline cache (`use_cache=True`).
 

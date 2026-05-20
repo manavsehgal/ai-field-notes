@@ -1,5 +1,18 @@
 """Prepare a deterministic JSONL queue of patent corpus prompts.
 
+⚠️ DEMOTED 2026-05-20 — SPICE F-STRING QUEUE CONSTRUCTION IS HISTORICAL.
+The lambda-based ``FAMILY_TEMPLATES`` + ``SPICE`` categorical-pool sampling
+below is preserved for the claude-corpus-synth in-CC-session pathway, but the
+**pigeon-hole defect** it caused on patent-strategist v2 (5000 target rows
+against a ~250-prompt pool, ~20× saturation; see
+``ideas/rca-g4-corpus-failure-2026-05-20.md`` defect 4 +
+``ideas/uber-local-corpus-gen-decision.md`` §209) means it MUST NOT be reused
+for new NIM-driven corpora at production volume. The NeMo DataDesigner stack
+(per uber doc Phase 7 §613) replaces this with ``SamplerColumnConfig`` +
+``LLMTextColumnConfig`` pools and a pigeon-hole pre-flight gate
+(uber doc §415). For new verticals: build pools as DataDesigner categorical
+columns, not f-string lambdas.
+
 Materializes N prompts following spec §6.1 + §5.3 family distribution into a
 JSONL queue that the claude-corpus-synth skill consumes in-CC-session. NO Claude
 calls — this is pure deterministic prep. Same `--seed` always yields the same
