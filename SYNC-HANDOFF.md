@@ -1,10 +1,11 @@
 <!--
-  ⚠️ STATUS: NEW — Mac sweep pending.
+  ⚠️ STATUS: SHIPPED — Mac swept at destination commit manavsehgal/ainative-business.github.io@902410f on 2026-05-19.
   This file is one feature/release at a time, not a running log.
   At the next release prompt, **clear this entire file and start fresh** (do NOT append to existing sections).
   Last reset: 2026-05-19 (Unsloth-on-Spark feasibility article + signature SVG).
 
   Prior Mac sweep receipts (preserved here since SYNC-HANDOFF is per-release-not-running-log):
+  - 2026-05-19 unsloth-on-spark-feasibility-article cycle: swept at destination commit manavsehgal/ainative-business.github.io@902410f (Mac PR #12 against this repo).
   - 2026-05-19 patent-strategist-bench-v0.1-published-plus-synth-skill-patches cycle: swept at destination commit manavsehgal/ainative-business.github.io@7b1b62e (Mac PR #11 against this repo).
   - 2026-05-19 patent-strategist-W3-data-prep-article cycle: swept at destination commit manavsehgal/ainative-business.github.io@c71a5bb (Mac PR #10 against this repo).
   - 2026-05-17 patent-strategist-v1-baseline cycle: swept at destination commit manavsehgal/ainative-business.github.io@df0066c (Mac PR #9 against this repo).
@@ -18,7 +19,7 @@
 -->
 ---
 release_slug: 2026-05-19-unsloth-on-spark-feasibility-article
-status: NEW
+status: SHIPPED
 source_range: 538d3a9..HEAD                # main was at 538d3a9 before this cycle's commit
 articles_added:
   - slug: unsloth-on-spark-feasibility     # series: Machine that Builds Machines; stage: fine-tuning; product: Foundation; signature: UnslothEnvelopeFlat; one inline fn-diagram (5-stage flow pipeline, accent on save_gguf); 11 explainers (4 define / 1 why / 3 pitfall / 1 math / 1 deeper / 1 hardware); ~2900 words; reproducibility appendix with container + package pins + recipe; covers C2 Q1+Q1b+Q2+Q3+Q5+Q6 gates green on `nvcr.io/nvidia/pytorch:25.11-py3` + Llama-3.1-Nemotron-Nano-8B-v1 + Unsloth 2026.5.5; headline metric is 16.94 GB peak GPU alloc across every GPU-resident stage (~5 GB under the s40 baseline of ~22 GB)
